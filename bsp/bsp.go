@@ -1,7 +1,12 @@
 package bsp
 
 import (
+	"errors"
+	"os"
+	"strings"
+
 	m "github.com/packetflinger/libq2/message"
+	u "github.com/packetflinger/libq2/util"
 )
 
 const (
@@ -13,12 +18,47 @@ const (
 )
 
 type BSPFile struct {
+	Name     string // just the filename minus extension (ex: "q2dm1")
+	Filename string // including any path prefix and .bsp extension
+	Handle   *os.File
+	Header   m.MessageBuffer
+}
+
+func OpenBSPFile(f string) (*BSPFile, error) {
+	if !u.FileExists(f) {
+		return nil, errors.New("no such file")
+	}
+
+	fp, e := os.Open(f)
+	if e != nil {
+		return nil, e
+	}
+
+	header := make([]byte, HeaderLen)
+	_, e = fp.Read(header)
+	if e != nil {
+		return nil, e
+	}
+	tokens := strings.Split(f, string(os.PathSeparator))
+	ftokens := strings.Split(tokens[len(tokens)-1], ".")
+
+	bsp := BSPFile{
+		Name:     ftokens[0],
+		Filename: f,
+		Handle:   fp,
+		Header:   m.NewMessageBuffer(header),
+	}
+
+	return &bsp, nil
+}
+
+func (b *BSPFile) Close() {
+	if b.Handle != nil {
+		b.Handle.Close()
+	}
 }
 
 // Make sure the first 4 bytes match the magic number
-func (bsp BSPFile) Validate(header []byte) bool {
-	msg := m.MessageBuffer{
-		Buffer: header,
-	}
-	return msg.ReadLong() == Magic
+func (bsp *BSPFile) Validate() bool {
+	return bsp.Header.ReadLong() == Magic
 }

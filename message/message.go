@@ -304,12 +304,12 @@ type CenterPrint struct {
 	Data string
 }
 
-func NewMessageBuffer(size int) MessageBuffer {
-	msg := MessageBuffer{}
-	msg.Buffer = make([]byte, size)
-	msg.Index = 0
-	msg.Length = 0
-	return msg
+func NewMessageBuffer(data []byte) MessageBuffer {
+	return MessageBuffer{
+		Buffer: data,
+		Index:  0,
+		Length: len(data),
+	}
 }
 
 func (m *MessageBuffer) Reset() {
