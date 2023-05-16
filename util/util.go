@@ -21,3 +21,17 @@ func FileExists(f string) bool {
 	}
 	return !info.IsDir()
 }
+
+// Remove any duplipcates
+func Deduplicate(in []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+
+	for _, entry := range in {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
