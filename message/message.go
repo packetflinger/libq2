@@ -2,6 +2,7 @@ package message
 
 import "bytes"
 
+// server to client message types
 const (
 	SVCBad = iota
 	SVCMuzzleFlash
@@ -66,7 +67,7 @@ const (
 	EntitySolid     = 1 << 27
 )
 
-// playerstate stuff
+// playerstate flags
 const (
 	PlayerType        = 1 << 0
 	PlayerOrigin      = 1 << 1
@@ -90,7 +91,7 @@ const (
 	PlayerMask = (1 << PlayerBits) - 1
 )
 
-// Sound
+// Sound properties
 const (
 	SoundVolume      = 1 << 0 // 1 byte
 	SoundAttenuation = 1 << 1 // 1 byte
@@ -99,7 +100,7 @@ const (
 	SoundOffset      = 1 << 4 // 1 byte, msec offset from frame start
 )
 
-// temporary entities
+// temporary entity types
 const (
 	TentGunshot = iota
 	TentBlood
@@ -191,6 +192,7 @@ type ServerFrame struct {
 	Flash2         []MuzzleFlash
 }
 
+// always the first message received from server
 type ServerData struct {
 	Protocol     int32
 	ServerCount  int32
