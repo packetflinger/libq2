@@ -2,6 +2,7 @@ package pak
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	m "github.com/packetflinger/libq2/message"
@@ -150,5 +151,45 @@ func (pak *PakFile) ParseFileData() error {
 		}
 		pak.Files[i].Data = blob
 	}
+	return nil
+}
+
+func (pak *PakFile) AddFile(f string) error {
+	for _, pf := range pak.Files {
+		if pf.Name == f {
+			return fmt.Errorf("%s already exists in pak", pf.Name)
+		}
+	}
+
+	data, e := os.ReadFile(f)
+	if e != nil {
+		return e
+	}
+
+	pak.Files = append(pak.Files, PackedFile{
+		Name:   f,
+		Length: len(data),
+		Data:   data,
+		// we don't care about setting an offset
+	})
+	return nil
+}
+
+func (pak *PakFile) RemoveFile(f string) error {
+	target := -1
+	for i, pf := range pak.Files {
+		if pf.Name == f {
+			target = i
+		}
+	}
+
+	if target == -1 {
+		return errors.New("file not found in pak")
+	}
+
+	// remove the file from the slice
+	filelist := pak.Files[:target-1]
+	filelist = append(filelist, pak.Files[target:]...)
+	pak.Files = filelist
 	return nil
 }

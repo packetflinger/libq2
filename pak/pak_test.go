@@ -19,3 +19,42 @@ func TestOpenPakFile(t *testing.T) {
 	}
 	pak.Close()
 }
+
+func TestAddFile(t *testing.T) {
+	pak, e := OpenPakFile("../testdata/test.pak")
+	if e != nil {
+		t.Errorf("%v", e)
+	}
+
+	e = pak.AddFile("../testdata/testfile.txt")
+	if e != nil {
+		t.Error(e)
+	}
+
+	if len(pak.Files) != 3 {
+		t.Error("Wrong file count")
+	}
+
+	if string(pak.Files[len(pak.Files)-1].Data) != "test\n" {
+		t.Error("new file contents mismatch")
+	}
+	pak.Close()
+}
+
+func TestRemoveFile(t *testing.T) {
+	pak, e := OpenPakFile("../testdata/test.pak")
+	if e != nil {
+		t.Errorf("%v", e)
+	}
+
+	e = pak.RemoveFile("test2.cfg")
+	if e != nil {
+		t.Error(e)
+	}
+
+	if len(pak.Files) != 1 {
+		t.Error("Wrong file count")
+	}
+
+	pak.Close()
+}
