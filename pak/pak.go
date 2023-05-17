@@ -224,3 +224,12 @@ func (pak *PakFile) Write() error {
 	}
 	return nil
 }
+
+func (pak *PakFile) Delete() error {
+	pak.Close()
+	e := os.Remove(pak.Filename)
+	if e != nil {
+		return e
+	}
+	return nil
+}
