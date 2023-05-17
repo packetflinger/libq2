@@ -193,3 +193,34 @@ func (pak *PakFile) RemoveFile(f string) error {
 	pak.Files = filelist
 	return nil
 }
+
+// create a new pak file on disk from the PakFile structure
+func (pak *PakFile) Write() error {
+	data := m.MessageBuffer{}
+	index := m.MessageBuffer{}
+
+	for _, f := range pak.Files {
+		idxfile := m.NewMessageBuffer(make([]byte, FileBlockLength))
+		idxfile.WriteString(f.Name)
+		idxfile.Index = FileNameLength // name is 56 bytes
+		idxfile.WriteLong(int32(data.Index) + HeaderLength)
+		idxfile.WriteLong(int32(f.Length))
+
+		index.WriteData(idxfile.Buffer)
+		data.WriteData(f.Data)
+	}
+	//msg := m.NewMessageBuffer(make([]byte, len(data.Buffer)+len(index.Buffer)+HeaderLength))
+	msg := m.NewMessageBuffer(make([]byte, 12))
+
+	msg.WriteLong(int32(Magic))
+	msg.WriteLong(int32(len(data.Buffer) + HeaderLength)) // inde offset
+	msg.WriteLong(int32(len(index.Buffer)))               // index length
+	msg.WriteData(data.Buffer)
+	msg.WriteData(index.Buffer)
+
+	e := os.WriteFile(pak.Filename, msg.Buffer, 0644)
+	if e != nil {
+		return fmt.Errorf("%v", e)
+	}
+	return nil
+}

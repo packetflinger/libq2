@@ -1,6 +1,7 @@
 package pak
 
 import (
+	"os"
 	"testing"
 )
 
@@ -57,4 +58,32 @@ func TestRemoveFile(t *testing.T) {
 	}
 
 	pak.Close()
+}
+
+func TestWrite(t *testing.T) {
+	pak, e := OpenPakFile("../testdata/test.pak")
+	if e != nil {
+		t.Errorf("%v", e)
+	}
+	pak.Close()
+
+	pak.Filename = "/tmp/testpak.pak"
+	pak.Write()
+
+	want, e := os.ReadFile("../testdata/test.pak")
+	if e != nil {
+		t.Error(e)
+	}
+	have, e := os.ReadFile("/tmp/testpak.pak")
+	if e != nil {
+		t.Error(e)
+	}
+
+	for i := range want {
+		if want[i] != have[i] {
+			t.Error("Result pak not byte-for-byte match")
+		}
+	}
+
+	os.Remove("/tmp/testpak.pak")
 }
