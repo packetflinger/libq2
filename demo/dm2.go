@@ -2,7 +2,6 @@ package demo
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	m "github.com/packetflinger/libq2/message"
@@ -59,7 +58,6 @@ func (demo *DM2File) ParseDM2(cb m.MessageCallbacks) error {
 		}
 		demo.Position += size
 
-		//err = demo.ParseLump(lump)
 		_, err = m.ParseMessageLump(m.NewMessageBuffer(lump), cb)
 		if err != nil {
 			return err
@@ -83,7 +81,6 @@ func nextLump(f *os.File, pos int64) ([]byte, int, error) {
 	}
 
 	lenbuf := m.MessageBuffer{Buffer: lumplen, Index: 0}
-	fmt.Println("lenbuf", lenbuf)
 	length := lenbuf.ReadLong()
 
 	// EOF
