@@ -11,6 +11,24 @@ const (
 	MaxConfigStrings = 2080
 )
 
+// function pointers for each message type
+type MessageCallbacks struct {
+	ServerDataCB   func(ServerData)
+	ConfigStringCB func(ConfigString)
+	BaselineCB     func(PackedEntity)
+	FrameCB        func(FrameMsg)
+	PlayerStateCB  func(PackedPlayer)
+	EntityCB       func([]PackedEntity)
+	PrintCB        func(Print)
+	StuffCB        func(StuffText)
+	LayoutCB       func(Layout)
+	CenterPrintCB  func(CenterPrint)
+	SoundCB        func(PackedSound)
+	TempEntCB      func(TemporaryEntity)
+	Flash1CB       func(MuzzleFlash)
+	Flash2CB       func(MuzzleFlash)
+}
+
 type ServerFrame struct {
 	Frame          FrameMsg
 	Playerstate    PackedPlayer
