@@ -23,13 +23,14 @@ func TestOpenDM2File(t *testing.T) {
 func TestParseDM2(t *testing.T) {
 	pmsg := ""
 	demo, _ := OpenDM2File("../testdata/test.dm2")
-
-	demo.Callbacks.PrintCB = func(p m.Print) {
-		pmsg = p.String
-		fmt.Println(p.Level, p.String)
+	cb := m.MessageCallbacks{
+		PrintCB: func(p m.Print) {
+			pmsg = p.String
+			fmt.Println(p.Level, p.String)
+		},
 	}
 
-	err := demo.ParseDM2()
+	err := demo.ParseDM2(cb)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,6 +38,5 @@ func TestParseDM2(t *testing.T) {
 	if pmsg != "claire: hi\n" {
 		t.Errorf("Print msg not expected")
 	}
-
 	demo.Close()
 }

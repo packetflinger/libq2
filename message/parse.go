@@ -1,6 +1,9 @@
 package message
 
 import (
+	"encoding/hex"
+	"fmt"
+
 	util "github.com/packetflinger/libq2/util"
 )
 
@@ -30,9 +33,11 @@ type MessageCallbacks struct {
 }
 
 type ServerFrame struct {
+	Server         ServerData
 	Frame          FrameMsg
 	Playerstate    PackedPlayer
 	Entities       [MaxEntities]PackedEntity
+	Baselines      [MaxEntities]PackedEntity
 	Strings        []ConfigString
 	Prints         []Print
 	Stuffs         []StuffText
@@ -154,6 +159,124 @@ type Layout struct {
 
 type CenterPrint struct {
 	Data string
+}
+
+// Parse through a clod of various messages. In the case of demos, these lumps
+// will be read from disk, for a live client, they'll be received via the network
+// every 0.1 seconds
+func ParseMessageLump(buf MessageBuffer, cb MessageCallbacks) (ServerFrame, error) {
+	sf := ServerFrame{}
+
+	for buf.Index < len(buf.Buffer) {
+		cmd := buf.ReadByte()
+
+		switch cmd {
+		case SVCServerData:
+			s := buf.ParseServerData()
+			sf.Server = s
+			if cb.ServerDataCB != nil {
+				cb.ServerDataCB(s)
+			}
+
+		case SVCConfigString:
+			cs := buf.ParseConfigString()
+			sf.Strings = append(sf.Strings, cs)
+			if cb.ConfigStringCB != nil {
+				cb.ConfigStringCB(cs)
+			}
+
+		case SVCSpawnBaseline:
+			bl := buf.ParseSpawnBaseline()
+			sf.Baselines[bl.Number] = bl
+			if cb.BaselineCB != nil {
+				cb.BaselineCB(bl)
+			}
+
+		case SVCStuffText:
+			st := buf.ParseStuffText()
+			sf.Stuffs = append(sf.Stuffs, st)
+			if cb.StuffCB != nil {
+				cb.StuffCB(st)
+			}
+
+		case SVCFrame:
+			fr := buf.ParseFrame()
+			sf.Frame = fr
+			if cb.FrameCB != nil {
+				cb.FrameCB(fr)
+			}
+
+		case SVCPlayerInfo:
+			ps := buf.ParseDeltaPlayerstate(PackedPlayer{})
+			sf.Playerstate = ps
+			if cb.PlayerStateCB != nil {
+				cb.PlayerStateCB(ps)
+			}
+
+		case SVCPacketEntities:
+			ents := buf.ParsePacketEntities()
+			for _, e := range ents {
+				sf.Entities[e.Number] = e
+			}
+			if cb.EntityCB != nil {
+				cb.EntityCB(ents)
+			}
+
+		case SVCPrint:
+			p := buf.ParsePrint()
+			sf.Prints = append(sf.Prints, p)
+			if cb.PrintCB != nil {
+				cb.PrintCB(p)
+			}
+
+		case SVCSound:
+			s := buf.ParseSound()
+			sf.Sounds = append(sf.Sounds, s)
+			if cb.SoundCB != nil {
+				cb.SoundCB(s)
+			}
+
+		case SVCTempEntity:
+			te := buf.ParseTempEntity()
+			sf.TempEntities = append(sf.TempEntities, te)
+			if cb.TempEntCB != nil {
+				cb.TempEntCB(te)
+			}
+
+		case SVCMuzzleFlash:
+			mf := buf.ParseMuzzleFlash()
+			sf.Flash1 = append(sf.Flash1, mf)
+			if cb.Flash1CB != nil {
+				cb.Flash1CB(mf)
+			}
+
+		case SVCMuzzleFlash2:
+			mf := buf.ParseMuzzleFlash()
+			if cb.Flash2CB != nil {
+				cb.Flash2CB(mf)
+			}
+
+		case SVCLayout:
+			l := buf.ParseLayout()
+			if cb.LayoutCB != nil {
+				cb.LayoutCB(l)
+			}
+
+		case SVCInventory:
+			// nobody cares about inventory msgs, just parse them in case they're present
+			buf.ParseInventory()
+
+		case SVCCenterPrint:
+			c := buf.ParseCenterPrint()
+			if cb.CenterPrintCB != nil {
+				cb.CenterPrintCB(c)
+			}
+
+		default:
+			return ServerFrame{}, fmt.Errorf("unknown CMD: %d\n%s", cmd, hex.Dump(buf.Buffer[buf.Index-1:]))
+		}
+	}
+	return sf, nil
 }
 
 func (m *MessageBuffer) ParseServerData() ServerData {
