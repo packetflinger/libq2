@@ -93,6 +93,12 @@ func (pak *PakFile) Close() {
 	}
 }
 
+func NewPak(s string) *PakFile {
+	return &PakFile{
+		Filename: s,
+	}
+}
+
 // Make sure the first 4 bytes match the magic number
 func (pak *PakFile) Validate() bool {
 	pak.Header.Index = 0
@@ -209,7 +215,7 @@ func (pak *PakFile) Write() error {
 		index.WriteData(idxfile.Buffer)
 		data.WriteData(f.Data)
 	}
-	//msg := m.NewMessageBuffer(make([]byte, len(data.Buffer)+len(index.Buffer)+HeaderLength))
+
 	msg := m.NewMessageBuffer(make([]byte, 12))
 
 	msg.WriteLong(int32(Magic))
