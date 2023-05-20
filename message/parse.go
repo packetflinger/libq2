@@ -2,7 +2,10 @@ package message
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	util "github.com/packetflinger/libq2/util"
 )
@@ -159,6 +162,11 @@ type Layout struct {
 
 type CenterPrint struct {
 	Data string
+}
+
+type ChallengeResponse struct {
+	Number    int
+	Protocols []int // protocols support by server (34=orig, 35=r1q2, 36=q2pro)
 }
 
 // Parse through a clod of various messages. In the case of demos, these lumps
@@ -1202,4 +1210,32 @@ func (m *MessageBuffer) ParseCenterPrint() CenterPrint {
 	return CenterPrint{
 		Data: m.ReadString(),
 	}
+}
+
+func (m *MessageBuffer) ParseChallenge() (ChallengeResponse, error) {
+	cl := m.ReadLong()
+	if cl != -1 {
+		return ChallengeResponse{}, errors.New("not connectionless message, invalid challenge response")
+	}
+
+	tokens := strings.Fields(string(m.ReadString()))
+	num, err := strconv.Atoi(tokens[1])
+	if err != nil {
+		return ChallengeResponse{}, errors.New("invalid challenge response")
+	}
+
+	pr := []int{}
+	protocols := strings.Split(tokens[2][2:], ",")
+	for _, p := range protocols {
+		pint, err := strconv.Atoi(p)
+		if err != nil {
+			continue
+		}
+		pr = append(pr, pint)
+	}
+
+	return ChallengeResponse{
+		Number:    num,
+		Protocols: pr,
+	}, nil
 }
