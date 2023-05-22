@@ -1,6 +1,10 @@
 package util
 
-import "os"
+import (
+	"bufio"
+	"os"
+	"strings"
+)
 
 func VectorCompare(v1 [3]int16, v2 [3]int16) bool {
 	return (v1[0] == v2[0]) && (v1[1] == v2[1]) && (v1[2] == v2[2])
@@ -34,4 +38,13 @@ func Deduplicate(in []string) []string {
 		}
 	}
 	return list
+}
+
+func SplitLines(str string) []string {
+	var lines []string
+	sc := bufio.NewScanner(strings.NewReader(str))
+	for sc.Scan() {
+		lines = append(lines, sc.Text())
+	}
+	return lines
 }
