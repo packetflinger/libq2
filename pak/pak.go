@@ -206,9 +206,15 @@ func (pak *PakFile) Write() error {
 	index := m.MessageBuffer{}
 
 	for _, f := range pak.Files {
-		idxfile := m.NewMessageBuffer(make([]byte, FileBlockLength))
+		idxfile := m.MessageBuffer{}
 		idxfile.WriteString(f.Name)
-		idxfile.Index = FileNameLength // name is 56 bytes
+
+		// pad remaining space with zeros
+		remaining := FileNameLength - len(idxfile.Buffer)
+		for i := 0; i < remaining; i++ {
+			idxfile.WriteByte(0)
+		}
+
 		idxfile.WriteLong(int32(data.Index) + HeaderLength)
 		idxfile.WriteLong(int32(f.Length))
 
@@ -216,7 +222,7 @@ func (pak *PakFile) Write() error {
 		data.WriteData(f.Data)
 	}
 
-	msg := m.NewMessageBuffer(make([]byte, 12))
+	msg := m.MessageBuffer{}
 
 	msg.WriteLong(int32(Magic))
 	msg.WriteLong(int32(len(data.Buffer) + HeaderLength)) // inde offset
