@@ -25,6 +25,7 @@ type BSPFile struct {
 	Header   m.MessageBuffer
 	LumpMeta [19]BSPLumpMeta
 	LumpData [19]BSPLumpData
+	Ents     []BSPEntity
 }
 
 // Collections of data are organized into "lumps" within the file
@@ -68,6 +69,7 @@ func OpenBSPFile(f string) (*BSPFile, error) {
 		return nil, e
 	}
 
+	bsp.Ents = bsp.FetchEntities()
 	return &bsp, nil
 }
 
