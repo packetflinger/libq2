@@ -1285,21 +1285,3 @@ func (p ClientPacket) Marshal() []byte {
 	msg.WriteData(p.Data)
 	return msg.Buffer
 }
-
-// Given a sequence number, figure out if it's reliable and if so
-// what the actual sequence number is
-/*
-func ValidateSequence(s uint32) (bool, uint32) {
-	if s&0x80000000 > 0 {
-		return true, s & 0x7fffffff
-	}
-	return false, s
-}
-
-func SequenceValue(seq uint32, reliable bool) uint32 {
-	if reliable {
-		return seq | 0x80000000
-	}
-	return seq
-}
-*/
