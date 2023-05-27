@@ -15,6 +15,9 @@ const (
 	MaxStats         = 32
 	MaxEntities      = 1024
 	MaxConfigStrings = 2080
+	CLCMove          = 2
+	CLCUserinfo      = 3
+	CLCStringCommand = 4
 )
 
 // function pointers for each message type
@@ -169,6 +172,16 @@ type ChallengeResponse struct {
 	Protocols []int // protocols support by server (34=orig, 35=r1q2, 36=q2pro)
 }
 
+type ClientPacket struct {
+	Sequence1   int32
+	Sequence2   int32
+	QPort       uint16 //
+	Reliable1   bool   // requires an ack
+	Reliable2   bool
+	MessageType byte   // what kind of msg?
+	Data        []byte // the actual msg
+}
+
 // Parse through a clod of various messages. In the case of demos, these lumps
 // will be read from disk, for a live client, they'll be received via the network
 // every 0.1 seconds
@@ -279,6 +292,9 @@ func ParseMessageLump(buf MessageBuffer, cb MessageCallbacks) (ServerFrame, erro
 			if cb.CenterPrintCB != nil {
 				cb.CenterPrintCB(c)
 			}
+
+		case SVCBad:
+			continue
 
 		default:
 			return ServerFrame{}, fmt.Errorf("unknown CMD: %d\n%s", cmd, hex.Dump(buf.Buffer[buf.Index-1:]))
@@ -1239,3 +1255,51 @@ func (m *MessageBuffer) ParseChallenge() (ChallengeResponse, error) {
 		Protocols: pr,
 	}, nil
 }
+
+func NewConnectionlessMessage(str string) MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteLong(-1)
+	msg.WriteString(str)
+	return msg
+}
+
+func NewClientCommand(str string) MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteByte(CLCStringCommand)
+	msg.WriteString(str)
+	return msg
+}
+
+func (p ClientPacket) Marshal() []byte {
+	msg := MessageBuffer{}
+	msg.WriteLong(p.Sequence1)
+	if p.Reliable1 {
+		msg.Buffer[msg.Index-1] |= 0x80
+	}
+	msg.WriteLong(p.Sequence2)
+	if p.Reliable2 {
+		msg.Buffer[msg.Index-1] |= 0x80
+	}
+	msg.WriteShort(uint16(p.QPort))
+	msg.WriteByte(p.MessageType)
+	msg.WriteData(p.Data)
+	return msg.Buffer
+}
+
+// Given a sequence number, figure out if it's reliable and if so
+// what the actual sequence number is
+/*
+func ValidateSequence(s uint32) (bool, uint32) {
+	if s&0x80000000 > 0 {
+		return true, s & 0x7fffffff
+	}
+	return false, s
+}
+
+func SequenceValue(seq uint32, reliable bool) uint32 {
+	if reliable {
+		return seq | 0x80000000
+	}
+	return seq
+}
+*/

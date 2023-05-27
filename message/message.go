@@ -186,7 +186,7 @@ func NewMessageBuffer(data []byte) MessageBuffer {
 }
 
 func (m *MessageBuffer) Reset() {
-	m.Buffer = make([]byte, len(m.Buffer))
+	m.Buffer = []byte{}
 	m.Index = 0
 	m.Length = 0
 }
