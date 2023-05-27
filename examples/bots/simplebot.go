@@ -34,6 +34,7 @@ func main() {
 		Flash2CB:      func(f m.MuzzleFlash) { fmt.Println("MuzzleFlash2") },
 	}
 
+	// Just output print msgs
 	callbacks = m.MessageCallbacks{
 		PrintCB: func(p m.Print) {
 			fmt.Println(p.String)
