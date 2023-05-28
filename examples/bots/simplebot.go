@@ -12,34 +12,34 @@ import (
 func main() {
 	// simple print for each message type
 	callbacks := m.MessageCallbacks{
-		ServerDataCB:   func(s m.ServerData) { fmt.Println("ServerData:", s) },
-		ConfigStringCB: func(cs m.ConfigString) { fmt.Println("ConfigString:", cs) },
-		BaselineCB:     func(b m.PackedEntity) { fmt.Println("Baseline:", b) },
-		StuffCB:        func(s m.StuffText) { fmt.Println("Stuff:", s.String) },
-		FrameCB:        func(f m.FrameMsg) { fmt.Printf("Frame [%d,%d]\n", f.Number, f.Delta) },
-		PlayerStateCB:  func(p m.PackedPlayer) { fmt.Println("Playerstate") },
-		EntityCB: func(ents []m.PackedEntity) {
+		ServerData:   func(s *m.ServerData) { fmt.Println("ServerData:", s) },
+		ConfigString: func(cs *m.ConfigString) { fmt.Println("ConfigString:", cs) },
+		Baseline:     func(b *m.PackedEntity) { fmt.Println("Baseline:", b) },
+		Stuff:        func(s *m.StuffText) { fmt.Println("Stuff:", s.String) },
+		Frame:        func(f *m.FrameMsg) { fmt.Printf("Frame [%d,%d]\n", f.Number, f.Delta) },
+		PlayerState:  func(p *m.PackedPlayer) { fmt.Println("Playerstate") },
+		Entity: func(ents []*m.PackedEntity) {
 			fmt.Printf("Entities [")
 			for _, e := range ents {
 				fmt.Printf("%d,", e.Number)
 			}
 			fmt.Printf("]\n")
 		},
-		PrintCB:       func(p m.Print) { fmt.Printf("Print: [%d] %s\n", p.Level, p.String) },
-		LayoutCB:      func(l m.Layout) { fmt.Println("Layout") },
-		CenterPrintCB: func(p m.CenterPrint) { fmt.Printf("CenterPrint: %s\n", p.Data) },
-		SoundCB:       func(s m.PackedSound) { fmt.Println("Sound:", s) },
-		TempEntCB:     func(t m.TemporaryEntity) { fmt.Println("TempEnt:", t) },
-		Flash1CB:      func(f m.MuzzleFlash) { fmt.Println("MuzzleFlash1") },
-		Flash2CB:      func(f m.MuzzleFlash) { fmt.Println("MuzzleFlash2") },
+		Print:       func(p *m.Print) { fmt.Printf("Print: [%d] %s\n", p.Level, p.String) },
+		Layout:      func(l *m.Layout) { fmt.Println("Layout") },
+		CenterPrint: func(p *m.CenterPrint) { fmt.Printf("CenterPrint: %s\n", p.Data) },
+		Sound:       func(s *m.PackedSound) { fmt.Println("Sound:", s) },
+		TempEnt:     func(t *m.TemporaryEntity) { fmt.Println("TempEnt:", t) },
+		Flash1:      func(f *m.MuzzleFlash) { fmt.Println("MuzzleFlash1") },
+		Flash2:      func(f *m.MuzzleFlash) { fmt.Println("MuzzleFlash2") },
 	}
 
 	// Just output print msgs
-	callbacks = m.MessageCallbacks{
-		PrintCB: func(p m.Print) {
+	_ = m.MessageCallbacks{
+		Print: func(p *m.Print) {
 			fmt.Println(p.String)
 		},
-		CenterPrintCB: func(c m.CenterPrint) {
+		CenterPrint: func(c *m.CenterPrint) {
 			fmt.Println(c.Data)
 		},
 	}

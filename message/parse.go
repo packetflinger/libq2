@@ -22,20 +22,26 @@ const (
 
 // function pointers for each message type
 type MessageCallbacks struct {
-	ServerDataCB   func(ServerData)
-	ConfigStringCB func(ConfigString)
-	BaselineCB     func(PackedEntity)
-	FrameCB        func(FrameMsg)
-	PlayerStateCB  func(PackedPlayer)
-	EntityCB       func([]PackedEntity)
-	PrintCB        func(Print)
-	StuffCB        func(StuffText)
-	LayoutCB       func(Layout)
-	CenterPrintCB  func(CenterPrint)
-	SoundCB        func(PackedSound)
-	TempEntCB      func(TemporaryEntity)
-	Flash1CB       func(MuzzleFlash)
-	Flash2CB       func(MuzzleFlash)
+	// message specific callbacks
+	ServerData   func(*ServerData)
+	ConfigString func(*ConfigString)
+	Baseline     func(*PackedEntity)
+	Frame        func(*FrameMsg)
+	PlayerState  func(*PackedPlayer)
+	Entity       func([]*PackedEntity)
+	Print        func(*Print)
+	Stuff        func(*StuffText)
+	Layout       func(*Layout)
+	CenterPrint  func(*CenterPrint)
+	Sound        func(*PackedSound)
+	TempEnt      func(*TemporaryEntity)
+	Flash1       func(*MuzzleFlash)
+	Flash2       func(*MuzzleFlash)
+
+	// event specific callbacks
+	OnConnect func()               // connection to gameserver made
+	OnEnter   func()               // you entered the game (begin)
+	PreSend   func(*MessageBuffer) //
 }
 
 type ServerFrame struct {
@@ -172,16 +178,6 @@ type ChallengeResponse struct {
 	Protocols []int // protocols support by server (34=orig, 35=r1q2, 36=q2pro)
 }
 
-type ClientPacket struct {
-	Sequence1   int32
-	Sequence2   int32
-	QPort       uint16 //
-	Reliable1   bool   // requires an ack
-	Reliable2   bool
-	MessageType byte   // what kind of msg?
-	Data        []byte // the actual msg
-}
-
 // Parse through a clod of various messages. In the case of demos, these lumps
 // will be read from disk, for a live client, they'll be received via the network
 // every 0.1 seconds
@@ -195,92 +191,94 @@ func ParseMessageLump(buf MessageBuffer, cb MessageCallbacks) (ServerFrame, erro
 		case SVCServerData:
 			s := buf.ParseServerData()
 			sf.Server = s
-			if cb.ServerDataCB != nil {
-				cb.ServerDataCB(s)
+			if cb.ServerData != nil {
+				cb.ServerData(&s)
 			}
 
 		case SVCConfigString:
 			cs := buf.ParseConfigString()
 			sf.Strings = append(sf.Strings, cs)
-			if cb.ConfigStringCB != nil {
-				cb.ConfigStringCB(cs)
+			if cb.ConfigString != nil {
+				cb.ConfigString(&cs)
 			}
 
 		case SVCSpawnBaseline:
 			bl := buf.ParseSpawnBaseline()
 			sf.Baselines[bl.Number] = bl
-			if cb.BaselineCB != nil {
-				cb.BaselineCB(bl)
+			if cb.Baseline != nil {
+				cb.Baseline(&bl)
 			}
 
 		case SVCStuffText:
 			st := buf.ParseStuffText()
 			sf.Stuffs = append(sf.Stuffs, st)
-			if cb.StuffCB != nil {
-				cb.StuffCB(st)
+			if cb.Stuff != nil {
+				cb.Stuff(&st)
 			}
 
 		case SVCFrame:
 			fr := buf.ParseFrame()
 			sf.Frame = fr
-			if cb.FrameCB != nil {
-				cb.FrameCB(fr)
+			if cb.Frame != nil {
+				cb.Frame(&fr)
 			}
 
 		case SVCPlayerInfo:
 			ps := buf.ParseDeltaPlayerstate(PackedPlayer{})
 			sf.Playerstate = ps
-			if cb.PlayerStateCB != nil {
-				cb.PlayerStateCB(ps)
+			if cb.PlayerState != nil {
+				cb.PlayerState(&ps)
 			}
 
 		case SVCPacketEntities:
 			ents := buf.ParsePacketEntities()
-			for _, e := range ents {
-				sf.Entities[e.Number] = e
+			cbents := []*PackedEntity{}
+			for i := range ents {
+				sf.Entities[ents[i].Number] = ents[i]
+				cbents = append(cbents, &ents[i])
 			}
-			if cb.EntityCB != nil {
-				cb.EntityCB(ents)
+			if cb.Entity != nil {
+				cb.Entity(cbents)
 			}
 
 		case SVCPrint:
 			p := buf.ParsePrint()
 			sf.Prints = append(sf.Prints, p)
-			if cb.PrintCB != nil {
-				cb.PrintCB(p)
+			if cb.Print != nil {
+				cb.Print(&p)
 			}
 
 		case SVCSound:
 			s := buf.ParseSound()
 			sf.Sounds = append(sf.Sounds, s)
-			if cb.SoundCB != nil {
-				cb.SoundCB(s)
+			if cb.Sound != nil {
+				cb.Sound(&s)
 			}
 
 		case SVCTempEntity:
 			te := buf.ParseTempEntity()
 			sf.TempEntities = append(sf.TempEntities, te)
-			if cb.TempEntCB != nil {
-				cb.TempEntCB(te)
+			if cb.TempEnt != nil {
+				cb.TempEnt(&te)
 			}
 
 		case SVCMuzzleFlash:
 			mf := buf.ParseMuzzleFlash()
 			sf.Flash1 = append(sf.Flash1, mf)
-			if cb.Flash1CB != nil {
-				cb.Flash1CB(mf)
+			if cb.Flash1 != nil {
+				cb.Flash1(&mf)
 			}
 
 		case SVCMuzzleFlash2:
 			mf := buf.ParseMuzzleFlash()
-			if cb.Flash2CB != nil {
-				cb.Flash2CB(mf)
+			if cb.Flash2 != nil {
+				cb.Flash2(&mf)
 			}
 
 		case SVCLayout:
 			l := buf.ParseLayout()
-			if cb.LayoutCB != nil {
-				cb.LayoutCB(l)
+			if cb.Layout != nil {
+				cb.Layout(&l)
 			}
 
 		case SVCInventory:
@@ -289,8 +287,8 @@ func ParseMessageLump(buf MessageBuffer, cb MessageCallbacks) (ServerFrame, erro
 
 		case SVCCenterPrint:
 			c := buf.ParseCenterPrint()
-			if cb.CenterPrintCB != nil {
-				cb.CenterPrintCB(c)
+			if cb.CenterPrint != nil {
+				cb.CenterPrint(&c)
 			}
 
 		case SVCBad:
@@ -1254,34 +1252,4 @@ func (m *MessageBuffer) ParseChallenge() (ChallengeResponse, error) {
 		Number:    num,
 		Protocols: pr,
 	}, nil
-}
-
-func NewConnectionlessMessage(str string) MessageBuffer {
-	msg := MessageBuffer{}
-	msg.WriteLong(-1)
-	msg.WriteString(str)
-	return msg
-}
-
-func NewClientCommand(str string) MessageBuffer {
-	msg := MessageBuffer{}
-	msg.WriteByte(CLCStringCommand)
-	msg.WriteString(str)
-	return msg
-}
-
-func (p ClientPacket) Marshal() []byte {
-	msg := MessageBuffer{}
-	msg.WriteLong(p.Sequence1)
-	if p.Reliable1 {
-		msg.Buffer[msg.Index-1] |= 0x80
-	}
-	msg.WriteLong(p.Sequence2)
-	if p.Reliable2 {
-		msg.Buffer[msg.Index-1] |= 0x80
-	}
-	msg.WriteShort(uint16(p.QPort))
-	msg.WriteByte(p.MessageType)
-	msg.WriteData(p.Data)
-	return msg.Buffer
 }

@@ -100,8 +100,8 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 	defer c.Close()
 	log.Println("requesting challenge...")
 
-	getchal := m.NewConnectionlessMessage("getchallenge")
-	_, e = c.Write(getchal.Buffer)
+	getchal := m.ConnectionlessPacket{Data: "getchallenge"}.Marshal()
+	_, e = c.Write(getchal)
 	if e != nil {
 		return e
 	}
@@ -122,8 +122,8 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 	log.Printf("received challenge (%d)\n", bot.Net.Challenge.Number)
 
 	constr := fmt.Sprintf("connect 34 %d %d \"%s\"", bot.Netchan.QPort, bot.Net.Challenge.Number, bot.User.Marshal())
-	con := m.NewConnectionlessMessage(constr)
-	_, e = c.Write(con.Buffer)
+	con := m.ConnectionlessPacket{Data: constr}.Marshal()
+	_, e = c.Write(con)
 	if e != nil {
 		return e
 	}
@@ -140,6 +140,10 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 	}
 
 	bot.ClientCommand("new", true)
+
+	if cb.OnConnect != nil {
+		cb.OnConnect()
+	}
 
 	for {
 		bytes, err := bot.Receive()
@@ -163,6 +167,10 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 				bot.Netchan.msgOut.WriteByte(m.CLCStringCommand)
 				bot.Netchan.msgOut.WriteString("begin " + t[1] + "\n")
 				bot.Netchan.ReliableS1 = true
+
+				if cb.OnEnter != nil {
+					cb.OnEnter()
+				}
 			}
 
 			// handle version probe

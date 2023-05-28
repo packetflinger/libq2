@@ -24,7 +24,7 @@ func TestParseDM2(t *testing.T) {
 	pmsg := ""
 	demo, _ := OpenDM2File("../testdata/test.dm2")
 	cb := m.MessageCallbacks{
-		PrintCB: func(p m.Print) {
+		Print: func(p m.Print) {
 			pmsg = p.String
 			fmt.Println(p.Level, p.String)
 		},
