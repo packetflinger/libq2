@@ -10,11 +10,28 @@ import (
 )
 
 const (
-	Magic       = (('P' << 24) + ('S' << 16) + ('B' << 8) + 'I')
-	HeaderLen   = 160 // magic + version + lump metadata
-	EntityLump  = 0
-	TextureLump = 5  // the location in the header
-	TextureLen  = 76 // 40 bytes of origins and angles + 36 for textname
+	Magic          = (('P' << 24) + ('S' << 16) + ('B' << 8) + 'I')
+	HeaderLen      = 160 // magic + version + lump metadata
+	EntityLump     = 0
+	PlanesLump     = 1 // 20 bytes each
+	VerticesLump   = 2 // 12 bytes each (3 floats)
+	VisibilityLump = 3 // 4 bytes PVS, 4 bytes PHS
+	NodesLump      = 4 // 28 bytes each
+	TextureLump    = 5 // 76 bytes each
+	FacesLump      = 6 // 20 bytes each
+	LightMapLump   = 7
+	LeavesLump     = 8
+	LeafFaceTable  = 9
+	LeafBrushTable = 10
+	EdgesLump      = 11
+	FaceEdgeTable  = 12
+	ModelsLump     = 13
+	BrushesLump    = 14
+	BrushSidesLump = 15
+	POPLump        = 16
+	AreasLump      = 17
+	AreaPortals    = 18
+	TextureLen     = 76 // 40 bytes of origins and angles + 36 for textname
 )
 
 // represents a binary space partitioning map file
@@ -26,6 +43,7 @@ type BSPFile struct {
 	LumpMeta [19]BSPLumpMeta
 	LumpData [19]BSPLumpData
 	Ents     []BSPEntity
+	Planes   []BSPPlane
 }
 
 // Collections of data are organized into "lumps" within the file
@@ -70,6 +88,7 @@ func OpenBSPFile(f string) (*BSPFile, error) {
 	}
 
 	bsp.Ents = bsp.FetchEntities()
+	bsp.Planes = bsp.FetchPlanes()
 	return &bsp, nil
 }
 
@@ -88,7 +107,7 @@ func (bsp *BSPFile) Validate() bool {
 // find all the locations/sizes of the various lumps. There are
 // always 18 of them.
 func (bsp *BSPFile) ParseLumpMetadata() {
-	bsp.Header.Index = 8
+	bsp.Header.Index = 8 // 4 for magic + 4 for meta location
 	for i := 0; i < 18; i++ {
 		bsp.LumpMeta[i].location = bsp.Header.ReadLong()
 		bsp.LumpMeta[i].length = bsp.Header.ReadLong()
