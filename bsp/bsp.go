@@ -44,6 +44,7 @@ type BSPFile struct {
 	LumpData [19]BSPLumpData
 	Ents     []BSPEntity
 	Planes   []BSPPlane
+	Vertices []Vertex
 }
 
 // Collections of data are organized into "lumps" within the file
@@ -89,6 +90,7 @@ func OpenBSPFile(f string) (*BSPFile, error) {
 
 	bsp.Ents = bsp.FetchEntities()
 	bsp.Planes = bsp.FetchPlanes()
+	bsp.Vertices = bsp.FetchVertices()
 	return &bsp, nil
 }
 
