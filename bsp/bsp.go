@@ -36,15 +36,16 @@ const (
 
 // represents a binary space partitioning map file
 type BSPFile struct {
-	Name     string // just the filename minus extension (ex: "q2dm1")
-	Filename string // including any path prefix and .bsp extension
-	Handle   *os.File
-	Header   m.MessageBuffer
-	LumpMeta [19]BSPLumpMeta
-	LumpData [19]BSPLumpData
-	Ents     []BSPEntity
-	Planes   []BSPPlane
-	Vertices []Vertex
+	Name       string // just the filename minus extension (ex: "q2dm1")
+	Filename   string // including any path prefix and .bsp extension
+	Handle     *os.File
+	Header     m.MessageBuffer
+	LumpMeta   [19]BSPLumpMeta
+	LumpData   [19]BSPLumpData
+	Ents       []BSPEntity
+	Planes     []BSPPlane
+	Vertices   []Vertex
+	Visibility []Visibility
 }
 
 // Collections of data are organized into "lumps" within the file
@@ -91,6 +92,8 @@ func OpenBSPFile(f string) (*BSPFile, error) {
 	bsp.Ents = bsp.FetchEntities()
 	bsp.Planes = bsp.FetchPlanes()
 	bsp.Vertices = bsp.FetchVertices()
+	bsp.Visibility = bsp.FetchVisibility()
+
 	return &bsp, nil
 }
 
