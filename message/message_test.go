@@ -41,3 +41,17 @@ func TestWriteLong(t *testing.T) {
 		}
 	}
 }
+
+func TestAppend(t *testing.T) {
+	msg1 := MessageBuffer{}
+	msg2 := MessageBuffer{}
+
+	msg1.WriteByte(1)
+	msg2.WriteByte(1)
+	msg1.Append(&msg2)
+
+	msg1.Index = 0
+	if got := msg1.ReadShort(); got != 257 {
+		t.Errorf("Append failed - got %d, want 257\n", got)
+	}
+}
