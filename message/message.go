@@ -191,6 +191,16 @@ func (m *MessageBuffer) Reset() {
 	m.Length = 0
 }
 
+// combine 2 buffers, set index to the end
+func (m *MessageBuffer) Append(m2 *MessageBuffer) {
+	m.Buffer = append(m.Buffer, m2.Buffer...)
+	m.Index = len(m.Buffer)
+}
+
+func (m *MessageBuffer) Size() int {
+	return len(m.Buffer)
+}
+
 // 4 bytes signed
 func (msg *MessageBuffer) ReadLong() int32 {
 	l := int32(msg.Buffer[msg.Index])
