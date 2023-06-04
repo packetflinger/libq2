@@ -40,3 +40,18 @@ func TestParseDM2(t *testing.T) {
 	}
 	demo.Close()
 }
+
+func TestWrite(t *testing.T) {
+	demo, _ := OpenDM2File("../testdata/test.dm2")
+	cb := m.MessageCallbacks{}
+
+	err := demo.ParseDM2(cb)
+	if err != nil {
+		t.Error(err)
+	}
+
+	demo.Write()
+	t.Error()
+
+	demo.Close()
+}

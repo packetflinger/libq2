@@ -8,7 +8,7 @@ import (
 	"net"
 	"strings"
 
-	m "github.com/packetflinger/libq2/message"
+	"github.com/packetflinger/libq2/message"
 	pl "github.com/packetflinger/libq2/player"
 )
 
@@ -29,12 +29,12 @@ type Connection struct {
 	Address   string
 	Port      int
 	Conn      net.Conn
-	Challenge m.ChallengeResponse
+	Challenge message.ChallengeResponse
 }
 
 type NetChan struct {
-	msgIn      m.MessageBuffer
-	msgOut     m.MessageBuffer
+	msgIn      message.MessageBuffer
+	msgOut     message.MessageBuffer
 	QPort      uint16
 	Sequence1  int32
 	Sequence2  int32
@@ -62,15 +62,15 @@ func (bot *Bot) SendAck() error {
 }
 
 func (bot *Bot) ClientCommand(str string, reliable bool) error {
-	msg := m.MessageBuffer{}
+	msg := message.MessageBuffer{}
 	msg.WriteString(str)
-	p := m.ClientPacket{
+	p := message.ClientPacket{
 		Sequence1:   bot.Netchan.Sequence1,
 		Sequence2:   bot.Netchan.Sequence2,
 		QPort:       bot.Netchan.QPort,
 		Reliable1:   reliable,
 		Reliable2:   bot.Netchan.ReliableS2,
-		MessageType: m.CLCStringCommand,
+		MessageType: message.CLCStringCommand,
 		Data:        msg.Buffer,
 	}
 	packet := p.Marshal()
@@ -84,7 +84,7 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 	return nil
 }
 
-func (bot *Bot) Run(cb m.MessageCallbacks) error {
+func (bot *Bot) Run(cb message.MessageCallbacks) error {
 	if bot.Netchan.QPort == 0 {
 		bot.Netchan.QPort = uint16(rand.Intn(256))
 	}
@@ -100,7 +100,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 	defer c.Close()
 	log.Println("requesting challenge...")
 
-	getchal := m.ConnectionlessPacket{Data: "getchallenge"}.Marshal()
+	getchal := message.ConnectionlessPacket{Data: "getchallenge"}.Marshal()
 	_, e = c.Write(getchal)
 	if e != nil {
 		return e
@@ -112,7 +112,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 		return e
 	}
 
-	cmsg := m.MessageBuffer{Buffer: chal}
+	cmsg := message.MessageBuffer{Buffer: chal}
 	ch, err := cmsg.ParseChallenge()
 	if err != nil {
 		return err
@@ -122,7 +122,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 	log.Printf("received challenge (%d)\n", bot.Net.Challenge.Number)
 
 	constr := fmt.Sprintf("connect 34 %d %d \"%s\"", bot.Netchan.QPort, bot.Net.Challenge.Number, bot.User.Marshal())
-	con := m.ConnectionlessPacket{Data: constr}.Marshal()
+	con := message.ConnectionlessPacket{Data: constr}.Marshal()
 	_, e = c.Write(con)
 	if e != nil {
 		return e
@@ -154,7 +154,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 			break
 		}
 
-		serverframe, err := m.ParseMessageLump(bot.Netchan.msgIn, cb)
+		serverframe, err := message.ParseMessageLump(bot.Netchan.msgIn, message.MessageCallbacks{}, cb)
 		if err != nil {
 			return err
 		}
@@ -164,7 +164,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 			if t := strings.Fields(st.String); len(t) > 1 && t[0] == "precache" {
 				bot.Spawned = true
 				log.Println("entering game")
-				bot.Netchan.msgOut.WriteByte(m.CLCStringCommand)
+				bot.Netchan.msgOut.WriteByte(message.CLCStringCommand)
 				bot.Netchan.msgOut.WriteString("begin " + t[1] + "\n")
 				bot.Netchan.ReliableS1 = true
 
@@ -175,7 +175,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 
 			// handle version probe
 			if t := strings.Fields(st.String); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
-				bot.Netchan.msgOut.WriteByte(m.CLCStringCommand)
+				bot.Netchan.msgOut.WriteByte(message.CLCStringCommand)
 				bot.Netchan.msgOut.WriteString("\177c version " + bot.Version + "\n")
 				bot.Netchan.ReliableS1 = true
 			}
@@ -214,7 +214,7 @@ func (bot *Bot) Run(cb m.MessageCallbacks) error {
 
 func (bot *Bot) Send() error {
 	msg2 := &bot.Netchan.msgOut
-	msg := m.MessageBuffer{}
+	msg := message.MessageBuffer{}
 	msg.WriteLong(bot.Netchan.Sequence1)
 	if bot.Netchan.ReliableS1 {
 		msg.Buffer[msg.Index-1] |= 0x80
@@ -273,7 +273,7 @@ func (bot *Bot) Receive() (int, error) {
 	} else {
 		bot.Netchan.ReliableS2 = false
 	}
-	tmpmsg := m.MessageBuffer{Buffer: sequence}
+	tmpmsg := message.MessageBuffer{Buffer: sequence}
 	bot.Netchan.Sequence2 = tmpmsg.ReadLong()
 
 	// we don't care about the ack sequence
