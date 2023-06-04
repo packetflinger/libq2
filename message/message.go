@@ -1,6 +1,10 @@
 package message
 
-import "bytes"
+import (
+	"bytes"
+
+	"github.com/packetflinger/libq2/util"
+)
 
 // server to client message types
 const (
@@ -195,6 +199,11 @@ func (m *MessageBuffer) Reset() {
 func (m *MessageBuffer) Append(m2 *MessageBuffer) {
 	m.Buffer = append(m.Buffer, m2.Buffer...)
 	m.Index = len(m.Buffer)
+}
+
+func (m *MessageBuffer) Seek(offset int) {
+	off := util.Clamp(offset, 0, len(m.Buffer))
+	m.Index = off
 }
 
 func (m *MessageBuffer) Size() int {
