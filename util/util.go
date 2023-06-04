@@ -48,3 +48,14 @@ func SplitLines(str string) []string {
 	}
 	return lines
 }
+
+// Make sure val is in between lower and upper
+func Clamp(val int, lower int, upper int) int {
+	if val < lower {
+		return lower
+	}
+	if val > upper {
+		return upper
+	}
+	return val
+}
