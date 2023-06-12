@@ -11,19 +11,22 @@ import (
 )
 
 type DM2File struct {
-	Filename      string
-	Handle        *os.File
-	Position      int
-	ParsingFrames bool
-	Serverdata    message.ServerData
-	Configstrings []message.ConfigString
-	Baselines     []message.PackedEntity
-	//Frames        []message.ServerFrame
+	Filename     string
+	Handle       *os.File
+	Position     int
+	Spawned      bool // header read, "precache\n" stuff received
+	Header       DM2FileHeader
 	Frames       map[int]message.ServerFrame
 	CurrentFrame *message.ServerFrame
 	PrevFrame    *message.ServerFrame
 	LumpCallback func([]byte)
 	Callbacks    message.MessageCallbacks
+}
+
+type DM2FileHeader struct {
+	Serverdata    message.ServerData
+	Configstrings []message.ConfigString
+	Baselines     []message.PackedEntity
 }
 
 func OpenDM2File(f string) (*DM2File, error) {
@@ -111,26 +114,31 @@ func nextLump(f *os.File, pos int64) ([]byte, int, error) {
 func (demo *DM2File) Write() {
 	msg := message.MessageBuffer{}
 
-	//fmt.Println(demo.Serverdata)
-	// first do serverdata
-	msg.WriteByte(message.SVCServerData)
-	msg.Append(demo.Serverdata.Marshal())
+	msg.Append(demo.Header.Marshal())
+	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
+}
 
-	// then configstrings
-	for _, cs := range demo.Configstrings {
+// Write the entire header to a buffer
+func (header *DM2FileHeader) Marshal() *message.MessageBuffer {
+	msg := message.MessageBuffer{}
+
+	msg.WriteByte(message.SVCServerData)
+	msg.Append(header.Serverdata.Marshal())
+
+	for _, cs := range header.Configstrings {
 		msg.WriteByte(message.SVCConfigString)
 		msg.Append(cs.Marshal())
 	}
 
-	// then baselines
-	baselines := message.MessageBuffer{}
-	nilEntity := message.PackedEntity{}
-	for _, bl := range demo.Baselines {
+	for _, bl := range header.Baselines {
 		msg.WriteByte(message.SVCSpawnBaseline)
-		baselines.WriteDeltaEntity(bl, nilEntity)
+		msg.Append(bl.Marshal())
 	}
-	msg.Append(&baselines)
-	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
+
+	precache := message.StuffText{String: "precache\n"}
+	msg.Append(precache.Marshal())
+
+	return &msg
 }
 
 func (demo *DM2File) MarshalLump() {
@@ -138,28 +146,31 @@ func (demo *DM2File) MarshalLump() {
 }
 
 // Setup the callbacks for demo parsing. Stores data in the appropriate
-// spots as it's parsed for later use
+// spots as it's parsed for later use.
+//
+// You can't just parse each frame independently, the current frame depends
+// on a previous frame for delta compression (usually the last one).
 func (demo *DM2File) InternalCallbacks() message.MessageCallbacks {
 	cb := message.MessageCallbacks{
 		ServerData: func(s *message.ServerData) {
-			demo.Serverdata = *s
+			demo.Header.Serverdata = *s
 		},
 		ConfigString: func(cs *message.ConfigString) {
-			if !demo.ParsingFrames {
-				demo.Configstrings = append(demo.Configstrings, *cs)
+			if !demo.Spawned {
+				demo.Header.Configstrings = append(demo.Header.Configstrings, *cs)
 			} else {
 				demo.CurrentFrame.Strings = append(demo.CurrentFrame.Strings, *cs)
 			}
 		},
 		Baseline: func(b *message.PackedEntity) {
-			demo.Baselines = append(demo.Baselines, *b)
+			demo.Header.Baselines = append(demo.Header.Baselines, *b)
 		},
 		Stuff: func(s *message.StuffText) {
-			if demo.ParsingFrames {
+			if demo.Spawned {
 				demo.CurrentFrame.Stuffs = append(demo.CurrentFrame.Stuffs, *s)
 			}
 			if s.String == "precache\n" {
-				demo.ParsingFrames = true
+				demo.Spawned = true
 			}
 		},
 		Frame: func(f *message.FrameMsg) {
