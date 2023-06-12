@@ -16,13 +16,14 @@ type DM2File struct {
 	Position      int
 	ParsingFrames bool
 	Serverdata    message.ServerData
-	Configstrings [message.MaxConfigStrings]message.ConfigString
-	Baselines     [message.MaxEntities]message.PackedEntity
-	Frames        []message.ServerFrame
-	CurrentFrame  *message.ServerFrame
-	PrevFrame     *message.ServerFrame
-	LumpCallback  func([]byte)
-	Callbacks     message.MessageCallbacks
+	Configstrings []message.ConfigString
+	Baselines     []message.PackedEntity
+	//Frames        []message.ServerFrame
+	Frames       map[int]message.ServerFrame
+	CurrentFrame *message.ServerFrame
+	PrevFrame    *message.ServerFrame
+	LumpCallback func([]byte)
+	Callbacks    message.MessageCallbacks
 }
 
 func OpenDM2File(f string) (*DM2File, error) {
@@ -38,6 +39,7 @@ func OpenDM2File(f string) (*DM2File, error) {
 	demo := DM2File{
 		Filename: f,
 		Handle:   fp,
+		Frames:   make(map[int]message.ServerFrame),
 	}
 
 	return &demo, nil
@@ -61,7 +63,7 @@ func (demo *DM2File) ParseDM2(extcb message.MessageCallbacks) error {
 		}
 		demo.Position += size
 
-		_, err = message.ParseMessageLump(message.NewMessageBuffer(lump), intcb, extcb)
+		_, err = message.ParseMessageLump(message.NewMessageBuffer(lump), intcb, extcb, demo.PrevFrame)
 		if err != nil {
 			return err
 		}
@@ -120,15 +122,14 @@ func (demo *DM2File) Write() {
 		msg.Append(cs.Marshal())
 	}
 
-	/*
-		// then baselines
-		baselines := m.MessageBuffer{}
-		nilEntity := m.PackedEntity{}
-		for _, bl := range demo.Baselines {
-			baselines.WriteDeltaEntity(bl, nilEntity)
-		}
-		msg.Append(&baselines)
-	*/
+	// then baselines
+	baselines := message.MessageBuffer{}
+	nilEntity := message.PackedEntity{}
+	for _, bl := range demo.Baselines {
+		msg.WriteByte(message.SVCSpawnBaseline)
+		baselines.WriteDeltaEntity(bl, nilEntity)
+	}
+	msg.Append(&baselines)
 	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
 }
 
@@ -145,13 +146,13 @@ func (demo *DM2File) InternalCallbacks() message.MessageCallbacks {
 		},
 		ConfigString: func(cs *message.ConfigString) {
 			if !demo.ParsingFrames {
-				demo.Configstrings[cs.Index] = *cs
+				demo.Configstrings = append(demo.Configstrings, *cs)
 			} else {
 				demo.CurrentFrame.Strings = append(demo.CurrentFrame.Strings, *cs)
 			}
 		},
 		Baseline: func(b *message.PackedEntity) {
-			demo.Baselines[b.Number] = *b
+			demo.Baselines = append(demo.Baselines, *b)
 		},
 		Stuff: func(s *message.StuffText) {
 			if demo.ParsingFrames {
