@@ -192,7 +192,7 @@ type ChallengeResponse struct {
 //
 // External callbacks are for logic outside the library, like custom programs
 // that import this library.
-func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCallbacks) (ServerFrame, error) {
+func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCallbacks, delta *ServerFrame) (ServerFrame, error) {
 	sf := ServerFrame{}
 
 	for buf.Index < len(buf.Buffer) {
@@ -250,7 +250,11 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 			}
 
 		case SVCPlayerInfo:
-			ps := buf.ParseDeltaPlayerstate(PackedPlayer{})
+			lastps := PackedPlayer{}
+			if delta != nil {
+				lastps = delta.Playerstate
+			}
+			ps := buf.ParseDeltaPlayerstate(lastps)
 			sf.Playerstate = ps
 			if intcb.PlayerState != nil {
 				intcb.PlayerState(&ps)
@@ -260,7 +264,7 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 			}
 
 		case SVCPacketEntities:
-			ents := buf.ParsePacketEntities()
+			ents := buf.ParsePacketEntities(delta)
 			cbents := []*PackedEntity{}
 			for i := range ents {
 				sf.Entities[ents[i].Number] = ents[i]
@@ -538,19 +542,19 @@ func (m *MessageBuffer) ParseStuffText() StuffText {
 	return StuffText{String: m.ReadString()}
 }
 
-func (m *MessageBuffer) ParseFrame() FrameMsg {
-	N := int32(m.ReadLong())
-	D := int32(m.ReadLong())
-	S := int8(m.ReadByte())
-	A := int8(m.ReadByte())
-	Ab := m.ReadData(int(A))
+func (msg *MessageBuffer) ParseFrame() FrameMsg {
+	name := int32(msg.ReadLong())
+	delta := int32(msg.ReadLong())
+	suppressed := int8(msg.ReadByte())
+	areabytes := int8(msg.ReadByte())
+	areabits := msg.ReadData(int(areabytes))
 
 	return FrameMsg{
-		Number:     N,
-		Delta:      D,
-		Suppressed: S,
-		AreaBytes:  A,
-		AreaBits:   Ab,
+		Number:     name,
+		Delta:      delta,
+		Suppressed: suppressed,
+		AreaBytes:  areabytes,
+		AreaBits:   areabits,
 	}
 }
 
@@ -652,9 +656,9 @@ func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 
 // A S->C msg containing all entities the client should
 // know aobut for a particular frame
-func (m *MessageBuffer) ParsePacketEntities() []PackedEntity {
+func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
+	froments := [MaxEntities]PackedEntity{}
 	ents := []PackedEntity{}
-
 	for {
 		bits := m.ParseEntityBitmask()
 		num := m.ParseEntityNumber(bits)
@@ -663,7 +667,11 @@ func (m *MessageBuffer) ParsePacketEntities() []PackedEntity {
 			break
 		}
 
-		entity := m.ParseEntity(PackedEntity{}, num, bits)
+		if from != nil {
+			froments = from.Entities
+		}
+
+		entity := m.ParseEntity(froments[num], num, bits)
 		ents = append(ents, entity)
 	}
 
@@ -1380,4 +1388,31 @@ func (msg *MessageBuffer) WriteDeltaMove(from *client.ClientMove, to *client.Cli
 		msg.WriteByte(to.Impulse)
 	}
 	msg.WriteByte(to.Msec)
+}
+
+// generate an SVG image from a layout message
+func (lo Layout) RenderSVG() {
+	fmt.Println("")
+}
+
+func (ent PackedEntity) Marshal() *MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteDeltaEntity(PackedEntity{}, ent)
+	return &msg
+}
+
+func (fr FrameMsg) Marshal() *MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteLong(fr.Number)
+	msg.WriteLong(fr.Delta)
+	msg.WriteByte(byte(fr.Suppressed))
+	msg.WriteByte(byte(fr.AreaBytes))
+	msg.WriteData(fr.AreaBits)
+	return &msg
+}
+
+func (ps PackedPlayer) Marshal() *MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteDeltaPlayerstate(&ps, &PackedPlayer{})
+	return &msg
 }
