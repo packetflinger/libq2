@@ -1416,3 +1416,9 @@ func (ps PackedPlayer) Marshal() *MessageBuffer {
 	msg.WriteDeltaPlayerstate(&ps, &PackedPlayer{})
 	return &msg
 }
+
+func (st StuffText) Marshal() *MessageBuffer {
+	msg := MessageBuffer{}
+	msg.WriteString(st.String)
+	return &msg
+}
