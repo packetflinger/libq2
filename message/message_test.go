@@ -2,6 +2,8 @@ package message
 
 import (
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestWriteLong(t *testing.T) {
@@ -53,5 +55,97 @@ func TestAppend(t *testing.T) {
 	msg1.Index = 0
 	if got := msg1.ReadShort(); got != 257 {
 		t.Errorf("Append failed - got %d, want 257\n", got)
+	}
+}
+
+func TestWriteByte(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input int
+		want  []byte
+	}{
+		{
+			desc:  "TEST 1",
+			input: 5,
+			want:  []byte{5},
+		},
+		{
+			desc:  "TEST 2",
+			input: 255,
+			want:  []byte{255},
+		},
+		{
+			desc:  "TEST 3",
+			input: 100,
+			want:  []byte{100},
+		},
+	}
+	for _, tc := range tests {
+		t.Run("", func(t *testing.T) {
+			msg := MessageBuffer{}
+			msg.WriteByte(byte(tc.input))
+			got := msg.Buffer
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error("got diff:", diff)
+			}
+		})
+	}
+}
+
+func TestWriteShort(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input uint16
+		want  []uint8
+	}{
+		{
+			desc:  "TEST 1",
+			input: 5,
+			want:  []uint8{5, 0},
+		},
+		{
+			desc:  "TEST 2",
+			input: 65535,
+			want:  []uint8{255, 255},
+		},
+		{
+			desc:  "TEST 3",
+			input: 257,
+			want:  []uint8{1, 1},
+		},
+	}
+	for _, tc := range tests {
+		t.Run("", func(t *testing.T) {
+			msg := MessageBuffer{}
+			msg.WriteShort(tc.input)
+			got := msg.Buffer
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error("got diff:", diff)
+			}
+		})
+	}
+}
+
+func TestWriteString(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+		want  []uint8
+	}{
+		{
+			desc:  "TEST 1",
+			input: "q2dm1",
+			want:  []uint8{0x71, 0x32, 0x64, 0x6d, 0x31, 0x00}, // always ends in null
+		},
+	}
+	for _, tc := range tests {
+		t.Run("", func(t *testing.T) {
+			msg := MessageBuffer{}
+			msg.WriteString(tc.input)
+			got := msg.Buffer
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error("got diff:", diff)
+			}
+		})
 	}
 }
