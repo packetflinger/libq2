@@ -20,7 +20,7 @@ func (s *Server) DoRcon(str string) (Rcon, error) {
 	p := message.ConnectionlessPacket{
 		Data: fmt.Sprintf("rcon %s %s\n", s.Password, str),
 	}
-	out, err := p.SendtoHost(s.Address, s.Port)
+	out, err := p.Send(s.Address, s.Port)
 	if err != nil {
 		return Rcon{}, err
 	}

@@ -15,7 +15,7 @@ func TestFetchInfo(t *testing.T) {
 		t.Error(err)
 	}
 
-	if info.serverInfo["hostname"] != "PacketFlinger.com ~ DM" {
+	if info.Server["hostname"] != "PacketFlinger.com ~ DM" {
 		t.Error("invalid hostname lookup")
 	}
 }

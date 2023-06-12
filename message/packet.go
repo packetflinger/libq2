@@ -60,7 +60,7 @@ func (cp ConnectionlessPacket) Marshal() []byte {
 	return msg.Buffer
 }
 
-func (cp ConnectionlessPacket) SendtoHost(srv string, port int) (MessageBuffer, error) {
+func (cp ConnectionlessPacket) Send(srv string, port int) (MessageBuffer, error) {
 	target := fmt.Sprintf("%s:%d", srv, port)
 
 	// only use IPv4

@@ -9,11 +9,11 @@ import (
 )
 
 type ServerInfo struct {
-	serverInfo map[string]string
-	playerInfo []struct {
-		name  string
-		score int
-		ping  int
+	Server  map[string]string
+	Players []struct {
+		Name  string
+		Score int
+		Ping  int
 	}
 }
 
@@ -21,7 +21,7 @@ func (s *Server) FetchInfo() (ServerInfo, error) {
 	p := message.ConnectionlessPacket{
 		Data: "status",
 	}
-	out, err := p.SendtoHost(s.Address, s.Port)
+	out, err := p.Send(s.Address, s.Port)
 	if err != nil {
 		return ServerInfo{}, err
 	}
@@ -54,19 +54,19 @@ func parseServerinfo(s []string) ServerInfo {
 			players = fmt.Sprintf("%s,%s", players, player[2])
 			score, _ := strconv.Atoi(player[0])
 			ping, _ := strconv.Atoi(player[1])
-			si.playerInfo = append(si.playerInfo, struct {
-				name  string
-				score int
-				ping  int
+			si.Players = append(si.Players, struct {
+				Name  string
+				Score int
+				Ping  int
 			}{
-				name:  player[2][1 : len(player[2])-1],
-				score: score,
-				ping:  ping,
+				Name:  player[2][1 : len(player[2])-1],
+				Score: score,
+				Ping:  ping,
 			})
 		}
 
 		info["players"] = players[1:]
 	}
-	si.serverInfo = info
+	si.Server = info
 	return si
 }
