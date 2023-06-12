@@ -3,24 +3,26 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
-	d "github.com/packetflinger/libq2/demo"
-	m "github.com/packetflinger/libq2/message"
+	"github.com/packetflinger/libq2/demo"
+	"github.com/packetflinger/libq2/message"
+	"github.com/packetflinger/libq2/util"
 )
 
 func main() {
 	// open the demo file
-	demo, err := d.OpenDM2File("../testdata/test.dm2")
+	demo, err := demo.OpenDM2File("../testdata/testduel.dm2")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	// set a callback for parsing prints
-	callback := m.MessageCallbacks{
-		PrintCB: func(p m.Print) {
-			log.Println(p.String)
+	callback := message.MessageCallbacks{
+		Print: func(p *message.Print) {
+			fmt.Println(util.ConvertHighChars(p.String[:len(p.String)-1]))
 		},
 	}
 

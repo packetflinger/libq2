@@ -56,3 +56,21 @@ func TestClamp(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertHighChars(t *testing.T) {
+	in := "áîôéãèåáô"
+	want := "anticheat"
+	got := ConvertHighChars(in)
+	if got != want {
+		t.Error("ConvertHighChars: got", got, "want", want)
+	}
+}
+
+func TestConvertLowChars(t *testing.T) {
+	in := "anticheat"
+	want := "áîôéãèåáô"
+	got := ConvertLowChars(in)
+	if got != want {
+		t.Error("ConvertLowChars: got", got, "want", want)
+	}
+}

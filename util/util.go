@@ -59,3 +59,21 @@ func Clamp(val int, lower int, upper int) int {
 	}
 	return val
 }
+
+// Change consolechars back to normal text
+func ConvertHighChars(in string) string {
+	runes := []rune{}
+	for _, chr := range in {
+		runes = append(runes, chr&0x7f)
+	}
+	return string(runes)
+}
+
+// Change normal text to console chars
+func ConvertLowChars(in string) string {
+	runes := []rune{}
+	for _, chr := range in {
+		runes = append(runes, chr^0x80)
+	}
+	return string(runes)
+}
