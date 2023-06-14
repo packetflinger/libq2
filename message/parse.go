@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/packetflinger/libq2/client"
 	util "github.com/packetflinger/libq2/util"
 )
 
@@ -1333,6 +1332,7 @@ func (m *MessageBuffer) ParseChallenge() (ChallengeResponse, error) {
 	}, nil
 }
 
+/*
 func (msg *MessageBuffer) WriteDeltaMove(from *client.ClientMove, to *client.ClientMove) {
 	bits := byte(0)
 	if to.Angles.X != from.Angles.X {
@@ -1389,6 +1389,7 @@ func (msg *MessageBuffer) WriteDeltaMove(from *client.ClientMove, to *client.Cli
 	}
 	msg.WriteByte(to.Msec)
 }
+*/
 
 // generate an SVG image from a layout message
 func (lo Layout) RenderSVG() {
