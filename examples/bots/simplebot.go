@@ -4,53 +4,52 @@ import (
 	"fmt"
 	"log"
 
-	b "github.com/packetflinger/libq2/bot"
-	m "github.com/packetflinger/libq2/message"
-	p "github.com/packetflinger/libq2/player"
+	"github.com/packetflinger/libq2/bot"
+	"github.com/packetflinger/libq2/message"
+	"github.com/packetflinger/libq2/player"
 )
 
 func main() {
 	// simple print for each message type
-	callbacks := m.MessageCallbacks{
-		ServerData:   func(s *m.ServerData) { fmt.Println("ServerData:", s) },
-		ConfigString: func(cs *m.ConfigString) { fmt.Println("ConfigString:", cs) },
-		Baseline:     func(b *m.PackedEntity) { fmt.Println("Baseline:", b) },
-		Stuff:        func(s *m.StuffText) { fmt.Println("Stuff:", s.String) },
-		Frame:        func(f *m.FrameMsg) { fmt.Printf("Frame [%d,%d]\n", f.Number, f.Delta) },
-		PlayerState:  func(p *m.PackedPlayer) { fmt.Println("Playerstate") },
-		Entity: func(ents []*m.PackedEntity) {
+	_ = message.MessageCallbacks{
+		ServerData:   func(s *message.ServerData) { fmt.Println("ServerData:", s) },
+		ConfigString: func(cs *message.ConfigString) { fmt.Println("ConfigString:", cs) },
+		Baseline:     func(b *message.PackedEntity) { fmt.Println("Baseline:", b) },
+		Stuff:        func(s *message.StuffText) { fmt.Println("Stuff:", s.String) },
+		Frame:        func(f *message.FrameMsg) { fmt.Printf("Frame [%d,%d]\n", f.Number, f.Delta) },
+		PlayerState:  func(p *message.PackedPlayer) { fmt.Println("Playerstate") },
+		Entity: func(ents []*message.PackedEntity) {
 			fmt.Printf("Entities [")
 			for _, e := range ents {
 				fmt.Printf("%d,", e.Number)
 			}
 			fmt.Printf("]\n")
 		},
-		Print:       func(p *m.Print) { fmt.Printf("Print: [%d] %s\n", p.Level, p.String) },
-		Layout:      func(l *m.Layout) { fmt.Println("Layout") },
-		CenterPrint: func(p *m.CenterPrint) { fmt.Printf("CenterPrint: %s\n", p.Data) },
-		Sound:       func(s *m.PackedSound) { fmt.Println("Sound:", s) },
-		TempEnt:     func(t *m.TemporaryEntity) { fmt.Println("TempEnt:", t) },
-		Flash1:      func(f *m.MuzzleFlash) { fmt.Println("MuzzleFlash1") },
-		Flash2:      func(f *m.MuzzleFlash) { fmt.Println("MuzzleFlash2") },
+		Print:       func(p *message.Print) { fmt.Printf("Print: [%d] %s\n", p.Level, p.String) },
+		Layout:      func(l *message.Layout) { fmt.Println("Layout") },
+		CenterPrint: func(p *message.CenterPrint) { fmt.Printf("CenterPrint: %s\n", p.Data) },
+		Sound:       func(s *message.PackedSound) { fmt.Println("Sound:", s) },
+		TempEnt:     func(t *message.TemporaryEntity) { fmt.Println("TempEnt:", t) },
+		Flash1:      func(f *message.MuzzleFlash) { fmt.Println("MuzzleFlash1") },
+		Flash2:      func(f *message.MuzzleFlash) { fmt.Println("MuzzleFlash2") },
 	}
 
 	// Just output print msgs
-	_ = m.MessageCallbacks{
-		Print: func(p *m.Print) {
-			fmt.Println(p.String)
-		},
-		CenterPrint: func(c *m.CenterPrint) {
-			fmt.Println(c.Data)
+	callbacks := message.MessageCallbacks{
+		Print: func(p *message.Print) {
+			if p.Level == message.PrintLevelChat {
+				fmt.Println(p.String)
+			}
 		},
 	}
 
-	bot := b.Bot{
+	bot := bot.Bot{
 		Version: "PFBot Test v1",
-		Net: b.Connection{
+		Net: bot.Connection{
 			Address: "frag.gr",
 			Port:    27910,
 		},
-		User: p.Userinfo{
+		User: player.Userinfo{
 			Name: "totallynotabot",
 			Skin: "female/jezebel",
 			Hand: 0,
