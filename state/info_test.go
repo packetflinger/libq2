@@ -1,12 +1,13 @@
 package state
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestFetchInfo(t *testing.T) {
 	server := Server{
-		Address: "frag.gr",
+		Address: "localhost",
 		Port:    27910,
 	}
 
@@ -15,7 +16,12 @@ func TestFetchInfo(t *testing.T) {
 		t.Error(err)
 	}
 
-	if info.Server["hostname"] != "PacketFlinger.com ~ DM" {
-		t.Error("invalid hostname lookup")
-	}
+	/*
+		if info.Server["hostname"] != "PacketFlinger.com ~ DM" {
+			t.Error("invalid hostname lookup")
+		}
+	*/
+
+	fmt.Println(info)
+	t.Error()
 }

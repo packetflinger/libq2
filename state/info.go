@@ -27,46 +27,67 @@ func (s *Server) FetchInfo() (ServerInfo, error) {
 	}
 
 	lines := strings.Split(strings.Trim(string(out.Buffer[4:]), " \n\t"), "\n")
-	info := parseServerinfo(lines)
-	return info, nil
+	return parseServerinfo(lines)
 }
 
-func parseServerinfo(s []string) ServerInfo {
+func parseServerinfo(s []string) (ServerInfo, error) {
 	si := ServerInfo{}
-	serverinfo := s[1][1:]
-	playerinfo := s[2 : len(s)-1]
-
 	info := map[string]string{}
-	vars := strings.Split(serverinfo, "\\")
+
+	if s[0] != "print" {
+		return ServerInfo{}, fmt.Errorf("invalid server info string")
+	}
+
+	serverinfo := ""
+	if len(s) > 1 {
+		if len(s[1]) > 0 {
+			serverinfo = s[1][1:]
+			vars := strings.Split(serverinfo, "\\")
+
+			for i := 0; i < len(vars); i += 2 {
+				info[strings.ToLower(vars[i])] = vars[i+1]
+			}
+		}
+	}
+
+	if len(s) > 2 {
+		players := s[2:]
+		info["player_count"] = fmt.Sprintf("%d", len(players))
+		if len(players) > 0 {
+			playernames := ""
+
+			for _, p := range players {
+				player := strings.SplitN(p, " ", 3)
+				playernames = fmt.Sprintf("%s,%s", playernames, player[2])
+				score, _ := strconv.Atoi(player[0])
+				ping, _ := strconv.Atoi(player[1])
+				si.Players = append(si.Players, struct {
+					Name  string
+					Score int
+					Ping  int
+				}{
+					Name:  strings.Trim(player[2], "\""), // take quotes off
+					Score: score,
+					Ping:  ping,
+				})
+			}
+
+			info["players"] = playernames[1:]
+		}
+	}
+
+	si.Server = info
+	return si, nil
+}
+
+// Parse and info string (in the format of:
+// "\key1\val1\key2\val2\key3\val3\" into a key/value map)
+func ParseInfoString(info string) map[string]string {
+	infomap := map[string]string{}
+	vars := strings.Split(info, "\\")
 
 	for i := 0; i < len(vars); i += 2 {
-		info[strings.ToLower(vars[i])] = vars[i+1]
+		infomap[strings.ToLower(vars[i])] = vars[i+1]
 	}
-
-	playercount := len(playerinfo)
-	info["player_count"] = fmt.Sprintf("%d", playercount)
-
-	if playercount > 0 {
-		players := ""
-
-		for _, p := range playerinfo {
-			player := strings.SplitN(p, " ", 3)
-			players = fmt.Sprintf("%s,%s", players, player[2])
-			score, _ := strconv.Atoi(player[0])
-			ping, _ := strconv.Atoi(player[1])
-			si.Players = append(si.Players, struct {
-				Name  string
-				Score int
-				Ping  int
-			}{
-				Name:  player[2][1 : len(player[2])-1],
-				Score: score,
-				Ping:  ping,
-			})
-		}
-
-		info["players"] = players[1:]
-	}
-	si.Server = info
-	return si
+	return infomap
 }
