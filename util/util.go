@@ -2,6 +2,8 @@ package util
 
 import (
 	"bufio"
+	"encoding/binary"
+	"net"
 	"os"
 	"strings"
 )
@@ -76,4 +78,13 @@ func ConvertLowChars(in string) string {
 		runes = append(runes, chr^0x80)
 	}
 	return string(runes)
+}
+
+func BigIPAddressToDecimal(ip net.IP) int32 {
+	//return int32(ip[3]) + (int32(ip[2]) << 8) + (int32(ip[1]) << 16) + (int32(ip[0]) << 24)
+	return int32(binary.BigEndian.Uint32(ip))
+}
+
+func LittleIPAddressToDecmial(ip net.IP) int32 {
+	return int32(binary.LittleEndian.Uint32(ip))
 }
