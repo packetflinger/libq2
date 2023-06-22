@@ -209,6 +209,9 @@ func (m *MessageBuffer) Seek(offset int) {
 func (m *MessageBuffer) Size() int {
 	return len(m.Buffer)
 }
+func (m *MessageBuffer) Rewind() {
+	m.Index = 0
+}
 
 // 4 bytes signed
 func (msg *MessageBuffer) ReadLong() int32 {
