@@ -114,29 +114,53 @@ func nextLump(f *os.File, pos int64) ([]byte, int, error) {
 func (demo *DM2File) Write() {
 	msg := message.MessageBuffer{}
 
-	msg.Append(demo.Header.Marshal())
+	msg.Append(*demo.Header.Marshal())
 	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
 }
 
 // Write the entire header to a buffer
 func (header *DM2FileHeader) Marshal() *message.MessageBuffer {
 	msg := message.MessageBuffer{}
+	current := message.MessageBuffer{}
 
-	msg.WriteByte(message.SVCServerData)
-	msg.Append(header.Serverdata.Marshal())
+	current.WriteByte(message.SVCServerData)
+	current.Append(*header.Serverdata.Marshal())
 
 	for _, cs := range header.Configstrings {
-		msg.WriteByte(message.SVCConfigString)
-		msg.Append(cs.Marshal())
+		csmsg := cs.Marshal()
+		fmt.Println("cstring len", csmsg.Size())
+		if csmsg.Size()+current.Size()+1 >= message.MaxMessageLength {
+			msg.WriteLong(int32(len(current.Buffer)))
+			msg.Append(current)
+			current.Reset()
+		}
+		current.WriteByte(message.SVCConfigString)
+		current.Append(*csmsg)
 	}
 
 	for _, bl := range header.Baselines {
-		msg.WriteByte(message.SVCSpawnBaseline)
-		msg.Append(bl.Marshal())
+		blmsg := bl.Marshal()
+		if blmsg.Size()+current.Size()+1 >= message.MaxMessageLength {
+			msg.WriteLong(int32(len(current.Buffer)))
+			msg.Append(current)
+			current.Reset()
+		}
+		current.WriteByte(message.SVCSpawnBaseline)
+		current.Append(*blmsg)
 	}
 
 	precache := message.StuffText{String: "precache\n"}
-	msg.Append(precache.Marshal())
+	pc := precache.Marshal()
+	if pc.Size()+current.Size()+1 >= message.MaxMessageLength {
+		msg.WriteLong(int32(len(current.Buffer)))
+		msg.Append(current)
+		current.Reset()
+	}
+	current.WriteByte(message.SVCStuffText)
+	current.Append(*precache.Marshal())
+
+	msg.WriteLong(int32(len(current.Buffer)))
+	msg.Append(current)
 
 	return &msg
 }

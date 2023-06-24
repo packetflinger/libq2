@@ -15,6 +15,7 @@ const (
 	MaxStats         = 32
 	MaxEntities      = 1024
 	MaxConfigStrings = 2080
+	MaxMessageLength = 1390
 	CLCMove          = 2
 	CLCUserinfo      = 3
 	CLCStringCommand = 4
