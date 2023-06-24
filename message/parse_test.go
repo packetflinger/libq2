@@ -144,7 +144,7 @@ func TestParseDeltaEntities(t *testing.T) {
 
 	got := MessageBuffer{}
 	for _, e := range ents {
-		got.Append(e.Marshal())
+		got.Append(*e.Marshal())
 	}
 	got.WriteShort(0)
 	got.Reset()

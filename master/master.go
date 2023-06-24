@@ -81,7 +81,7 @@ func (m MasterServer) FetchServers() ([]MasterClient, error) {
 func (m *MasterServer) MarshalClients() *message.MessageBuffer {
 	msg := message.MessageBuffer{}
 	for _, cl := range m.Clients {
-		msg.Append(cl.Marshal())
+		msg.Append(*cl.Marshal())
 	}
 	return &msg
 }

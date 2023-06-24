@@ -139,7 +139,7 @@ func sendClientList(m *master.MasterServer, recip *net.Addr) {
 	msg.WriteData([]byte("servers ")) // note the space
 
 	clients := m.MarshalClients()
-	msg.Append(clients)
+	msg.Append(*clients)
 	(*m.Conn).WriteTo(msg.Buffer, *recip)
 	log.Println("sending client list to", *recip)
 }

@@ -196,7 +196,7 @@ func (m *MessageBuffer) Reset() {
 }
 
 // combine 2 buffers, set index to the end
-func (m *MessageBuffer) Append(m2 *MessageBuffer) {
+func (m *MessageBuffer) Append(m2 MessageBuffer) {
 	m.Buffer = append(m.Buffer, m2.Buffer...)
 	m.Index = len(m.Buffer)
 }
