@@ -223,6 +223,16 @@ func (msg *MessageBuffer) ReadLong() int32 {
 	return l
 }
 
+// 4 bytes unsigned
+func (msg *MessageBuffer) ReadULong() uint32 {
+	l := uint32(msg.Buffer[msg.Index])
+	l += uint32(msg.Buffer[msg.Index+1]) << 8
+	l += uint32(msg.Buffer[msg.Index+2]) << 16
+	l += uint32(msg.Buffer[msg.Index+3]) << 24
+	msg.Index += 4
+	return l
+}
+
 func (msg *MessageBuffer) WriteLong(data int32) {
 	b := []byte{
 		byte(data & 0xff),

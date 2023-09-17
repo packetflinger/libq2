@@ -149,3 +149,69 @@ func TestWriteString(t *testing.T) {
 		})
 	}
 }
+
+func TestReadULong(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input MessageBuffer
+		want  uint32
+	}{
+		{
+			desc:  "test1",
+			input: NewMessageBuffer([]byte{255, 255, 255, 255}),
+			want:  4294967295,
+		},
+		{
+			desc:  "test2",
+			input: NewMessageBuffer([]byte{128, 0, 0, 0}),
+			want:  128,
+		},
+		{
+			desc:  "test3",
+			input: NewMessageBuffer([]byte{0, 0, 0, 128}),
+			want:  2147483648,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			got := tc.input.ReadULong()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestReadLong(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input MessageBuffer
+		want  int32
+	}{
+		{
+			desc:  "test1",
+			input: NewMessageBuffer([]byte{255, 255, 255, 255}),
+			want:  -1,
+		},
+		{
+			desc:  "test2",
+			input: NewMessageBuffer([]byte{128, 0, 0, 0}),
+			want:  128,
+		},
+		{
+			desc:  "test3",
+			input: NewMessageBuffer([]byte{0, 0, 0, 128}),
+			want:  -2147483648,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			got := tc.input.ReadLong()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
