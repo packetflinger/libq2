@@ -1,0 +1,39 @@
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative *.proto
+syntax="proto3";
+
+option go_package = "github.com/packetflinger/libq2/proto";
+
+package proto;
+
+message ServerFile {
+    // Each message being a unique rcon password
+    message Password {
+        string identifier = 1;
+        string secret = 2;
+    }
+
+    message Server {
+        // an alias for a server
+        string identifier = 1;
+
+        // the ip:port or DNS address of the server
+        string address = 2;
+
+        // the password identifier, not the password itself
+        string rcon_password = 3;
+
+        // arbitrary identifiers for making collections 
+        // of servers
+        repeated string groups = 4;
+
+        // reference to a ~/.ssh/config host entry
+        string ssh_host = 5;
+
+        // the local path to the q2 log file
+        string log_file = 6;
+    }
+
+    repeated Password passwords = 1;
+    repeated Server servers = 2;
+}
