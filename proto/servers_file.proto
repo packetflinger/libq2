@@ -34,6 +34,6 @@ message ServerFile {
         string log_file = 6;
     }
 
-    repeated Password passwords = 1;
-    repeated Server servers = 2;
+    repeated Password password = 1;
+    repeated Server server = 2;
 }
