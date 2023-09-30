@@ -11,10 +11,8 @@ func TestDoRcon(t *testing.T) {
 		Password: "9E7A365A-A203-4010-A21E-9A9CCFB357D",
 	}
 
-	status, err := server.DoRcon("status")
+	_, err := server.DoRcon("status")
 	if err != nil {
 		t.Error(err)
 	}
-
-	t.Error(status)
 }

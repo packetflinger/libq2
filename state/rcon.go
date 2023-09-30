@@ -25,6 +25,8 @@ func (s *Server) DoRcon(str string) (Rcon, error) {
 		return Rcon{}, err
 	}
 
-	rcon.Output = string(out.Buffer[10:])
+	if len(out.Buffer) > 11 {
+		rcon.Output = string(out.Buffer[10:])
+	}
 	return rcon, nil
 }

@@ -22,7 +22,6 @@ type ConnectionlessPacket struct {
 	Data     string
 }
 
-//
 func NewConnectionlessPacket(str string) MessageBuffer {
 	msg := MessageBuffer{}
 	msg.WriteLong(-1)
@@ -78,10 +77,9 @@ func (cp ConnectionlessPacket) Send(srv string, port int) (MessageBuffer, error)
 	d := make([]byte, 1500)
 	read, err := conn.Read(d)
 	if err != nil {
-		return MessageBuffer{}, err
+		// swallow read errors
+		return MessageBuffer{}, nil
 	}
 
-	return MessageBuffer{
-		Buffer: d[:read],
-	}, nil
+	return MessageBuffer{Buffer: d[:read]}, nil
 }
