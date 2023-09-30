@@ -26,6 +26,5 @@ func (s *Server) DoRcon(str string) (Rcon, error) {
 	}
 
 	rcon.Output = string(out.Buffer[10:])
-	fmt.Println(rcon)
 	return rcon, nil
 }
