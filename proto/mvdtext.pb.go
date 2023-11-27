@@ -219,6 +219,53 @@ func (x *ConfigString) GetStr() string {
 	return ""
 }
 
+type MVDTextDemo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Block []*Block `protobuf:"bytes,1,rep,name=block,proto3" json:"block,omitempty"`
+}
+
+func (x *MVDTextDemo) Reset() {
+	*x = MVDTextDemo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_mvdtext_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MVDTextDemo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MVDTextDemo) ProtoMessage() {}
+
+func (x *MVDTextDemo) ProtoReflect() protoreflect.Message {
+	mi := &file_mvdtext_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MVDTextDemo.ProtoReflect.Descriptor instead.
+func (*MVDTextDemo) Descriptor() ([]byte, []int) {
+	return file_mvdtext_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MVDTextDemo) GetBlock() []*Block {
+	if x != nil {
+		return x.Block
+	}
+	return nil
+}
+
 var File_mvdtext_proto protoreflect.FileDescriptor
 
 var file_mvdtext_proto_rawDesc = []byte{
@@ -239,10 +286,13 @@ var file_mvdtext_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x12, 0x14,
 	0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x69,
 	0x6e, 0x64, 0x65, 0x78, 0x12, 0x10, 0x0a, 0x03, 0x73, 0x74, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x03, 0x73, 0x74, 0x72, 0x42, 0x26, 0x5a, 0x24, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x70, 0x61, 0x63, 0x6b, 0x65, 0x74, 0x66, 0x6c, 0x69, 0x6e, 0x67,
-	0x65, 0x72, 0x2f, 0x6c, 0x69, 0x62, 0x71, 0x32, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x09, 0x52, 0x03, 0x73, 0x74, 0x72, 0x22, 0x31, 0x0a, 0x0b, 0x4d, 0x56, 0x44, 0x54, 0x65, 0x78,
+	0x74, 0x44, 0x65, 0x6d, 0x6f, 0x12, 0x22, 0x0a, 0x05, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x42, 0x6c, 0x6f,
+	0x63, 0x6b, 0x52, 0x05, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x26, 0x5a, 0x24, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x70, 0x61, 0x63, 0x6b, 0x65, 0x74, 0x66, 0x6c,
+	0x69, 0x6e, 0x67, 0x65, 0x72, 0x2f, 0x6c, 0x69, 0x62, 0x71, 0x32, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -257,22 +307,24 @@ func file_mvdtext_proto_rawDescGZIP() []byte {
 	return file_mvdtext_proto_rawDescData
 }
 
-var file_mvdtext_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_mvdtext_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_mvdtext_proto_goTypes = []interface{}{
 	(*Block)(nil),        // 0: proto.Block
 	(*ServerData)(nil),   // 1: proto.ServerData
 	(*BaseStrings)(nil),  // 2: proto.BaseStrings
 	(*ConfigString)(nil), // 3: proto.ConfigString
+	(*MVDTextDemo)(nil),  // 4: proto.MVDTextDemo
 }
 var file_mvdtext_proto_depIdxs = []int32{
 	1, // 0: proto.Block.serverdata:type_name -> proto.ServerData
 	2, // 1: proto.ServerData.basestrings:type_name -> proto.BaseStrings
 	3, // 2: proto.BaseStrings.configstring:type_name -> proto.ConfigString
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0, // 3: proto.MVDTextDemo.block:type_name -> proto.Block
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_mvdtext_proto_init() }
@@ -329,6 +381,18 @@ func file_mvdtext_proto_init() {
 				return nil
 			}
 		}
+		file_mvdtext_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MVDTextDemo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -336,7 +400,7 @@ func file_mvdtext_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_mvdtext_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

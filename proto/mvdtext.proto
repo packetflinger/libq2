@@ -22,3 +22,7 @@ message ConfigString {
     uint64 index = 1;
     string str = 2;
 }
+
+message MVDTextDemo {
+    repeated Block block = 1;
+}
