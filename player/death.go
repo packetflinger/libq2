@@ -254,3 +254,78 @@ func CalculateDeath(obit string) (Death, error) {
 
 	return Death{}, errors.New("obituary not recognised")
 }
+
+// Get a string representation of the means of death index
+func MODToString(index int) string {
+	switch index {
+	case ModBlaster:
+		return "blaster"
+	case ModShotgun:
+		return "shotgun"
+	case ModSShotgun:
+		return "super shotgun"
+	case ModMachinegun:
+		return "machinegun"
+	case ModChaingun:
+		return "chaingun"
+	case ModGrenade:
+		return "grenade"
+	case ModGSplash:
+		return "grenade"
+	case ModRocket:
+		return "rocket"
+	case ModRSplash:
+		return "rocket"
+	case ModHyperblaster:
+		return "hyperblaster"
+	case ModRailgun:
+		return "railgun"
+	case ModBFGLaser:
+		return "BFG"
+	case ModBFGBlast:
+		return "BFG"
+	case ModBFGEffect:
+		return "BFG"
+	case ModHandgrenade:
+		return "handgrenade"
+	case ModHGSplash:
+		return "handgrenade"
+	case ModWater:
+		return "water"
+	case ModSlime:
+		return "slime"
+	case ModLava:
+		return "lava"
+	case ModCrush:
+		return "crush"
+	case ModTelefrag:
+		return "telefrag"
+	case ModFalling:
+		return "falling"
+	case ModSuicide:
+		return "suicide"
+	case ModHeldGrenade:
+		return "handgrenade"
+	case ModExplosive:
+		return "explosive"
+	case ModBarrel:
+		return "explosive"
+	case ModBomb:
+		return "explosive"
+	case ModExit:
+		return "exit"
+	case ModSplash:
+		return "splash"
+	case ModTargetLaser:
+		return "laser"
+	case ModTriggerHurt:
+		return "trigger"
+	case ModHit:
+		return "hit"
+	case ModTargetBlaster:
+		return "targetblaster"
+	case ModFriendlyFire:
+		return "friendlyfire"
+	}
+	return "unknown"
+}
