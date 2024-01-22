@@ -74,6 +74,8 @@ func parseServerinfo(s []string) (ServerInfo, error) {
 
 			info["players"] = playernames[1:]
 		}
+	} else {
+		info["player_count"] = "0"
 	}
 
 	si.Server = info
