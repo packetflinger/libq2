@@ -47,14 +47,19 @@ type MessageCallbacks struct {
 	OnConnect func()               // connection to gameserver made
 	OnEnter   func()               // you entered the game (begin)
 	PreSend   func(*MessageBuffer) //
+
+	// needed for parsing compressed things like playerstates and
+	// packetentities
+	FrameMap map[int]ServerFrame
 }
 
 type ServerFrame struct {
 	Server         ServerData
 	Frame          FrameMsg
+	DeltaFrame     *ServerFrame
 	Playerstate    PackedPlayer
-	Entities       [MaxEntities]PackedEntity
-	Baselines      [MaxEntities]PackedEntity
+	Entities       map[int]PackedEntity
+	Baselines      map[int]PackedEntity
 	Strings        []ConfigString
 	Prints         []Print
 	Stuffs         []StuffText
@@ -64,6 +69,18 @@ type ServerFrame struct {
 	TempEntities   []TemporaryEntity
 	Flash1         []MuzzleFlash
 	Flash2         []MuzzleFlash
+}
+
+// This "header" is present for both demos and live connections.
+// Before being spawned in, the server will send a serverdata message,
+// then all the current configstrings, and known entities and their
+// attributes at that time.
+//
+// After this, the server will start sending frames to the client
+type GamestateHeader struct {
+	Serverdata    ServerData
+	Configstrings []ConfigString
+	Baselines     []PackedEntity
 }
 
 // always the first message received from server
@@ -192,8 +209,10 @@ type ChallengeResponse struct {
 //
 // External callbacks are for logic outside the library, like custom programs
 // that import this library.
-func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCallbacks, delta *ServerFrame) (ServerFrame, error) {
-	sf := ServerFrame{}
+func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCallbacks) (ServerFrame, error) {
+	sf := NewServerFrame()
+	frameMap := intcb.FrameMap
+	deltaFrame := &ServerFrame{}
 
 	for buf.Index < len(buf.Buffer) {
 		cmd := buf.ReadByte()
@@ -221,7 +240,7 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 
 		case SVCSpawnBaseline:
 			bl := buf.ParseSpawnBaseline()
-			sf.Baselines[bl.Number] = bl
+			//sf.Baselines[int(bl.Number)] = bl
 			if intcb.Baseline != nil {
 				intcb.Baseline(&bl)
 			}
@@ -241,6 +260,8 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 
 		case SVCFrame:
 			fr := buf.ParseFrame()
+			df := frameMap[int(fr.Delta)]
+			deltaFrame = &df
 			sf.Frame = fr
 			if intcb.Frame != nil {
 				intcb.Frame(&fr)
@@ -251,8 +272,8 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 
 		case SVCPlayerInfo:
 			lastps := PackedPlayer{}
-			if delta != nil {
-				lastps = delta.Playerstate
+			if deltaFrame != nil {
+				lastps = deltaFrame.Playerstate
 			}
 			ps := buf.ParseDeltaPlayerstate(lastps)
 			sf.Playerstate = ps
@@ -264,10 +285,10 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 			}
 
 		case SVCPacketEntities:
-			ents := buf.ParsePacketEntities(delta)
+			ents := buf.ParsePacketEntities(deltaFrame)
 			cbents := []*PackedEntity{}
 			for i := range ents {
-				sf.Entities[ents[i].Number] = ents[i]
+				//sf.Entities[int(ents[i].Number)] = ents[i]
 				cbents = append(cbents, &ents[i])
 			}
 			if intcb.Entity != nil {
@@ -657,7 +678,7 @@ func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 // A S->C msg containing all entities the client should
 // know aobut for a particular frame
 func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
-	froments := [MaxEntities]PackedEntity{}
+	froments := map[int]PackedEntity{}
 	ents := []PackedEntity{}
 	for {
 		bits := m.ParseEntityBitmask()
@@ -671,7 +692,7 @@ func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 			froments = from.Entities
 		}
 
-		entity := m.ParseEntity(froments[num], num, bits)
+		entity := m.ParseEntity(froments[int(num)], num, bits)
 		ents = append(ents, entity)
 	}
 
@@ -748,7 +769,7 @@ func (to *PackedPlayer) DeltaPlayerstateBitmask(from *PackedPlayer) uint16 {
 	}
 
 	if to.PlayerMove.Gravity != from.PlayerMove.Gravity {
-		bits |= PlayerTime
+		bits |= PlayerGravity
 	}
 
 	if !util.VectorCompare(to.PlayerMove.DeltaAngles, from.PlayerMove.DeltaAngles) {
@@ -918,7 +939,7 @@ func (to *PackedEntity) DeltaEntityBitmask(from *PackedEntity) int {
 	}
 
 	if to.SkinNum != from.SkinNum {
-		if to.SkinNum&mask&mask > 0 {
+		if to.SkinNum&mask > 0 {
 			bits |= EntitySkin8 | EntitySkin16
 		} else if to.SkinNum&uint32(0x0000ff00) > 0 {
 			bits |= EntitySkin16
@@ -1423,4 +1444,71 @@ func (st StuffText) Marshal() *MessageBuffer {
 	msg := MessageBuffer{}
 	msg.WriteString(st.String)
 	return &msg
+}
+
+// Write the entire header to a buffer
+func (header *GamestateHeader) Marshal() *MessageBuffer {
+	msg := MessageBuffer{}
+	current := MessageBuffer{}
+
+	current.WriteByte(SVCServerData)
+	current.Append(*header.Serverdata.Marshal())
+
+	for _, cs := range header.Configstrings {
+		csmsg := cs.Marshal()
+		fmt.Println("cstring len", csmsg.Size())
+		if csmsg.Size()+current.Size()+1 >= MaxMessageLength {
+			msg.WriteLong(int32(len(current.Buffer)))
+			msg.Append(current)
+			current.Reset()
+		}
+		current.WriteByte(SVCConfigString)
+		current.Append(*csmsg)
+	}
+
+	for _, bl := range header.Baselines {
+		blmsg := bl.Marshal()
+		if blmsg.Size()+current.Size()+1 >= MaxMessageLength {
+			msg.WriteLong(int32(len(current.Buffer)))
+			msg.Append(current)
+			current.Reset()
+		}
+		current.WriteByte(SVCSpawnBaseline)
+		current.Append(*blmsg)
+	}
+
+	precache := StuffText{String: "precache\n"}
+	pc := precache.Marshal()
+	if pc.Size()+current.Size()+1 >= MaxMessageLength {
+		msg.WriteLong(int32(len(current.Buffer)))
+		msg.Append(current)
+		current.Reset()
+	}
+	current.WriteByte(SVCStuffText)
+	current.Append(*precache.Marshal())
+
+	msg.WriteLong(int32(len(current.Buffer)))
+	msg.Append(current)
+
+	return &msg
+}
+
+func NewServerFrame() ServerFrame {
+	sf := ServerFrame{
+		Entities:  make(map[int]PackedEntity),
+		Baselines: make(map[int]PackedEntity),
+	}
+	return sf
+}
+
+// Make a copy of a ServerFrame containing only things we need
+// to merge from the previous frame (playerstate and entities).
+// The rest is filled in as the message lumps are parsed
+func (sf ServerFrame) MergeCopy() ServerFrame {
+	nsf := NewServerFrame()
+	nsf.Playerstate = sf.Playerstate
+	for k, v := range sf.Entities {
+		nsf.Entities[k] = v
+	}
+	return nsf
 }
