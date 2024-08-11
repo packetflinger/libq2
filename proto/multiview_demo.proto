@@ -1,0 +1,12 @@
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative multiview_demo.proto
+syntax="proto3";
+option go_package = "github.com/packetflinger/libq2/proto";
+package proto;
+
+message Multicast {
+    uint32 type = 1;
+    bool reliable = 2;
+    uint32 leafnum = 3;
+    string data = 4;
+}
