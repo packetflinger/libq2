@@ -364,3 +364,89 @@ func (msg *MessageBuffer) ReadPosition() [3]uint16 {
 func (msg *MessageBuffer) ReadDirection() uint8 {
 	return msg.ReadByte()
 }
+
+func (msg *MessageBuffer) ReadUInt8() uint8 {
+	val := uint8(msg.Buffer[msg.Index])
+	msg.Index++
+	return val
+}
+
+func (msg *MessageBuffer) WriteUInt8(b uint8) {
+	bb := []byte{byte(b)}
+	msg.Buffer = append(msg.Buffer, bb...)
+	msg.Index++
+}
+
+func (msg *MessageBuffer) ReadUInt16() uint16 {
+	s := uint16(msg.Buffer[msg.Index] & 0xff)
+	s += uint16(msg.Buffer[msg.Index+1]) << 8
+	msg.Index += 2
+
+	return s
+}
+
+func (msg *MessageBuffer) WriteUInt16(s uint16) {
+	b := []byte{
+		byte(s & 0xff),
+		byte((s >> 8) & 0xff),
+	}
+	msg.Buffer = append(msg.Buffer, b...)
+	msg.Index += 2
+}
+
+func (msg *MessageBuffer) ReadInt16() int16 {
+	s := int16(msg.Buffer[msg.Index] & 0xff)
+	s += int16(msg.Buffer[msg.Index+1]) << 8
+	msg.Index += 2
+
+	return s
+}
+
+func (msg *MessageBuffer) WriteInt16(s int16) {
+	b := []byte{
+		byte(s & 0xff),
+		byte((s >> 8) & 0xff),
+	}
+	msg.Buffer = append(msg.Buffer, b...)
+	msg.Index += 2
+}
+
+func (msg *MessageBuffer) ReadInt32() int32 {
+	l := int32(msg.Buffer[msg.Index])
+	l += int32(msg.Buffer[msg.Index+1]) << 8
+	l += int32(msg.Buffer[msg.Index+2]) << 16
+	l += int32(msg.Buffer[msg.Index+3]) << 24
+	msg.Index += 4
+	return l
+}
+
+func (msg *MessageBuffer) WriteInt32(data int32) {
+	b := []byte{
+		byte(data & 0xff),
+		byte((data >> 8) & 0xff),
+		byte((data >> 16) & 0xff),
+		byte((data >> 24) & 0xff),
+	}
+	msg.Buffer = append(msg.Buffer, b...)
+	msg.Index += 4
+}
+
+func (msg *MessageBuffer) ReadUInt32() uint32 {
+	l := uint32(msg.Buffer[msg.Index])
+	l += uint32(msg.Buffer[msg.Index+1]) << 8
+	l += uint32(msg.Buffer[msg.Index+2]) << 16
+	l += uint32(msg.Buffer[msg.Index+3]) << 24
+	msg.Index += 4
+	return l
+}
+
+func (msg *MessageBuffer) WriteUInt32(data uint32) {
+	b := []byte{
+		byte(data & 0xff),
+		byte((data >> 8) & 0xff),
+		byte((data >> 16) & 0xff),
+		byte((data >> 24) & 0xff),
+	}
+	msg.Buffer = append(msg.Buffer, b...)
+	msg.Index += 4
+}
