@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// simple print for each message type
-	_ = message.MessageCallbacks{
+	callbacks := message.MessageCallbacks{
 		ServerData:   func(s *message.ServerData) { fmt.Println("ServerData:", s) },
 		ConfigString: func(cs *message.ConfigString) { fmt.Println("ConfigString:", cs) },
 		Baseline:     func(b *message.PackedEntity) { fmt.Println("Baseline:", b) },
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// Just output print msgs
-	callbacks := message.MessageCallbacks{
+	_ = message.MessageCallbacks{
 		Print: func(p *message.Print) {
 			if p.Level == message.PrintLevelChat {
 				fmt.Println(p.String)
@@ -43,19 +43,30 @@ func main() {
 		},
 	}
 
+	_ = message.MessageCallbacks{
+		ConfigString: func(cs *message.ConfigString) {
+			fmt.Println("ConfigString:", cs)
+			//fmt.Printf("%s", hex.Dump([]byte(cs.String)))
+		},
+		/*qLayout: func(l *message.Layout) {
+			fmt.Println("Layout")
+			fmt.Printf("%s", hex.Dump([]byte(l.Data)))
+		},*/
+	}
+
 	bot := bot.Bot{
 		Version: "PFBot Test v1",
 		Net: bot.Connection{
-			Address: "frag.gr",
-			Port:    27910,
+			Address: "dev.frag.gr",
+			Port:    27999,
 		},
 		User: player.Userinfo{
-			Name: "totallynotabot",
+			Name: "test1",
 			Skin: "female/jezebel",
 			Hand: 0,
-			Rate: 1000,
+			Rate: 15000,
 		},
-		Debug: false,
+		Debug: true,
 	}
 
 	if err := bot.Run(callbacks); err != nil {
