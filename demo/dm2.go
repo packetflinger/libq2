@@ -15,18 +15,12 @@ type DM2File struct {
 	Handle       *os.File
 	Position     int
 	Spawned      bool // header read, "precache\n" stuff received
-	Header       DM2FileHeader
+	Header       message.GamestateHeader
 	Frames       map[int]message.ServerFrame
 	CurrentFrame *message.ServerFrame
 	PrevFrame    *message.ServerFrame
 	LumpCallback func([]byte)
 	Callbacks    message.MessageCallbacks
-}
-
-type DM2FileHeader struct {
-	Serverdata    message.ServerData
-	Configstrings []message.ConfigString
-	Baselines     []message.PackedEntity
 }
 
 func OpenDM2File(f string) (*DM2File, error) {
@@ -66,7 +60,7 @@ func (demo *DM2File) ParseDM2(extcb message.MessageCallbacks) error {
 		}
 		demo.Position += size
 
-		_, err = message.ParseMessageLump(message.NewMessageBuffer(lump), intcb, extcb, demo.PrevFrame)
+		_, err = message.ParseMessageLump(message.NewMessageBuffer(lump), intcb, extcb)
 		if err != nil {
 			return err
 		}
@@ -118,53 +112,6 @@ func (demo *DM2File) Write() {
 	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
 }
 
-// Write the entire header to a buffer
-func (header *DM2FileHeader) Marshal() *message.MessageBuffer {
-	msg := message.MessageBuffer{}
-	current := message.MessageBuffer{}
-
-	current.WriteByte(message.SVCServerData)
-	current.Append(*header.Serverdata.Marshal())
-
-	for _, cs := range header.Configstrings {
-		csmsg := cs.Marshal()
-		fmt.Println("cstring len", csmsg.Size())
-		if csmsg.Size()+current.Size()+1 >= message.MaxMessageLength {
-			msg.WriteLong(int32(len(current.Buffer)))
-			msg.Append(current)
-			current.Reset()
-		}
-		current.WriteByte(message.SVCConfigString)
-		current.Append(*csmsg)
-	}
-
-	for _, bl := range header.Baselines {
-		blmsg := bl.Marshal()
-		if blmsg.Size()+current.Size()+1 >= message.MaxMessageLength {
-			msg.WriteLong(int32(len(current.Buffer)))
-			msg.Append(current)
-			current.Reset()
-		}
-		current.WriteByte(message.SVCSpawnBaseline)
-		current.Append(*blmsg)
-	}
-
-	precache := message.StuffText{String: "precache\n"}
-	pc := precache.Marshal()
-	if pc.Size()+current.Size()+1 >= message.MaxMessageLength {
-		msg.WriteLong(int32(len(current.Buffer)))
-		msg.Append(current)
-		current.Reset()
-	}
-	current.WriteByte(message.SVCStuffText)
-	current.Append(*precache.Marshal())
-
-	msg.WriteLong(int32(len(current.Buffer)))
-	msg.Append(current)
-
-	return &msg
-}
-
 func (demo *DM2File) MarshalLump() {
 
 }
@@ -176,6 +123,7 @@ func (demo *DM2File) MarshalLump() {
 // on a previous frame for delta compression (usually the last one).
 func (demo *DM2File) InternalCallbacks() message.MessageCallbacks {
 	cb := message.MessageCallbacks{
+		FrameMap: demo.Frames,
 		ServerData: func(s *message.ServerData) {
 			demo.Header.Serverdata = *s
 		},
@@ -198,16 +146,24 @@ func (demo *DM2File) InternalCallbacks() message.MessageCallbacks {
 			}
 		},
 		Frame: func(f *message.FrameMsg) {
-			demo.PrevFrame = demo.CurrentFrame
-			demo.CurrentFrame = &message.ServerFrame{}
+			newframe := message.NewServerFrame()
+			if demo.CurrentFrame != nil {
+				newframe = demo.CurrentFrame.MergeCopy()
+			}
+			demo.Frames[int(f.Number)] = newframe
+			demo.CurrentFrame = &newframe
+			delta := demo.Frames[int(f.Delta)]
+			demo.CurrentFrame.DeltaFrame = &delta
 			demo.CurrentFrame.Frame = *f
+
+			//fmt.Printf("%v\n\n", demo.CurrentFrame)
 		},
 		PlayerState: func(p *message.PackedPlayer) {
 			demo.CurrentFrame.Playerstate = *p
 		},
 		Entity: func(ents []*message.PackedEntity) {
 			for _, e := range ents {
-				demo.CurrentFrame.Entities[e.Number] = *e
+				demo.CurrentFrame.Entities[int(e.Number)] = *e
 			}
 		},
 		Print: func(p *message.Print) {
