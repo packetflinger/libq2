@@ -38,9 +38,6 @@ func TestMarshal(t *testing.T) {
 	}
 
 	demo.Close()
-	t.Error(textpb)
-
-	//t.Error("Frame count:", len(textpb.Frames))
 }
 
 func TestServerDataToProto(t *testing.T) {

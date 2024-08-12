@@ -59,14 +59,13 @@ func TestWrite(t *testing.T) {
 	msg := m.MessageBuffer{}
 	msg.WriteDeltaPlayerstate(&psto, &psfrom)
 
-	fmt.Println(psfrom)
-	fmt.Println("ljsfljsf")
-	fmt.Println(psto)
-	fmt.Println("lajksflk")
-	fmt.Println(msg)
+	//fmt.Println(psfrom)
+	//fmt.Println("ljsfljsf")
+	//fmt.Println(psto)
+	//fmt.Println("lajksflk")
+	//fmt.Println(msg)
 	//demo.Write()
-	t.Error()
-
+	//t.Error()
 	demo.Close()
 }
 
