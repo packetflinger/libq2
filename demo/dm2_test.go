@@ -7,17 +7,30 @@ import (
 	m "github.com/packetflinger/libq2/message"
 )
 
-func TestOpenDM2File(t *testing.T) {
-	demo, e := OpenDM2File("../testdata/test.dm2")
-	if e != nil {
-		t.Errorf("%v", e)
+func TestNewDM2Demo(t *testing.T) {
+	tests := []struct {
+		name string
+		file string
+		want int
+	}{
+		{
+			name: "Test 1",
+			file: "../testdata/test.dm2",
+			want: 7931,
+		},
 	}
-
-	if demo.Handle == nil {
-		t.Error("Handle - file handle is nil")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			demo, err := NewDM2Demo(tc.file)
+			if err != nil {
+				t.Error(err)
+			}
+			got := len(demo.binaryData)
+			if got != tc.want {
+				t.Errorf("\nSize mismatch\ngot: %d, want: %d\n", got, tc.want)
+			}
+		})
 	}
-
-	demo.Close()
 }
 
 func TestParseDM2(t *testing.T) {

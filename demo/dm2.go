@@ -2,13 +2,19 @@ package demo
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/packetflinger/libq2/message"
-	"github.com/packetflinger/libq2/util"
+
+	pb "github.com/packetflinger/libq2/proto"
 )
+
+type DM2Demo struct {
+	textProto      *pb.DM2Demo
+	binaryData     []byte // the contents of a .dm2 file
+	binaryPosition int64  // where in those contents we are
+}
 
 type DM2File struct {
 	Filename     string
@@ -23,29 +29,16 @@ type DM2File struct {
 	Callbacks    message.MessageCallbacks
 }
 
-func OpenDM2File(f string) (*DM2File, error) {
-	if !util.FileExists(f) {
-		return nil, errors.New("no such file")
+// Read the entire binary demo file into memory
+func NewDM2Demo(filename string) (*DM2Demo, error) {
+	if filename == "" {
+		return nil, fmt.Errorf("no file specified")
 	}
-
-	fp, e := os.Open(f)
-	if e != nil {
-		return nil, e
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
 	}
-
-	demo := DM2File{
-		Filename: f,
-		Handle:   fp,
-		Frames:   make(map[int]message.ServerFrame),
-	}
-
-	return &demo, nil
-}
-
-func (demo *DM2File) Close() {
-	if demo.Handle != nil {
-		demo.Handle.Close()
-	}
+	return &DM2Demo{binaryData: data}, nil
 }
 
 func (demo *DM2File) ParseDM2(extcb message.MessageCallbacks) error {
