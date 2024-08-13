@@ -5,74 +5,6 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
-func (demo *DM2File) Marshal(textpb *pb.TestDemo, data message.MessageBuffer) error {
-	//textpb := &pb.TestDemo{}
-	currentFrame := &pb.Frame{}
-	//fmt.Println("data:\n", data)
-	for data.Index < len(data.Buffer) {
-		cmd := data.ReadByte()
-		switch cmd {
-		case message.SVCServerData:
-			serverdata := ServerDataToProto(&data)
-			//fmt.Println("[svcdata]")
-			textpb.Serverinfo = serverdata
-		case message.SVCConfigString:
-			cs := ConfigstringToProto(&data)
-			if currentFrame.GetNumber() == 0 {
-				textpb.Configstrings = append(textpb.Configstrings, cs)
-				//fmt.Println("[configstring] -", cs.GetIndex())
-			} else {
-				currentFrame.Configstrings = append(currentFrame.Configstrings, cs)
-				//fmt.Println("  [configstring] -", cs.GetIndex())
-			}
-		case message.SVCSpawnBaseline:
-			bitmask := data.ParseEntityBitmask()
-			number := data.ParseEntityNumber(bitmask)
-			baseline := EntityToProto(&data, bitmask, number)
-			//fmt.Println("[baseline] -", number)
-			textpb.Baselines = append(textpb.Baselines, baseline)
-		case message.SVCStuffText:
-			stuff := StuffTextToProto(&data)
-			//fmt.Println("[stuff] -", stuff.GetString_())
-			if currentFrame.Number > 0 {
-				currentFrame.Stufftexts = append(currentFrame.Stufftexts, stuff)
-			}
-		case message.SVCFrame: // includes playerstate and packetentities
-			frame := FrameToProto(&data)
-			//fmt.Println(frame)
-			//fmt.Println("frameout:", FrameToBinary(frame))
-			//fmt.Println("[frame] -", frame.GetNumber())
-			textpb.Frames = append(textpb.Frames, frame)
-			currentFrame = frame
-		case message.SVCPrint:
-			print := PrintToProto(&data)
-			currentFrame.Prints = append(currentFrame.Prints, print)
-			//fmt.Println("[print] -", print.GetString_())
-		case message.SVCMuzzleFlash:
-			flash := FlashToProto(&data)
-			currentFrame.Flashes1 = append(currentFrame.Flashes1, flash)
-			//fmt.Println("[muzzleflash]")
-		case message.SVCTempEntity:
-			te := TempEntToProto(&data)
-			currentFrame.TemporaryEntities = append(currentFrame.TemporaryEntities, te)
-			//fmt.Println("[temp entity]")
-		case message.SVCLayout:
-			layout := LayoutToProto(&data)
-			currentFrame.Layouts = append(currentFrame.Layouts, layout)
-			//fmt.Println("[layout]")
-		case message.SVCSound:
-			sound := SoundToProto(&data)
-			currentFrame.Sounds = append(currentFrame.Sounds, sound)
-			//fmt.Println("[sound]")
-		case message.SVCCenterPrint:
-			cp := CenterPrintToProto(&data)
-			currentFrame.Centerprints = append(currentFrame.Centerprints, cp)
-			//fmt.Println("[centerprint]")
-		}
-	}
-	return nil
-}
-
 func ServerDataToProto(data *message.MessageBuffer) *pb.ServerInfo {
 	sd := &pb.ServerInfo{}
 	sd.Protocol = data.ReadULong()
@@ -401,28 +333,10 @@ func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.Messag
 		msg.WriteByte(byte(to.GetRdFlags()))
 	}
 
-	ReconsilePlayerstateStats(to, from, msg)
-	/*
-		// compress the stats
-		statbits := int32(0)
-		for i := 0; i < MaxStats; i++ {
-			if to.Stats[i] != from.Stats[i] {
-				statbits |= 1 << i
-			}
-		}
-	*/
-	/*
-		stats := to.GetStats()
-		msg.WriteLong(statbits)
-		for i := 0; i < MaxStats; i++ {
-			if (statbits & (1 << i)) > 0 {
-				msg.WriteShort(uint16(stats[i]))
-			}
-		}
-	*/
+	ReconcilePlayerstateStats(to, from, msg)
 }
 
-func ReconsilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *message.MessageBuffer) {
+func ReconcilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *message.MessageBuffer) {
 	bits := uint32(0)
 	toStats := [32]int16{}
 	for _, s := range to.GetStats() {

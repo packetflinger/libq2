@@ -16,19 +16,6 @@ type DM2Demo struct {
 	binaryPosition int    // where in those contents we are
 }
 
-type DM2File struct {
-	Filename     string
-	Handle       *os.File
-	Position     int
-	Spawned      bool // header read, "precache\n" stuff received
-	Header       message.GamestateHeader
-	Frames       map[int]message.ServerFrame
-	CurrentFrame *message.ServerFrame
-	PrevFrame    *message.ServerFrame
-	LumpCallback func([]byte)
-	Callbacks    message.MessageCallbacks
-}
-
 // Read the entire binary demo file into memory
 func NewDM2Demo(filename string) (*DM2Demo, error) {
 	if filename == "" {
