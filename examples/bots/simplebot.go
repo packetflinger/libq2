@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// simple print for each message type
-	callbacks := message.MessageCallbacks{
+	callbacks := message.Callback{
 		ServerData:   func(s *message.ServerData) { fmt.Println("ServerData:", s) },
 		ConfigString: func(cs *message.ConfigString) { fmt.Println("ConfigString:", cs) },
 		Baseline:     func(b *message.PackedEntity) { fmt.Println("Baseline:", b) },
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// Just output print msgs
-	_ = message.MessageCallbacks{
+	_ = message.Callback{
 		Print: func(p *message.Print) {
 			if p.Level == message.PrintLevelChat {
 				fmt.Println(p.String)
@@ -43,22 +43,11 @@ func main() {
 		},
 	}
 
-	_ = message.MessageCallbacks{
-		ConfigString: func(cs *message.ConfigString) {
-			fmt.Println("ConfigString:", cs)
-			//fmt.Printf("%s", hex.Dump([]byte(cs.String)))
-		},
-		/*qLayout: func(l *message.Layout) {
-			fmt.Println("Layout")
-			fmt.Printf("%s", hex.Dump([]byte(l.Data)))
-		},*/
-	}
-
 	bot := bot.Bot{
 		Version: "PFBot Test v1",
 		Net: bot.Connection{
 			Address: "dev.frag.gr",
-			Port:    27999,
+			Port:    27910,
 		},
 		User: player.Userinfo{
 			Name: "test1",
@@ -66,7 +55,7 @@ func main() {
 			Hand: 0,
 			Rate: 15000,
 		},
-		Debug: true,
+		Debug: false,
 	}
 
 	if err := bot.Run(callbacks); err != nil {
