@@ -209,9 +209,9 @@ type ChallengeResponse struct {
 //
 // External callbacks are for logic outside the library, like custom programs
 // that import this library.
-func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCallbacks) (ServerFrame, error) {
+func ParseMessageLump(buf MessageBuffer) (ServerFrame, error) {
 	sf := NewServerFrame()
-	frameMap := intcb.FrameMap
+	//frameMap := intcb.FrameMap
 	deltaFrame := &ServerFrame{}
 
 	for buf.Index < len(buf.Buffer) {
@@ -221,54 +221,24 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 		case SVCServerData:
 			s := buf.ParseServerData()
 			sf.Server = s
-			if intcb.ServerData != nil {
-				intcb.ServerData(&s)
-			}
-			if extcb.ServerData != nil {
-				extcb.ServerData(&s)
-			}
 
 		case SVCConfigString:
 			cs := buf.ParseConfigString()
 			sf.Strings = append(sf.Strings, cs)
-			if intcb.ConfigString != nil {
-				intcb.ConfigString(&cs)
-			}
-			if extcb.ConfigString != nil {
-				extcb.ConfigString(&cs)
-			}
 
 		case SVCSpawnBaseline:
-			bl := buf.ParseSpawnBaseline()
+			_ = buf.ParseSpawnBaseline()
 			//sf.Baselines[int(bl.Number)] = bl
-			if intcb.Baseline != nil {
-				intcb.Baseline(&bl)
-			}
-			if extcb.Baseline != nil {
-				extcb.Baseline(&bl)
-			}
 
 		case SVCStuffText:
 			st := buf.ParseStuffText()
 			sf.Stuffs = append(sf.Stuffs, st)
-			if intcb.Stuff != nil {
-				intcb.Stuff(&st)
-			}
-			if extcb.Stuff != nil {
-				extcb.Stuff(&st)
-			}
 
 		case SVCFrame:
 			fr := buf.ParseFrame()
-			df := frameMap[int(fr.Delta)]
-			deltaFrame = &df
+			//df := frameMap[int(fr.Delta)]
+			//deltaFrame = &df
 			sf.Frame = fr
-			if intcb.Frame != nil {
-				intcb.Frame(&fr)
-			}
-			if extcb.Frame != nil {
-				extcb.Frame(&fr)
-			}
 
 		case SVCPlayerInfo:
 			lastps := PackedPlayer{}
@@ -277,12 +247,6 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 			}
 			ps := buf.ParseDeltaPlayerstate(lastps)
 			sf.Playerstate = ps
-			if intcb.PlayerState != nil {
-				intcb.PlayerState(&ps)
-			}
-			if extcb.PlayerState != nil {
-				extcb.PlayerState(&ps)
-			}
 
 		case SVCPacketEntities:
 			ents := buf.ParsePacketEntities(deltaFrame)
@@ -291,83 +255,35 @@ func ParseMessageLump(buf MessageBuffer, intcb MessageCallbacks, extcb MessageCa
 				//sf.Entities[int(ents[i].Number)] = ents[i]
 				cbents = append(cbents, &ents[i])
 			}
-			if intcb.Entity != nil {
-				intcb.Entity(cbents)
-			}
-			if extcb.Entity != nil {
-				extcb.Entity(cbents)
-			}
 
 		case SVCPrint:
 			p := buf.ParsePrint()
 			sf.Prints = append(sf.Prints, p)
-			if intcb.Print != nil {
-				intcb.Print(&p)
-			}
-			if extcb.Print != nil {
-				extcb.Print(&p)
-			}
 
 		case SVCSound:
 			s := buf.ParseSound()
 			sf.Sounds = append(sf.Sounds, s)
-			if intcb.Sound != nil {
-				intcb.Sound(&s)
-			}
-			if extcb.Sound != nil {
-				extcb.Sound(&s)
-			}
 
 		case SVCTempEntity:
 			te := buf.ParseTempEntity()
 			sf.TempEntities = append(sf.TempEntities, te)
-			if intcb.TempEnt != nil {
-				intcb.TempEnt(&te)
-			}
-			if extcb.TempEnt != nil {
-				extcb.TempEnt(&te)
-			}
 
 		case SVCMuzzleFlash:
 			mf := buf.ParseMuzzleFlash()
 			sf.Flash1 = append(sf.Flash1, mf)
-			if intcb.Flash1 != nil {
-				intcb.Flash1(&mf)
-			}
-			if extcb.Flash1 != nil {
-				extcb.Flash1(&mf)
-			}
 
 		case SVCMuzzleFlash2:
-			mf := buf.ParseMuzzleFlash()
-			if intcb.Flash2 != nil {
-				intcb.Flash2(&mf)
-			}
-			if extcb.Flash2 != nil {
-				extcb.Flash2(&mf)
-			}
+			_ = buf.ParseMuzzleFlash()
 
 		case SVCLayout:
-			l := buf.ParseLayout()
-			if intcb.Layout != nil {
-				intcb.Layout(&l)
-			}
-			if extcb.Layout != nil {
-				extcb.Layout(&l)
-			}
+			_ = buf.ParseLayout()
 
 		case SVCInventory:
 			// nobody cares about inventory msgs, just parse them in case they're present
 			buf.ParseInventory()
 
 		case SVCCenterPrint:
-			c := buf.ParseCenterPrint()
-			if intcb.CenterPrint != nil {
-				intcb.CenterPrint(&c)
-			}
-			if extcb.CenterPrint != nil {
-				extcb.CenterPrint(&c)
-			}
+			_ = buf.ParseCenterPrint()
 
 		case SVCBad:
 			continue
