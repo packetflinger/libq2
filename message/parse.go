@@ -242,7 +242,7 @@ func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (Server
 
 		case SVCPlayerInfo:
 			lastps := PackedPlayer{}
-			if deltaFrame != nil {
+			if deltaFrame.Frame.Number != 0 {
 				lastps = deltaFrame.Playerstate
 			}
 			ps := buf.ParseDeltaPlayerstate(lastps)
