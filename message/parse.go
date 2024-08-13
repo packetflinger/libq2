@@ -26,7 +26,7 @@ const (
 )
 
 // function pointers for each message type
-type MessageCallbacks struct {
+type Callback struct {
 	// message specific callbacks
 	ServerData   func(*ServerData)
 	ConfigString func(*ConfigString)
@@ -209,7 +209,7 @@ type ChallengeResponse struct {
 //
 // External callbacks are for logic outside the library, like custom programs
 // that import this library.
-func ParseMessageLump(buf MessageBuffer) (ServerFrame, error) {
+func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (ServerFrame, error) {
 	sf := NewServerFrame()
 	//frameMap := intcb.FrameMap
 	deltaFrame := &ServerFrame{}

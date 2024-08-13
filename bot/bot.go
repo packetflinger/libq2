@@ -84,7 +84,7 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 	return nil
 }
 
-func (bot *Bot) Run(cb message.MessageCallbacks) error {
+func (bot *Bot) Run(cb message.Callback) error {
 	if bot.Netchan.QPort == 0 {
 		bot.Netchan.QPort = uint16(rand.Intn(256))
 	}
@@ -154,7 +154,7 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 			break
 		}
 
-		serverframe, err := message.ParseMessageLump(bot.Netchan.msgIn, message.MessageCallbacks{}, cb)
+		serverframe, err := message.ParseMessageLump(bot.Netchan.msgIn, message.Callback{}, cb)
 		if err != nil {
 			return err
 		}
@@ -197,11 +197,11 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 				continue
 			}
 		}
-
-		if err != nil {
-			log.Println(err)
-		}
-
+		/*
+			if err != nil {
+				log.Println(err)
+			}
+		*/
 		if bot.Netchan.Sequence2&3 == 0 && bot.Spawned {
 			err = bot.SendAck()
 			if err != nil {
