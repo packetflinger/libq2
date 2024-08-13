@@ -288,6 +288,9 @@ func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (Server
 		case SVCBad:
 			continue
 
+		case SVCDisconnect:
+			return ServerFrame{}, fmt.Errorf("received disconnect message")
+
 		default:
 			return ServerFrame{}, fmt.Errorf("unknown CMD: %d\n%s", cmd, hex.Dump(buf.Buffer[buf.Index-1:]))
 		}
