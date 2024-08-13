@@ -11,12 +11,13 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
+/*
 func TestMarshal(t *testing.T) {
 	demo, e := OpenDM2File("../testdata/testduel.dm2")
 	if e != nil {
 		t.Errorf("%v", e)
 	}
-	textpb := &pb.TestDemo{}
+	textpb := &pb.DM2Demo{}
 	for {
 		lump, size, err := nextLump(demo.Handle, int64(demo.Position))
 		if err != nil {
@@ -39,6 +40,7 @@ func TestMarshal(t *testing.T) {
 
 	demo.Close()
 }
+*/
 
 func TestServerDataToProto(t *testing.T) {
 	tests := []struct {

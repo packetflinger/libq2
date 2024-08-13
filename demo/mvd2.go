@@ -140,7 +140,7 @@ func (d *MVD2File) Close() {
 	}
 }
 
-func (d *MVD2File) Parse(extcb message.MessageCallbacks) error {
+func (d *MVD2File) Parse(extcb message.Callback) error {
 	//intcb := d.InternalCallbacks()
 	for {
 		lump, size, err := d.nextLump(d.Handle, int64(d.Position))
@@ -164,8 +164,8 @@ func (d *MVD2File) Parse(extcb message.MessageCallbacks) error {
 //
 // You can't just parse each frame independently, the current frame depends
 // on a previous frame for delta compression (usually the last one).
-func (d *MVD2File) InternalCallbacks() message.MessageCallbacks {
-	return message.MessageCallbacks{}
+func (d *MVD2File) InternalCallbacks() message.Callback {
+	return message.Callback{}
 }
 
 func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {

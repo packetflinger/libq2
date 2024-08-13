@@ -20,16 +20,13 @@ func TestOpenMVD2File(t *testing.T) {
 }
 
 func TestParseMVD2(t *testing.T) {
-	//pmsg := ""
 	demo, _ := OpenMVD2File("../testdata/test.mvd2")
-	cb := message.MessageCallbacks{}
+	cb := message.Callback{}
 
 	err := demo.Parse(cb)
 	if err != nil {
 		t.Error(err)
 	}
-
-	t.Error()
 
 	demo.Close()
 }

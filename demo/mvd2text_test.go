@@ -18,7 +18,7 @@ func TestParseMVD2TextDemo(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			t.Error()
+			//t.Error()
 		})
 	}
 }

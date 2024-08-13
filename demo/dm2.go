@@ -64,6 +64,7 @@ func (demo *DM2Demo) nextLump() (message.MessageBuffer, int, error) {
 	return lump, lumpSize, nil
 }
 
+// Parse all the messages in a particular chunk of data
 func (demo *DM2Demo) UnmarshalLump(data message.MessageBuffer) error {
 	currentFrame := &pb.Frame{}
 	textpb := demo.textProto
