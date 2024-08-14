@@ -158,6 +158,9 @@ func (bot *Bot) Run(cb message.Callback) error {
 		if err != nil {
 			return err
 		}
+		for _, pr := range serverframe.Prints {
+			log.Printf("%s", pr.String) // newline is included in the string
+		}
 
 		for _, st := range serverframe.Stuffs {
 			// entering the game
