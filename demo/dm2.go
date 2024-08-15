@@ -30,6 +30,7 @@ func NewDM2Demo(filename string) (*DM2Demo, error) {
 	return demo, nil
 }
 
+// Load the binary demo into protobuf
 func (demo *DM2Demo) Unmarshal() error {
 	for {
 		lump, length, err := demo.nextLump()
