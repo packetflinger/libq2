@@ -133,3 +133,7 @@ func (demo *DM2Demo) WriteTextProto(filename string) error {
 	}
 	return nil
 }
+
+func (demo *DM2Demo) GetTextProto() *pb.DM2Demo {
+	return demo.textProto
+}
