@@ -221,24 +221,54 @@ func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (Server
 		case SVCServerData:
 			s := buf.ParseServerData()
 			sf.Server = s
+			if intcb.ServerData != nil {
+				intcb.ServerData(&s)
+			}
+			if extcb.ServerData != nil {
+				extcb.ServerData(&s)
+			}
 
 		case SVCConfigString:
 			cs := buf.ParseConfigString()
 			sf.Strings = append(sf.Strings, cs)
+			if intcb.ConfigString != nil {
+				intcb.ConfigString(&cs)
+			}
+			if extcb.ConfigString != nil {
+				extcb.ConfigString(&cs)
+			}
 
 		case SVCSpawnBaseline:
-			_ = buf.ParseSpawnBaseline()
-			//sf.Baselines[int(bl.Number)] = bl
+			bl := buf.ParseSpawnBaseline()
+			sf.Baselines[int(bl.Number)] = bl
+			if intcb.Baseline != nil {
+				intcb.Baseline(&bl)
+			}
+			if extcb.Baseline != nil {
+				extcb.Baseline(&bl)
+			}
 
 		case SVCStuffText:
 			st := buf.ParseStuffText()
 			sf.Stuffs = append(sf.Stuffs, st)
+			if intcb.Stuff != nil {
+				intcb.Stuff(&st)
+			}
+			if extcb.Stuff != nil {
+				extcb.Stuff(&st)
+			}
 
 		case SVCFrame:
 			fr := buf.ParseFrame()
 			//df := frameMap[int(fr.Delta)]
 			//deltaFrame = &df
 			sf.Frame = fr
+			if intcb.Frame != nil {
+				intcb.Frame(&fr)
+			}
+			if extcb.Frame != nil {
+				extcb.Frame(&fr)
+			}
 
 		case SVCPlayerInfo:
 			lastps := PackedPlayer{}
@@ -247,36 +277,84 @@ func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (Server
 			}
 			ps := buf.ParseDeltaPlayerstate(lastps)
 			sf.Playerstate = ps
+			if intcb.PlayerState != nil {
+				intcb.PlayerState(&ps)
+			}
+			if extcb.PlayerState != nil {
+				extcb.PlayerState(&ps)
+			}
 
 		case SVCPacketEntities:
 			ents := buf.ParsePacketEntities(deltaFrame)
 			cbents := []*PackedEntity{}
 			for i := range ents {
-				//sf.Entities[int(ents[i].Number)] = ents[i]
+				sf.Entities[int(ents[i].Number)] = ents[i]
 				cbents = append(cbents, &ents[i])
+			}
+			if intcb.Entity != nil {
+				intcb.Entity(cbents)
+			}
+			if extcb.Entity != nil {
+				extcb.Entity(cbents)
 			}
 
 		case SVCPrint:
 			p := buf.ParsePrint()
 			sf.Prints = append(sf.Prints, p)
+			if intcb.Print != nil {
+				intcb.Print(&p)
+			}
+			if extcb.Print != nil {
+				extcb.Print(&p)
+			}
 
 		case SVCSound:
 			s := buf.ParseSound()
 			sf.Sounds = append(sf.Sounds, s)
+			if intcb.Sound != nil {
+				intcb.Sound(&s)
+			}
+			if extcb.Sound != nil {
+				extcb.Sound(&s)
+			}
 
 		case SVCTempEntity:
 			te := buf.ParseTempEntity()
 			sf.TempEntities = append(sf.TempEntities, te)
+			if intcb.TempEnt != nil {
+				intcb.TempEnt(&te)
+			}
+			if extcb.TempEnt != nil {
+				extcb.TempEnt(&te)
+			}
 
 		case SVCMuzzleFlash:
 			mf := buf.ParseMuzzleFlash()
 			sf.Flash1 = append(sf.Flash1, mf)
+			if intcb.Flash1 != nil {
+				intcb.Flash1(&mf)
+			}
+			if extcb.Flash1 != nil {
+				extcb.Flash1(&mf)
+			}
 
 		case SVCMuzzleFlash2:
-			_ = buf.ParseMuzzleFlash()
+			mf := buf.ParseMuzzleFlash()
+			if intcb.Flash2 != nil {
+				intcb.Flash2(&mf)
+			}
+			if extcb.Flash2 != nil {
+				extcb.Flash2(&mf)
+			}
 
 		case SVCLayout:
-			_ = buf.ParseLayout()
+			lo := buf.ParseLayout()
+			if intcb.Layout != nil {
+				intcb.Layout(&lo)
+			}
+			if extcb.Layout != nil {
+				extcb.Layout(&lo)
+			}
 
 		case SVCInventory:
 			// nobody cares about inventory msgs, just parse them in case they're present
