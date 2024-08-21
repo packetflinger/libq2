@@ -1,6 +1,7 @@
 package demo
 
 import (
+	"os"
 	"testing"
 )
 
@@ -134,25 +135,36 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-/*
-func TestWrite(t *testing.T) {
+func TestMarshal(t *testing.T) {
 	tests := []struct {
-		name string
-		file string
+		name    string
+		inFile  string
+		outFile string
 	}{
 		{
-			name: "Test 1",
-			file: "../testdata/test.dm2",
+			name:    "Test 1",
+			inFile:  "../testdata/testduel.dm2",
+			outFile: "../../../.quake2/baseq2/demos/output-test2.dm2",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.file)
+			demo, err := NewDM2Demo(tc.inFile)
 			if err != nil {
 				t.Error(err)
 			}
-			t.Error(demo.binaryData[7711:7747])
+			err = demo.Unmarshal()
+			if err != nil {
+				t.Error(err)
+			}
+			data, err := demo.Marshal()
+			if err != nil {
+				t.Error(err)
+			}
+			err = os.WriteFile(tc.outFile, data, 0777)
+			if err != nil {
+				t.Error(err)
+			}
 		})
 	}
 }
-*/
