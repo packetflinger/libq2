@@ -1310,9 +1310,8 @@ func (m *MessageBuffer) ParseLayout() Layout {
 // 2 bytes for every item
 func (m *MessageBuffer) ParseInventory() {
 	// we don't actually care about this, just parsing it
-	inv := [MaxItems]uint16{}
 	for i := 0; i < MaxItems; i++ {
-		inv[i] = m.ReadShort()
+		_ = m.ReadShort()
 	}
 }
 
