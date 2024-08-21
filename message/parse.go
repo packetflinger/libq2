@@ -554,6 +554,10 @@ func (m *MessageBuffer) ParseEntity(from PackedEntity, num uint16, bits uint32) 
 		to.Solid = uint32(m.ReadWord())
 	}
 
+	if bits&EntityRemove != 0 {
+		to.Remove = true
+	}
+
 	return to
 }
 

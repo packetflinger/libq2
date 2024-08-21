@@ -72,6 +72,7 @@ func EntityToProto(data *message.MessageBuffer, bitmask uint32, number uint16) *
 	b.Sound = uint32(ent.Sound)
 	b.Event = uint32(ent.Event)
 	b.Solid = ent.Solid
+	b.Remove = ent.Remove
 	return b
 }
 
@@ -422,6 +423,10 @@ func ReconcilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *
 func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	bits := uint32(0)
 	mask := uint32(0xffff8000)
+
+	if to.GetRemove() {
+		bits |= message.EntityRemove
+	}
 
 	if to.GetOriginX() != from.GetOriginX() {
 		bits |= message.EntityOrigin1
