@@ -448,7 +448,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetSkin() != from.GetSkin() {
-		if to.GetSkin()&mask&mask > 0 {
+		if to.GetSkin()&mask > 0 {
 			bits |= message.EntitySkin8 | message.EntitySkin16
 		} else if to.GetSkin()&uint32(0x0000ff00) > 0 {
 			bits |= message.EntitySkin16
