@@ -78,6 +78,7 @@ func EntityToProto(data *message.MessageBuffer, bitmask uint32, number uint16) *
 // finish this later
 func EntityToBinary(ent *pb.PackedEntity) message.MessageBuffer {
 	msg := message.MessageBuffer{}
+	DeltaEntity(&pb.PackedEntity{}, ent, &msg)
 	return msg
 }
 
@@ -197,6 +198,54 @@ func FrameToBinary(fr *pb.Frame) message.MessageBuffer {
 		DeltaEntity(&pb.PackedEntity{}, ent, &msg)
 	}
 	msg.WriteShort(0) // EoE
+
+	// player-based muzzle flashes
+	for _, flash := range fr.GetFlashes1() {
+		tmp := FlashToBinary(flash)
+		msg.WriteByte(message.SVCMuzzleFlash)
+		msg.Append(tmp)
+	}
+	// monster-basd muzzle flashes
+	for _, flash := range fr.GetFlashes2() {
+		tmp := FlashToBinary(flash)
+		msg.WriteByte(message.SVCMuzzleFlash2)
+		msg.Append(tmp)
+	}
+	for _, ent := range fr.GetTemporaryEntities() {
+		tmp := TempEntToBinary(ent)
+		msg.WriteByte(message.SVCTempEntity)
+		msg.Append(tmp)
+	}
+	for _, layout := range fr.GetLayouts() {
+		tmp := LayoutToBinary(layout)
+		msg.WriteByte(message.SVCLayout)
+		msg.Append(tmp)
+	}
+	for _, sound := range fr.GetSounds() {
+		tmp := SoundToBinary(sound)
+		msg.WriteByte(message.SVCSound)
+		msg.Append(tmp)
+	}
+	for _, print := range fr.GetPrints() {
+		tmp := PrintToBinary(print)
+		msg.WriteByte(message.SVCPrint)
+		msg.Append(tmp)
+	}
+	for _, stuff := range fr.GetStufftexts() {
+		tmp := StuffTextToBinary(stuff)
+		msg.WriteByte(message.SVCStuffText)
+		msg.Append(tmp)
+	}
+	for _, cs := range fr.GetConfigstrings() {
+		tmp := ConfigstringToBinary(cs)
+		//msg.WriteByte(message.SVCConfigString)
+		msg.Append(tmp)
+	}
+	for _, cp := range fr.GetCenterprints() {
+		tmp := CenterPrintToBinary(cp)
+		msg.WriteByte(message.SVCCenterPrint)
+		msg.Append(tmp)
+	}
 	return msg
 }
 
@@ -323,6 +372,13 @@ func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.Messag
 		msg.WriteChar(uint8(to.GetGunAnglesX()))
 		msg.WriteChar(uint8(to.GetGunAnglesY()))
 		msg.WriteChar(uint8(to.GetGunAnglesZ()))
+	}
+
+	if bits&message.PlayerBlend > 0 {
+		msg.WriteByte(byte(to.GetBlendW()))
+		msg.WriteByte(byte(to.GetBlendX()))
+		msg.WriteByte(byte(to.GetBlendY()))
+		msg.WriteByte(byte(to.GetBlendZ()))
 	}
 
 	if bits&message.PlayerFOV > 0 {
@@ -560,15 +616,15 @@ func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *message.MessageB
 	}
 
 	if bits&message.EntityAngle1 > 0 {
-		m.WriteByte(byte(to.GetAngleX() >> 8))
+		m.WriteByte(byte(to.GetAngleX()))
 	}
 
 	if bits&message.EntityAngle2 > 0 {
-		m.WriteByte(byte(to.GetAngleY() >> 8))
+		m.WriteByte(byte(to.GetAngleY()))
 	}
 
 	if bits&message.EntityAngle3 > 0 {
-		m.WriteByte(byte(to.GetAngleZ() >> 8))
+		m.WriteByte(byte(to.GetAngleZ()))
 	}
 
 	if bits&message.EntityOldOrigin > 0 {
@@ -600,7 +656,7 @@ func PrintToProto(data *message.MessageBuffer) *pb.Print {
 
 func PrintToBinary(p *pb.Print) message.MessageBuffer {
 	msg := message.MessageBuffer{}
-	msg.WriteShort(uint16(p.GetLevel()))
+	msg.WriteByte(byte(p.GetLevel()))
 	msg.WriteString(p.GetString_())
 	return msg
 }
