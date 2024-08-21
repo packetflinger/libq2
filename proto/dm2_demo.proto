@@ -53,6 +53,7 @@ message PackedEntity {
     uint32 frame = 19;          // 16 bits
     uint32 sound = 20;          // 8 bits
     uint32 event = 21;          // 8 bits
+    bool remove = 22;           // this ent should be removed after frame
 }
 
 message PlayerMove {

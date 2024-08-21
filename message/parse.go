@@ -118,6 +118,7 @@ type PackedEntity struct {
 	Frame       uint16
 	Sound       uint8
 	Event       uint8
+	Remove      bool
 }
 
 type PlayerMoveState struct {
