@@ -1166,18 +1166,19 @@ func (x *Print) GetString_() string {
 	return ""
 }
 
+// Start a sound playing
 type PackedSound struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	Flags       uint32 `protobuf:"varint,1,opt,name=flags,proto3" json:"flags,omitempty"` // 8 bits
-	Index       uint32 `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"` // 8 bits
+	Index       uint32 `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty"` // 8 bits, CS_SOUNDS + this
 	Volume      uint32 `protobuf:"varint,3,opt,name=volume,proto3" json:"volume,omitempty"`
 	Attenuation uint32 `protobuf:"varint,4,opt,name=attenuation,proto3" json:"attenuation,omitempty"`
 	TimeOffset  uint32 `protobuf:"varint,5,opt,name=time_offset,json=timeOffset,proto3" json:"time_offset,omitempty"`
 	Channel     uint32 `protobuf:"varint,6,opt,name=channel,proto3" json:"channel,omitempty"`                      // 16 bits
-	Entity      uint32 `protobuf:"varint,7,opt,name=entity,proto3" json:"entity,omitempty"`                        // 16 bits
+	Entity      uint32 `protobuf:"varint,7,opt,name=entity,proto3" json:"entity,omitempty"`                        // 16 bits, relative to this ent
 	PositionX   uint32 `protobuf:"varint,8,opt,name=position_x,json=positionX,proto3" json:"position_x,omitempty"` // 16 bits
 	PositionY   uint32 `protobuf:"varint,9,opt,name=position_y,json=positionY,proto3" json:"position_y,omitempty"`
 	PositionZ   uint32 `protobuf:"varint,10,opt,name=position_z,json=positionZ,proto3" json:"position_z,omitempty"`

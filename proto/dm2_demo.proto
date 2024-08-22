@@ -129,14 +129,15 @@ message Print {
     string string = 2;
 }
 
+// Start a sound playing
 message PackedSound {
     uint32 flags = 1;       // 8 bits
-    uint32 index = 2;       // 8 bits
+    uint32 index = 2;       // 8 bits, CS_SOUNDS + this
     uint32 volume = 3;
     uint32 attenuation = 4;
     uint32 time_offset = 5;
     uint32 channel = 6;     // 16 bits
-    uint32 entity = 7;      // 16 bits
+    uint32 entity = 7;      // 16 bits, relative to this ent
     uint32 position_x = 8;  // 16 bits
     uint32 position_y = 9;
     uint32 position_z = 10;
