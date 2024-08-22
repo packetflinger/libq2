@@ -677,8 +677,8 @@ func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 	return ps
 }
 
-// A S->C msg containing all entities the client should
-// know aobut for a particular frame
+// A server-to-client message containing all entities the client should know
+// about for a particular frame
 func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 	froments := map[int]PackedEntity{}
 	ents := []PackedEntity{}
