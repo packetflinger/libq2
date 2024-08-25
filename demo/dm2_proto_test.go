@@ -449,3 +449,56 @@ func TestSound(t *testing.T) {
 		})
 	}
 }
+
+func TestReconcilePlayerstateStats(t *testing.T) {
+	tests := []struct {
+		name string
+		ps1  *pb.PackedPlayer
+		ps2  *pb.PackedPlayer
+		want []byte
+	}{
+		{
+			name: "Test 1",
+			ps1: &pb.PackedPlayer{
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 100},
+					{Index: 2, Value: 90},
+				},
+			},
+			ps2: &pb.PackedPlayer{
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 101},
+					{Index: 2, Value: 90},
+				},
+			},
+			want: []byte{2, 0, 0, 0, 101, 0},
+		},
+		{
+			name: "Test 2",
+			ps1: &pb.PackedPlayer{
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 100},
+					{Index: 5, Value: 90},
+					{Index: 9, Value: 2},
+				},
+			},
+			ps2: &pb.PackedPlayer{
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 101},
+					{Index: 5, Value: 90},
+					{Index: 9, Value: 1},
+				},
+			},
+			want: []byte{2, 2, 0, 0, 101, 0, 1, 0},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := message.MessageBuffer{}
+			ReconcilePlayerstateStats(tc.ps2, tc.ps1, &got)
+			if !bytes.Equal(got.Buffer, tc.want) {
+				t.Error("\ngot:\n", got.Buffer, "\nwant\n", tc.want)
+			}
+		})
+	}
+}
