@@ -420,3 +420,42 @@ func TestPlayerstateToBinary(t *testing.T) {
 		})
 	}
 }
+
+func TestSound(t *testing.T) {
+	tests := []struct {
+		name string
+		data []byte
+		want []byte
+	}{
+		{
+			name: "test 1",
+			data: []byte{9, 8, 64, 26, 0},
+			want: []byte{9, 8, 64, 26, 0},
+		},
+		{
+			name: "test 2",
+			data: []byte{9, 8, 64, 18, 0},
+			want: []byte{9, 8, 64, 18, 0},
+		},
+		{
+			name: "test 3",
+			data: []byte{9, 5, 252, 193, 251, 0},
+			want: []byte{9, 5, 252, 193, 251, 0},
+		},
+		{
+			name: "test 4",
+			data: []byte{9, 160, 250, 21, 252, 187, 250, 0},
+			want: []byte{9, 160, 250, 21, 252, 187, 250, 0},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			msg := message.NewMessageBuffer(tc.data)
+			sndproto := SoundToProto(&msg)
+			got := SoundToBinary(sndproto)
+			if !bytes.Equal(got.Buffer, tc.want) {
+				t.Error("\ngot:\n", got.Buffer, "\nwant\n", tc.want)
+			}
+		})
+	}
+}
