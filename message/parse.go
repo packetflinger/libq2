@@ -708,6 +708,7 @@ func (m *MessageBuffer) ParsePrint() Print {
 	}
 }
 
+// This is a start-sound packet
 func (m *MessageBuffer) ParseSound() PackedSound {
 	s := PackedSound{}
 	s.Flags = m.ReadByte()
@@ -732,8 +733,9 @@ func (m *MessageBuffer) ParseSound() PackedSound {
 	}
 
 	if (s.Flags & SoundEntity) > 0 {
-		s.Channel = m.ReadShort() & 7
-		s.Entity = s.Channel >> 3
+		tmp := m.ReadShort()
+		s.Entity = tmp >> 3
+		s.Channel = tmp & 7
 	} else {
 		s.Channel = 0
 		s.Entity = 0
