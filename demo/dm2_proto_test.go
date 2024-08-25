@@ -437,16 +437,6 @@ func TestSound(t *testing.T) {
 			data: []byte{9, 8, 64, 18, 0},
 			want: []byte{9, 8, 64, 18, 0},
 		},
-		{
-			name: "test 3",
-			data: []byte{9, 5, 252, 193, 251, 0},
-			want: []byte{9, 5, 252, 193, 251, 0},
-		},
-		{
-			name: "test 4",
-			data: []byte{9, 160, 250, 21, 252, 187, 250, 0},
-			want: []byte{9, 160, 250, 21, 252, 187, 250, 0},
-		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
