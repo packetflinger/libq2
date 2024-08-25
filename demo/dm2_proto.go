@@ -926,10 +926,7 @@ func SoundToBinary(s *pb.PackedSound) message.MessageBuffer {
 		msg.WriteByte(byte(s.GetTimeOffset()))
 	}
 
-	// fix this
 	if (s.GetFlags() & message.SoundEntity) > 0 {
-		//s.Channel = m.ReadShort() & 7
-		//s.Entity = s.Channel >> 3
 		msg.WriteShort(uint16(s.GetEntity()<<3 + s.GetChannel()))
 	}
 
