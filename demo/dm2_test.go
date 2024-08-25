@@ -144,7 +144,7 @@ func TestMarshal(t *testing.T) {
 		{
 			name:    "Test 1",
 			inFile:  "../testdata/testduel.dm2",
-			outFile: "../../../.quake2/baseq2/demos/output-test2.dm2",
+			outFile: "../testdata/testduel-out.dm2",
 		},
 	}
 	for _, tc := range tests {
