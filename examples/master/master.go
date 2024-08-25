@@ -1,3 +1,4 @@
+// An example Quake 2 master server
 package main
 
 import (
@@ -13,8 +14,6 @@ import (
 var (
 	listenPort = flag.Int("port", 27900, "Port to listen on")
 	listenIP   = flag.String("addr", "[::]", "IP address to listen on")
-	// pingEvery  = flag.Int("pingtime", 120, "Ping server if not heard from in this number of seconds")
-	// mgmtTime   = flag.Int("mgmttime", 31, "Check all servers every x seconds")
 	foreground = flag.Bool("fg", false, "Log to stdout instead of file")
 	logfile    = flag.String("logfile", "master.log", "The filename to use for the log")
 	api        = flag.Bool("api", false, "Whether or not to enable the web API")
