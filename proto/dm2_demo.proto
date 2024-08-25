@@ -33,9 +33,9 @@ message StuffText {
 // an edict_t packed up and ready for xfer
 message PackedEntity {
     uint32 number = 1;          // 32 bits
-    int32 origin_x = 2;        // 16 bits
-    int32 origin_y = 3;        // 16 bits
-    int32 origin_z = 4;        // 16 bits
+    int32 origin_x = 2;         // 16 bits
+    int32 origin_y = 3;         // 16 bits
+    int32 origin_z = 4;         // 16 bits
     int32 angle_x = 5;
     int32 angle_y = 6;
     int32 angle_z = 7;
@@ -58,7 +58,7 @@ message PackedEntity {
 
 message PlayerMove {
     uint32 type = 1;            // 8 bits
-    int32 origin_x = 2;        // 16 bits
+    int32 origin_x = 2;         // 16 bits
     int32 origin_y = 3;
     int32 origin_z = 4;
     uint32 velocity_x = 5;
@@ -66,8 +66,8 @@ message PlayerMove {
     uint32 velocity_z = 7;
     uint32 flags = 8;           // byte
     uint32 time = 9;            // byte
-    int32 gravity = 10;        // 16 bits
-    int32 delta_angle_x = 11;  // 16 bits
+    int32 gravity = 10;         // 16 bits
+    int32 delta_angle_x = 11;   // 16 bits
     int32 delta_angle_y = 12;
     int32 delta_angle_z = 13;
 }
@@ -79,10 +79,10 @@ message PlayerStat {
 
 message PackedPlayer {
     PlayerMove movestate = 1;
-    int32 view_angles_x = 2;   // 16 bits
-    int32 view_angles_y = 3;   // 16 bits
-    int32 view_angles_z = 4;   // 16 bits
-    int32 view_offset_x = 5;   // 8 bits
+    int32 view_angles_x = 2;        // 16 bits
+    int32 view_angles_y = 3;        // 16 bits
+    int32 view_angles_z = 4;        // 16 bits
+    int32 view_offset_x = 5;        // 8 bits
     int32 view_offset_y = 6;
     int32 view_offset_z = 7;
     int32 kick_angles_x = 8;
@@ -94,8 +94,8 @@ message PackedPlayer {
     int32 gun_offset_x = 14;
     int32 gun_offset_y = 15;
     int32 gun_offset_z = 16;
-    uint32 gun_index = 17;      // 8 bits
-    uint32 gun_frame = 18;      // 8 bits
+    uint32 gun_index = 17;          // 8 bits
+    uint32 gun_frame = 18;          // 8 bits
     uint32 blend_w = 19;
     uint32 blend_x = 20;
     uint32 blend_y = 21;
@@ -125,7 +125,7 @@ message Frame {
 }
 
 message Print {
-    uint32 level = 1;   // 8 bits
+    uint32 level = 1;       // 8 bits
     string string = 2;
 }
 
@@ -174,4 +174,3 @@ message Layout {
 message CenterPrint {
     string string = 1;
 }
-
