@@ -7,6 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"google.golang.org/protobuf/proto"
+
+	pb "github.com/packetflinger/libq2/proto"
 	util "github.com/packetflinger/libq2/util"
 )
 
@@ -674,6 +677,116 @@ func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 	}
 
 	ps.PlayerMove = pm
+	return ps
+}
+
+// ParseDeltaPlayerstateProto will merge a previous playerstate with one parsed
+// from the receiver. Only the changed values are copied.
+func (m *MessageBuffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.PackedPlayer {
+	ps := &pb.PackedPlayer{}
+	pm := &pb.PlayerMove{}
+	stats := []*pb.PlayerStat{}
+
+	if from != nil {
+		ps = proto.Clone(from).(*pb.PackedPlayer)
+		// proto.Clone() isn't deep, sub-protos need to be copied manually
+		pm = proto.Clone(from.Movestate).(*pb.PlayerMove)
+		if len(from.GetStats()) > 0 {
+			stats = from.GetStats()
+		}
+	}
+	bits := m.ReadWord()
+
+	if bits&PlayerType != 0 {
+		pm.Type = uint32(m.ReadByte())
+	}
+
+	if bits&PlayerOrigin != 0 {
+		pm.OriginX = int32(m.ReadShort())
+		pm.OriginY = int32(m.ReadShort())
+		pm.OriginZ = int32(m.ReadShort())
+	}
+
+	if bits&PlayerVelocity != 0 {
+		pm.VelocityX = uint32(m.ReadShort())
+		pm.VelocityY = uint32(m.ReadShort())
+		pm.VelocityZ = uint32(m.ReadShort())
+	}
+
+	if bits&PlayerTime != 0 {
+		pm.Time = uint32(m.ReadByte())
+	}
+
+	if bits&PlayerFlags != 0 {
+		pm.Flags = uint32(m.ReadByte())
+	}
+
+	if bits&PlayerGravity != 0 {
+		pm.Gravity = int32(m.ReadShort())
+	}
+
+	if bits&PlayerDeltaAngles != 0 {
+		pm.DeltaAngleX = int32(m.ReadShort())
+		pm.DeltaAngleY = int32(m.ReadShort())
+		pm.DeltaAngleZ = int32(m.ReadShort())
+	}
+
+	if bits&PlayerViewOffset != 0 {
+		ps.ViewOffsetX = int32(m.ReadChar())
+		ps.ViewOffsetY = int32(m.ReadChar())
+		ps.ViewOffsetZ = int32(m.ReadChar())
+	}
+
+	if bits&PlayerViewAngles != 0 {
+		ps.ViewAnglesX = int32(m.ReadShort())
+		ps.ViewAnglesY = int32(m.ReadShort())
+		ps.ViewAnglesZ = int32(m.ReadShort())
+	}
+
+	if bits&PlayerKickAngles != 0 {
+		ps.KickAnglesX = int32(m.ReadChar())
+		ps.KickAnglesY = int32(m.ReadChar())
+		ps.KickAnglesZ = int32(m.ReadChar())
+	}
+
+	if bits&PlayerWeaponIndex != 0 {
+		ps.GunIndex = uint32(m.ReadByte())
+	}
+
+	if bits&PlayerWeaponFrame != 0 {
+		ps.GunFrame = uint32(m.ReadByte())
+		ps.GunOffsetX = int32(m.ReadChar())
+		ps.GunOffsetY = int32(m.ReadChar())
+		ps.GunOffsetZ = int32(m.ReadChar())
+		ps.GunAnglesX = int32(m.ReadChar())
+		ps.GunAnglesY = int32(m.ReadChar())
+		ps.GunAnglesZ = int32(m.ReadChar())
+	}
+
+	if bits&PlayerBlend != 0 {
+		ps.BlendW = uint32(m.ReadChar())
+		ps.BlendX = uint32(m.ReadChar())
+		ps.BlendY = uint32(m.ReadChar())
+		ps.BlendZ = uint32(m.ReadChar())
+	}
+
+	if bits&PlayerFOV != 0 {
+		ps.Fov = uint32(m.ReadByte())
+	}
+
+	if bits&PlayerRDFlags != 0 {
+		ps.RdFlags = uint32(m.ReadByte())
+	}
+
+	statbits := int32(m.ReadLong())
+	for i := 0; i < 32; i++ {
+		if statbits&(1<<i) != 0 {
+			stats = append(stats, &pb.PlayerStat{Index: uint32(i), Value: int32(m.ReadShort())})
+		}
+	}
+	ps.Stats = stats
+
+	ps.Movestate = pm
 	return ps
 }
 

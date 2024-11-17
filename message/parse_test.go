@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	pb "github.com/packetflinger/libq2/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestServerData(t *testing.T) {
@@ -215,3 +217,164 @@ func TestValidateSequence(t *testing.T) {
 	}
 }
 */
+
+func TestParseDeltaPlayerstateProto(t *testing.T) {
+	tests := []struct {
+		name string
+		msg  *MessageBuffer
+		from *pb.PackedPlayer
+		want *pb.PackedPlayer
+	}{
+		{
+			name: "from nil playerstate",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					134, 35, 196, 8, 255, 36, 193, 1, 147, 253, 254, 255,
+					0, 0, 0, 0, 88, 42, 10, 119, 206, 0, 0, 0, 0, 1, 44,
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				},
+			},
+			from: nil,
+			want: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX:   2244,
+					OriginY:   9471,
+					OriginZ:   449,
+					VelocityX: 64915,
+					VelocityY: 65534,
+				},
+				ViewAnglesX: 2602,
+				ViewAnglesY: 52855,
+				ViewOffsetZ: 88,
+				KickAnglesZ: 1,
+				GunFrame:    44,
+			},
+		},
+		{
+			name: "fov only from valid state",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					0, 8, 105, 0, 0, 0, 0,
+				},
+			},
+			from: &pb.PackedPlayer{
+				Movestate:   &pb.PlayerMove{},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         90,
+			},
+			want: &pb.PackedPlayer{
+				Movestate:   &pb.PlayerMove{},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         105,
+			},
+		},
+		{
+			name: "fov only from valid with movestate",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					0, 8, 105, 0, 0, 0, 0,
+				},
+			},
+			from: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 1,
+					OriginY: 2,
+					OriginZ: 3,
+				},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         90,
+			},
+			want: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 1,
+					OriginY: 2,
+					OriginZ: 3,
+				},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         105,
+			},
+		},
+		{
+			name: "fov only from valid with existing stats",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					0, 8, 105, 0, 0, 0, 0,
+				},
+			},
+			from: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 1,
+					OriginY: 2,
+					OriginZ: 3,
+				},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         90,
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 100},
+					{Index: 5, Value: 50},
+					{Index: 10, Value: 25},
+				},
+			},
+			want: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 1,
+					OriginY: 2,
+					OriginZ: 3,
+				},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         105,
+				Stats: []*pb.PlayerStat{
+					{Index: 1, Value: 100},
+					{Index: 5, Value: 50},
+					{Index: 10, Value: 25},
+				},
+			},
+		},
+		{
+			name: "fov only from valid state with new stats",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					0, 8, 105, 96, 0, 0, 0, 9, 0, 0, 0,
+				},
+			},
+			from: &pb.PackedPlayer{
+				Movestate:   &pb.PlayerMove{},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         90,
+			},
+			want: &pb.PackedPlayer{
+				Movestate:   &pb.PlayerMove{},
+				ViewAnglesX: 5,
+				ViewAnglesY: 5,
+				ViewAnglesZ: 5,
+				Fov:         105,
+				Stats: []*pb.PlayerStat{
+					{Index: 5, Value: 9},
+					{Index: 6, Value: 0},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.msg.ParseDeltaPlayerstateProto(tc.from)
+			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
+				t.Errorf("ParseDeltaPlayerstateProto(%v) = %v, want: %v\n", tc.from, got, tc.want)
+			}
+		})
+	}
+}
