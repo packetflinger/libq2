@@ -25,7 +25,9 @@ func (s *Server) FetchInfo() (ServerInfo, error) {
 	if err != nil {
 		return ServerInfo{}, err
 	}
-
+	if len(out.Buffer) < 5 {
+		return ServerInfo{}, fmt.Errorf("invalid serverinfo response, is server running?")
+	} 
 	lines := strings.Split(strings.Trim(string(out.Buffer[4:]), " \n\t"), "\n")
 	return parseServerinfo(lines)
 }
