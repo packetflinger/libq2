@@ -16,6 +16,8 @@ type DM2Demo struct {
 	binaryData     []byte // the contents of a .dm2 file
 	binaryPosition int    // where in those contents we are
 	currentFrame   *pb.Frame
+	compressed     bool // every frame contains every edict
+	frames         map[int32]*pb.Frame
 }
 
 // Read the entire binary demo file into memory
@@ -29,7 +31,12 @@ func NewDM2Demo(filename string) (*DM2Demo, error) {
 	}
 	demo := &DM2Demo{binaryData: data}
 	demo.textProto = &pb.DM2Demo{}
-	demo.currentFrame = &pb.Frame{}
+	demo.textProto.Baselines = make(map[int32]*pb.PackedEntity)
+	demo.textProto.Configstrings = make(map[int32]*pb.CString)
+	demo.textProto.Frames = make(map[int32]*pb.Frame)
+
+	// demo.currentFrame = &pb.Frame{}
+	//demo.frames = make(map[int32]*pb.Frame)
 	return demo, nil
 }
 
@@ -48,6 +55,7 @@ func (demo *DM2Demo) Unmarshal() error {
 			return err
 		}
 	}
+	demo.compressed = true
 	return nil
 }
 
@@ -83,43 +91,46 @@ func (demo *DM2Demo) UnmarshalLump(data message.MessageBuffer) error {
 			textpb.Serverinfo = serverdata
 		case message.SVCConfigString:
 			cs := ConfigstringToProto(&data)
-			if demo.currentFrame.GetNumber() == 0 {
-				textpb.Configstrings = append(textpb.Configstrings, cs)
+			if textpb.GetCurrentFrame() == 0 {
+				textpb.Configstrings[int32(cs.GetIndex())] = cs
 			} else {
-				demo.currentFrame.Configstrings = append(demo.currentFrame.Configstrings, cs)
+				textpb.Frames[textpb.GetCurrentFrame()].Configstrings[int32(cs.GetIndex())] = cs
 			}
 		case message.SVCSpawnBaseline:
 			bitmask := data.ParseEntityBitmask()
 			number := data.ParseEntityNumber(bitmask)
 			baseline := EntityToProto(&data, bitmask, number)
-			textpb.Baselines = append(textpb.Baselines, baseline)
+			textpb.Baselines[int32(baseline.GetNumber())] = baseline
 		case message.SVCStuffText:
 			stuff := StuffTextToProto(&data)
-			if demo.currentFrame.Number > 0 {
-				demo.currentFrame.Stufftexts = append(demo.currentFrame.Stufftexts, stuff)
+			if textpb.GetCurrentFrame() > 0 {
+				textpb.Frames[textpb.GetCurrentFrame()].Stufftexts = append(textpb.Frames[textpb.GetCurrentFrame()].Stufftexts, stuff)
 			}
 		case message.SVCFrame: // includes playerstate and packetentities
-			frame := FrameToProto(&data)
-			textpb.Frames = append(textpb.Frames, frame)
-			demo.currentFrame = frame
+			frame := FrameToProto(&data, demo.frames)
+			textpb.Frames[frame.GetNumber()] = frame
+			if textpb.Frames[frame.GetNumber()].Configstrings == nil {
+				textpb.Frames[frame.GetNumber()].Configstrings = make(map[int32]*pb.CString)
+			}
+			textpb.CurrentFrame = frame.GetNumber()
 		case message.SVCPrint:
 			print := PrintToProto(&data)
-			demo.currentFrame.Prints = append(demo.currentFrame.Prints, print)
+			textpb.Frames[textpb.GetCurrentFrame()].Prints = append(textpb.Frames[textpb.GetCurrentFrame()].Prints, print)
 		case message.SVCMuzzleFlash:
 			flash := FlashToProto(&data)
-			demo.currentFrame.Flashes1 = append(demo.currentFrame.Flashes1, flash)
+			textpb.Frames[textpb.GetCurrentFrame()].Flashes1 = append(textpb.Frames[textpb.GetCurrentFrame()].Flashes1, flash)
 		case message.SVCTempEntity:
 			te := TempEntToProto(&data)
-			demo.currentFrame.TemporaryEntities = append(demo.currentFrame.TemporaryEntities, te)
+			textpb.Frames[textpb.GetCurrentFrame()].TemporaryEntities = append(textpb.Frames[textpb.GetCurrentFrame()].TemporaryEntities, te)
 		case message.SVCLayout:
 			layout := LayoutToProto(&data)
-			demo.currentFrame.Layouts = append(demo.currentFrame.Layouts, layout)
+			textpb.Frames[textpb.GetCurrentFrame()].Layouts = append(textpb.Frames[textpb.GetCurrentFrame()].Layouts, layout)
 		case message.SVCSound:
 			sound := SoundToProto(&data)
-			demo.currentFrame.Sounds = append(demo.currentFrame.Sounds, sound)
+			textpb.Frames[textpb.GetCurrentFrame()].Sounds = append(textpb.Frames[textpb.GetCurrentFrame()].Sounds, sound)
 		case message.SVCCenterPrint:
 			cp := CenterPrintToProto(&data)
-			demo.currentFrame.Centerprints = append(demo.currentFrame.Centerprints, cp)
+			textpb.Frames[textpb.GetCurrentFrame()].Centerprints = append(textpb.Frames[textpb.GetCurrentFrame()].Centerprints, cp)
 		}
 	}
 	return nil
@@ -151,12 +162,35 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 	out := message.MessageBuffer{}  // the overall demo
 	lump := message.MessageBuffer{} // the current lump
 
-	lump.Append(ServerDataToBinary(demo.textProto.Serverinfo))
-	for _, cs := range demo.GetTextProto().GetConfigstrings() {
+	textpb := demo.GetTextProto()
+
+	lump.Append(ServerDataToBinary(textpb.Serverinfo))
+	/*
+		for _, cs := range textpb.GetConfigstrings() {
+			tmp := ConfigstringToBinary(cs)
+			buildDemoBuffer(&out, &lump, tmp, false)
+		}
+	*/
+	for i := 0; i < MaxConfigStrings; i++ {
+		cs, ok := textpb.Configstrings[int32(i)]
+		if !ok {
+			continue
+		}
 		tmp := ConfigstringToBinary(cs)
 		buildDemoBuffer(&out, &lump, tmp, false)
 	}
-	for _, bl := range demo.GetTextProto().GetBaselines() {
+	/*
+		for _, bl := range textpb.GetBaselines() {
+			tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
+			tmp.Append(EntityToBinary(bl))
+			buildDemoBuffer(&out, &lump, tmp, false)
+		}
+	*/
+	for i := 0; i < MaxEdicts; i++ {
+		bl, ok := textpb.Baselines[int32(i)]
+		if !ok {
+			continue
+		}
 		tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
 		tmp.Append(EntityToBinary(bl))
 		buildDemoBuffer(&out, &lump, tmp, false)
@@ -167,9 +201,24 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 	buildDemoBuffer(&out, &lump, tmp, false)
 
 	// each frame is a new lump at this point
-	for _, fr := range demo.GetTextProto().GetFrames() {
+	/*
+		for _, fr := range textpb.GetFrames() {
+			tmp := FrameToBinary(fr)
+			buildDemoBuffer(&out, &lump, tmp, true)
+		}
+	*/
+
+	i := int32(0)
+	total := 0
+	for total < len(textpb.GetFrames()) {
+		i++
+		fr, ok := textpb.Frames[i]
+		if !ok {
+			continue
+		}
 		tmp := FrameToBinary(fr)
 		buildDemoBuffer(&out, &lump, tmp, true)
+		total++
 	}
 	out.WriteLong(-1) // end of demo
 	return out.Buffer, nil
@@ -187,3 +236,115 @@ func buildDemoBuffer(final *message.MessageBuffer, lump *message.MessageBuffer, 
 	}
 	lump.Append(msg)
 }
+
+// Demos use delta-compression for things like packetentities and playerstates.
+// Only property values that are different from the last frame are emitted.
+// This saves a huge amount of space and bandwidth because the game doesn't
+// have to retransmit the same (unchanged) data over and over again.
+//
+// Decompressing will ensure every frame contains every entity and playerstate
+// property. This will allow for more accurate manipulation of the demo data
+// which can then be re-compressed before being written back to a binary file.
+func (demo *DM2Demo) Decompress() (*pb.DM2Demo, error) {
+	/*
+		newdemo := &pb.DM2Demo{}
+		info := *demo.textProto.GetServerinfo()
+		newdemo.Serverinfo = &info
+
+		configstrings := []*pb.CString{}
+		copy(configstrings, demo.textProto.GetConfigstrings())
+		newdemo.Configstrings = configstrings
+
+		baselines := []*pb.PackedEntity{}
+		copy(baselines, demo.textProto.GetBaselines())
+		newdemo.Baselines = baselines
+	*/
+	//oldframes := make(map[int32]*pb.Frame)
+	//mergedFrame := &pb.Frame{}
+	//for _, frame := range demo.GetTextProto().GetFrames() {
+	/*deltaFrame, ok := oldframes[frame.GetDelta()]
+	if !ok {
+		ps := *frame.GetPlayerState()
+		mergedFrame.PlayerState = &ps
+		copy(mergedFrame.Entities, frame.GetEntities())
+	} else {
+
+	}
+	oldframes[frame.GetNumber()] = frame
+	newdemo.Frames = append(newdemo.Frames, mergedFrame)*/
+	//}
+
+	return &pb.DM2Demo{}, nil
+}
+
+/*
+func mergeFrame(base, current *pb.Frame) *pb.Frame {
+	fr := proto.Clone(base).(*pb.Frame)
+	fr.Number = current.GetNumber()
+	fr.Delta = current.GetDelta()
+
+	return fr
+}
+
+func mergePlayerstate(base, current *pb.PackedPlayer) *pb.PackedPlayer {
+	ms := proto.Clone(base.Movestate).(*pb.PlayerMove)
+	if ms.GetType() != current.GetMovestate().GetType() {
+		base.Movestate.Type = current.Movestate.Type
+	}
+	if ms.GetOriginX() != current.GetMovestate().GetOriginX() {
+		base.Movestate.OriginX = current.Movestate.OriginX
+	}
+	if ms.GetOriginY() != current.GetMovestate().GetOriginY() {
+		base.Movestate.OriginY = current.Movestate.OriginY
+	}
+	if ms.GetOriginZ() != current.GetMovestate().GetOriginZ() {
+		base.Movestate.OriginZ = current.Movestate.OriginZ
+	}
+	if ms.GetVelocityX() != current.GetMovestate().GetVelocityX() {
+		base.Movestate.VelocityX = current.Movestate.VelocityX
+	}
+	if ms.GetVelocityY() != current.GetMovestate().GetVelocityY() {
+		base.Movestate.VelocityY = current.Movestate.VelocityY
+	}
+	if ms.GetVelocityZ() != current.GetMovestate().GetVelocityZ() {
+		base.Movestate.VelocityZ = current.Movestate.VelocityZ
+	}
+	if ms.GetFlags() != current.GetMovestate().GetFlags() {
+		base.Movestate.Flags = current.Movestate.Flags
+	}
+	if ms.GetTime() != current.GetMovestate().GetTime() {
+		base.Movestate.Time = current.Movestate.Time
+	}
+	if ms.GetGravity() != current.GetMovestate().GetGravity() {
+		base.Movestate.Gravity = current.Movestate.Gravity
+	}
+	if ms.GetDeltaAngleX() != current.GetMovestate().GetDeltaAngleX() {
+		base.Movestate.DeltaAngleX = current.Movestate.DeltaAngleX
+	}
+	if ms.GetDeltaAngleY() != current.GetMovestate().GetDeltaAngleY() {
+		base.Movestate.DeltaAngleY = current.Movestate.DeltaAngleY
+	}
+	if ms.GetDeltaAngleZ() != current.GetMovestate().GetDeltaAngleZ() {
+		base.Movestate.DeltaAngleZ = current.Movestate.DeltaAngleZ
+	}
+	if base.GetViewAnglesX() != current.GetViewAnglesX() {
+		base.ViewAnglesX = current.ViewAnglesX
+	}
+	if base.GetViewAnglesY() != current.GetViewAnglesY() {
+		base.ViewAnglesY = current.ViewAnglesY
+	}
+	if base.GetViewAnglesZ() != current.GetViewAnglesZ() {
+		base.ViewAnglesZ = current.ViewAnglesZ
+	}
+	if base.GetViewOffsetX() != current.GetViewOffsetX() {
+		base.ViewOffsetX = current.ViewOffsetX
+	}
+	if base.GetViewAnglesY() != current.GetViewAnglesY() {
+		base.ViewAnglesY = current.ViewAnglesY
+	}
+	if base.GetViewAnglesZ() != current.GetViewAnglesZ() {
+		base.ViewAnglesZ = current.ViewAnglesZ
+	}
+	return base
+}
+*/

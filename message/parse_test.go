@@ -378,3 +378,101 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 		})
 	}
 }
+
+func TestParseEntityProto(t *testing.T) {
+	tests := []struct {
+		name string
+		msg  *MessageBuffer
+		from *pb.PackedEntity
+		want *pb.PackedEntity
+	}{
+		{
+			name: "from nil",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
+				},
+			},
+			from: nil,
+			want: &pb.PackedEntity{
+				Number: 2,
+				AngleX: 2,
+				AngleY: 239,
+				Frame:  71,
+			},
+		},
+		{
+			name: "no change",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
+				},
+			},
+			from: &pb.PackedEntity{
+				Number: 2,
+				AngleX: 2,
+				AngleY: 239,
+				Frame:  71,
+			},
+			want: &pb.PackedEntity{
+				Number: 2,
+				AngleX: 2,
+				AngleY: 239,
+				Frame:  71,
+			},
+		},
+		{
+			name: "single change",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
+				},
+			},
+			from: &pb.PackedEntity{
+				Number: 2,
+				AngleX: 1,
+				AngleY: 239,
+				Frame:  71,
+			},
+			want: &pb.PackedEntity{
+				Number: 2,
+				AngleX: 2,
+				AngleY: 239,
+				Frame:  71,
+			},
+		},
+		{
+			name: "all new stuff",
+			msg: &MessageBuffer{
+				Buffer: []byte{
+					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
+				},
+			},
+			from: &pb.PackedEntity{
+				Number:      2,
+				AngleZ:      33,
+				ModelIndex:  255,
+				ModelIndex2: 255,
+			},
+			want: &pb.PackedEntity{
+				Number:      2,
+				AngleX:      2,
+				AngleY:      239,
+				AngleZ:      33,
+				ModelIndex:  255,
+				ModelIndex2: 255,
+				Frame:       71,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bits := tc.msg.ParseEntityBitmask()
+			num := tc.msg.ParseEntityNumber(bits)
+			got := tc.msg.ParseEntityProto(tc.from, num, bits)
+			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
+				t.Errorf("ParseEntityProto(%v) = %v, want: %v\n", tc.from, got, tc.want)
+			}
+		})
+	}
+}

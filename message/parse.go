@@ -814,6 +814,145 @@ func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 	return ents
 }
 
+// ParsePacketEntitiesProto will parse an `SVC_PACKETENTITIES` msg. This is the
+// last of the 3-tuple of msgs sent from the server for each frame. There is no
+// delimiter between entities, once the entity is fully parsed it immediately
+// moves on to the next. If the entity number is 0, the end of the clod of ents
+// has been reached.
+//
+// This has to decompress entities as they're parsed or else there is no way to
+// tell new values from existing. This makes it impossible to decompress all
+// entities after the fact.
+func (m *MessageBuffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
+	out := make(map[int32]*pb.PackedEntity)
+	for k := range from {
+		out[k] = proto.Clone(from[k]).(*pb.PackedEntity)
+	}
+	for {
+		bits := m.ParseEntityBitmask()
+		num := m.ParseEntityNumber(bits)
+		if num <= 0 {
+			break
+		}
+		orig, ok := out[int32(num)]
+		if !ok {
+			orig = &pb.PackedEntity{}
+		}
+		out[int32(num)] = m.ParseEntityProto(orig, num, bits)
+	}
+	return out
+}
+
+// ParseEntityProto will parse an entity from stream and return an uncompressed
+// PackedEntity proto. It uses the `from` param to decompress, this acts as a
+// baseline, applies the changes and returns a clone of that full PackedEntity.
+func (m *MessageBuffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
+	to := &pb.PackedEntity{}
+	if from != nil {
+		to = proto.Clone(from).(*pb.PackedEntity)
+	}
+	to.Number = uint32(num)
+
+	if bits == 0 {
+		return to
+	}
+
+	if bits&EntityModel != 0 {
+		to.ModelIndex = uint32(m.ReadByte())
+	}
+
+	if bits&EntityModel2 != 0 {
+		to.ModelIndex2 = uint32(m.ReadByte())
+	}
+
+	if bits&EntityModel3 != 0 {
+		to.ModelIndex3 = uint32(m.ReadByte())
+	}
+
+	if bits&EntityModel4 != 0 {
+		to.ModelIndex4 = uint32(m.ReadByte())
+	}
+
+	if bits&EntityFrame8 != 0 {
+		to.Frame = uint32(m.ReadByte())
+	}
+
+	if bits&EntityFrame16 != 0 {
+		to.Frame = uint32(m.ReadShort())
+	}
+
+	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
+		to.Skin = uint32(m.ReadLong())
+	} else if bits&EntitySkin8 != 0 {
+		to.Skin = uint32(m.ReadByte())
+	} else if bits&EntitySkin16 != 0 {
+		to.Skin = uint32(m.ReadWord())
+	}
+
+	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
+		to.Effects = uint32(m.ReadLong())
+	} else if bits&EntityEffects8 != 0 {
+		to.Effects = uint32(m.ReadByte())
+	} else if bits&EntityEffects16 != 0 {
+		to.Effects = uint32(m.ReadWord())
+	}
+
+	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
+		to.RenderFx = uint32(m.ReadLong())
+	} else if bits&EntityRenderFX8 != 0 {
+		to.RenderFx = uint32(m.ReadByte())
+	} else if bits&EntityRenderFX16 != 0 {
+		to.RenderFx = uint32(m.ReadWord())
+	}
+
+	if bits&EntityOrigin1 != 0 {
+		to.OriginX = int32(m.ReadShort())
+	}
+
+	if bits&EntityOrigin2 != 0 {
+		to.OriginY = int32(m.ReadShort())
+	}
+
+	if bits&EntityOrigin3 != 0 {
+		to.OriginZ = int32(m.ReadShort())
+	}
+
+	if bits&EntityAngle1 != 0 {
+		to.AngleX = int32(m.ReadByte())
+	}
+
+	if bits&EntityAngle2 != 0 {
+		to.AngleY = int32(m.ReadByte())
+	}
+
+	if bits&EntityAngle3 != 0 {
+		to.AngleZ = int32(m.ReadByte())
+	}
+
+	if bits&EntityOldOrigin != 0 {
+		to.OldOriginX = int32(m.ReadShort())
+		to.OldOriginY = int32(m.ReadShort())
+		to.OldOriginZ = int32(m.ReadShort())
+	}
+
+	if bits&EntitySound != 0 {
+		to.Sound = uint32(m.ReadByte())
+	}
+
+	if bits&EntityEvent != 0 {
+		to.Event = uint32(m.ReadByte())
+	}
+
+	if bits&EntitySolid != 0 {
+		to.Solid = uint32(m.ReadWord())
+	}
+
+	if bits&EntityRemove != 0 {
+		to.Remove = true
+	}
+	return to
+}
+
 func (m *MessageBuffer) ParsePrint() Print {
 	return Print{
 		Level:  uint8(m.ReadByte()),

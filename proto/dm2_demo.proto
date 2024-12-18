@@ -6,10 +6,10 @@ package proto;
 
 message DM2Demo {
     ServerInfo serverinfo = 1;
-    repeated PackedEntity baselines = 2;
-    repeated CString configstrings = 3;
-    repeated StuffText stuffs = 4;
-    repeated Frame frames = 5;
+    map<int32, PackedEntity> baselines = 2;
+    map<int32, CString> configstrings = 3;
+    map<int32, Frame> frames = 5;
+    int32 current_frame = 6;    // index to the frames map
 }
 
 message ServerInfo {
@@ -112,8 +112,8 @@ message Frame {
     uint32 area_bytes = 4;          // 8 bits
     repeated uint32 area_bits = 5;  // byte
     PackedPlayer player_state = 6;
-    repeated PackedEntity entities = 7;
-    repeated CString configstrings = 8;
+    map<int32, PackedEntity> entities = 7;
+    map<int32, CString> configstrings = 8;
     repeated CenterPrint centerprints = 9;
     repeated StuffText stufftexts= 10;
     repeated Print prints = 11;

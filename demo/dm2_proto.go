@@ -96,9 +96,8 @@ func StuffTextToBinary(st *pb.StuffText) message.MessageBuffer {
 	return msg
 }
 
-func PlayerstateToProto(data *message.MessageBuffer) *pb.PackedPlayer {
+func PlayerstateToProto(player *message.PackedPlayer) *pb.PackedPlayer {
 	ps := &pb.PackedPlayer{}
-	player := data.ParseDeltaPlayerstate(message.PackedPlayer{})
 	pm := &pb.PlayerMove{}
 
 	pm.Type = uint32(player.PlayerMove.Type)
@@ -148,7 +147,7 @@ func PlayerstateToProto(data *message.MessageBuffer) *pb.PackedPlayer {
 
 // parse a frame first, then playerstate, then delta entities. It should
 // always be in that order
-func FrameToProto(data *message.MessageBuffer) *pb.Frame {
+func FrameToProto(data *message.MessageBuffer, oldframes map[int32]*pb.Frame) *pb.Frame {
 	frame := data.ParseFrame()
 	fr := &pb.Frame{}
 	fr.Number = frame.Number
@@ -158,24 +157,27 @@ func FrameToProto(data *message.MessageBuffer) *pb.Frame {
 	for _, ab := range frame.AreaBits {
 		fr.AreaBits = append(fr.AreaBits, uint32(ab))
 	}
+	deltaFrame := oldframes[fr.Delta]
 
 	ps := &pb.PackedPlayer{}
 	if data.ReadByte() == message.SVCPlayerInfo {
-		// just delta against a null playerstate
-		ps = PlayerstateToProto(data)
+		ps = data.ParseDeltaPlayerstateProto(deltaFrame.GetPlayerState())
 	}
 	fr.PlayerState = ps
 
 	if data.ReadByte() == message.SVCPacketEntities {
-		for {
-			bits := data.ParseEntityBitmask()
-			num := data.ParseEntityNumber(bits)
-			if num <= 0 {
-				break
+		fr.Entities = data.ParsePacketEntitiesProto(fr.Entities)
+		/*
+			for {
+				bits := data.ParseEntityBitmask()
+				num := data.ParseEntityNumber(bits)
+				if num <= 0 {
+					break
+				}
+				entity := data.ParseEntityProto(fr.Entities[int32(num)], num, bits)
+				fr.Entities[int32(num)] = entity
 			}
-			entity := EntityToProto(data, bits, num)
-			fr.Entities = append(fr.Entities, entity)
-		}
+		*/
 	}
 	return fr
 }
