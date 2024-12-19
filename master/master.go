@@ -143,7 +143,7 @@ func (m MasterServer) FetchServers() ([]MasterClient, error) {
 	msg.ReadLong() // eat the sequence
 	if string(msg.ReadData(7)) == "servers" {
 		for {
-			if msg.Index == len(msg.Buffer) {
+			if msg.Index == len(msg.Data) {
 				break
 			}
 			clients = append(clients, MasterClient{
@@ -157,8 +157,8 @@ func (m MasterServer) FetchServers() ([]MasterClient, error) {
 }
 
 // Write all MasterClient's info to a buffer for responding
-func (m *MasterServer) MarshalClients() *message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func (m *MasterServer) MarshalClients() *message.Buffer {
+	msg := message.Buffer{}
 	for _, cl := range m.Clients {
 		msg.Append(*cl.Marshal())
 	}
@@ -167,8 +167,8 @@ func (m *MasterServer) MarshalClients() *message.MessageBuffer {
 
 // Write this MasterClient's IP and port in a format that can be sent
 // as a response
-func (cl *MasterClient) Marshal() *message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func (cl *MasterClient) Marshal() *message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteData([]byte(cl.IP))
 
 	// reversed byte-order from msg.WriteShort()
@@ -183,7 +183,7 @@ func (cl *MasterClient) Marshal() *message.MessageBuffer {
 // dont do this
 func (m MasterServer) SendClientList() {
 	msg := m.MarshalClients()
-	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
+	fmt.Printf("%s\n", hex.Dump(msg.Data))
 }
 
 func (m *MasterServer) FindClient(cl net.Addr) *MasterClient {
@@ -240,16 +240,16 @@ func removeClient(m *MasterServer, from *net.Addr) {
 
 // for sending simple "ack"s and "ping"s
 func send(cmd string, m *MasterServer, recip *net.Addr) {
-	ack := message.MessageBuffer{}
+	ack := message.Buffer{}
 	ack.WriteLong(-1)
 	ack.WriteData([]byte(cmd))
-	(*m.Conn).WriteTo(ack.Buffer, *recip)
+	(*m.Conn).WriteTo(ack.Data, *recip)
 }
 
 // Runs concurrently for every datagram recieved by the server
 func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
-	msg := message.MessageBuffer{
-		Buffer: buf,
+	msg := message.Buffer{
+		Data: buf,
 	}
 	if msg.ReadLong() == -1 {
 		tok := strings.Split(string(msg.ReadData(len(buf))), "\n")
@@ -292,13 +292,13 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 // Someone requested a list of all Q2 servers we know about.
 func clientList(m *MasterServer, recip *net.Addr) {
 	m.Stats.GetServerHits++
-	msg := message.MessageBuffer{}
+	msg := message.Buffer{}
 	msg.WriteLong(-1)
 	msg.WriteData([]byte("servers ")) // note the space
 
 	clients := m.MarshalClients()
 	msg.Append(*clients)
-	(*m.Conn).WriteTo(msg.Buffer, *recip)
+	(*m.Conn).WriteTo(msg.Data, *recip)
 	log.Println("sending client list to", *recip)
 }
 

@@ -9,8 +9,8 @@ import (
 )
 
 func TestServerData(t *testing.T) {
-	msg := MessageBuffer{
-		Buffer: []byte{
+	msg := Buffer{
+		Data: []byte{
 			0x22, 0x00, 0x00, 0x00, 0x42, 0x85, 0xA4, 0x66,
 			0x01, 0x00, 0x00, 0x00, 0x54, 0x68, 0x65, 0x20,
 			0x45, 0x64, 0x67, 0x65, 0x00},
@@ -47,8 +47,8 @@ func TestServerData(t *testing.T) {
 }
 
 func TestParseConfigstring(t *testing.T) {
-	msg := MessageBuffer{
-		Buffer: []byte{
+	msg := Buffer{
+		Data: []byte{
 			0x02, 0x00, 0x75, 0x6E, 0x69, 0x74, 0x31, 0x5F, 0x00},
 	}
 	cs := msg.ParseConfigString()
@@ -69,8 +69,8 @@ func TestParseConfigstring(t *testing.T) {
 }
 
 func TestParseBaseline(t *testing.T) {
-	msg := MessageBuffer{
-		Buffer: []byte{0x83, 0xCA, 0x04, 0x23, 0x1C, 0x01, 0x00, 0x02, 0x80, 0x21, 0x00, 0x28, 0x78, 0x1C},
+	msg := Buffer{
+		Data: []byte{0x83, 0xCA, 0x04, 0x23, 0x1C, 0x01, 0x00, 0x02, 0x80, 0x21, 0x00, 0x28, 0x78, 0x1C},
 	}
 	entity := msg.ParseSpawnBaseline()
 	if entity.Number != 35 {
@@ -87,8 +87,8 @@ func TestParseBaseline(t *testing.T) {
 }
 
 func TestParseFrame(t *testing.T) {
-	msg := MessageBuffer{
-		Buffer: []byte{0x01, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x01, 0x02},
+	msg := Buffer{
+		Data: []byte{0x01, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x01, 0x02},
 	}
 	fr := msg.ParseFrame()
 	if fr.Delta != -1 {
@@ -105,8 +105,8 @@ func TestParseFrame(t *testing.T) {
 }
 
 func TestParsePlayerstate(t *testing.T) {
-	msg := MessageBuffer{
-		Buffer: []byte{0x00, 0x20, 0x0E, 0x0C, 0x00, 0xF5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+	msg := Buffer{
+		Data: []byte{0x00, 0x20, 0x0E, 0x0C, 0x00, 0xF5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	}
 	ps := msg.ParseDeltaPlayerstate(PackedPlayer{})
 
@@ -120,9 +120,9 @@ func TestParsePlayerstate(t *testing.T) {
 }
 
 func TestParseDeltaEntities(t *testing.T) {
-	msg := MessageBuffer{
+	msg := Buffer{
 		//Buffer: []byte{0x10, 0x01, 0x17, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00},
-		Buffer: []byte{
+		Data: []byte{
 			0x97, 0x8E, 0x90, 0x0B, 0x01, 0xFF, 0xFF, 0x0D,
 			0x00, 0x01, 0xA9, 0x30, 0x8F, 0x1F, 0xC1, 0x20,
 			0x04, 0xB6, 0xA9, 0x30, 0x8F, 0x1F, 0xC1, 0x20,
@@ -144,7 +144,7 @@ func TestParseDeltaEntities(t *testing.T) {
 		t.Error("wrong entity count, want 36, got", len(ents))
 	}
 
-	got := MessageBuffer{}
+	got := Buffer{}
 	for _, e := range ents {
 		got.Append(*e.Marshal())
 	}
@@ -221,14 +221,14 @@ func TestValidateSequence(t *testing.T) {
 func TestParseDeltaPlayerstateProto(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  *MessageBuffer
+		msg  *Buffer
 		from *pb.PackedPlayer
 		want *pb.PackedPlayer
 	}{
 		{
 			name: "from nil playerstate",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					134, 35, 196, 8, 255, 36, 193, 1, 147, 253, 254, 255,
 					0, 0, 0, 0, 88, 42, 10, 119, 206, 0, 0, 0, 0, 1, 44,
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -252,8 +252,8 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 		},
 		{
 			name: "fov only from valid state",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					0, 8, 105, 0, 0, 0, 0,
 				},
 			},
@@ -274,8 +274,8 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 		},
 		{
 			name: "fov only from valid with movestate",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					0, 8, 105, 0, 0, 0, 0,
 				},
 			},
@@ -304,8 +304,8 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 		},
 		{
 			name: "fov only from valid with existing stats",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					0, 8, 105, 0, 0, 0, 0,
 				},
 			},
@@ -344,8 +344,8 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 		},
 		{
 			name: "fov only from valid state with new stats",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					0, 8, 105, 96, 0, 0, 0, 9, 0, 0, 0,
 				},
 			},
@@ -382,14 +382,14 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 func TestParseEntityProto(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  *MessageBuffer
+		msg  *Buffer
 		from *pb.PackedEntity
 		want *pb.PackedEntity
 	}{
 		{
 			name: "from nil",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
 				},
 			},
@@ -403,8 +403,8 @@ func TestParseEntityProto(t *testing.T) {
 		},
 		{
 			name: "no change",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
 				},
 			},
@@ -423,8 +423,8 @@ func TestParseEntityProto(t *testing.T) {
 		},
 		{
 			name: "single change",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
 				},
 			},
@@ -443,8 +443,8 @@ func TestParseEntityProto(t *testing.T) {
 		},
 		{
 			name: "all new stuff",
-			msg: &MessageBuffer{
-				Buffer: []byte{
+			msg: &Buffer{
+				Data: []byte{
 					148, 4, 2, 71, 2, 239, 27, 3, 69, 196, 8, 255, 36, 2, 0, 0,
 				},
 			},

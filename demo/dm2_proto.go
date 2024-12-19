@@ -5,7 +5,7 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
-func ServerDataToProto(data *message.MessageBuffer) *pb.ServerInfo {
+func ServerDataToProto(data *message.Buffer) *pb.ServerInfo {
 	sd := &pb.ServerInfo{}
 	sd.Protocol = data.ReadULong()
 	sd.ServerCount = data.ReadULong()
@@ -16,8 +16,8 @@ func ServerDataToProto(data *message.MessageBuffer) *pb.ServerInfo {
 	return sd
 }
 
-func ServerDataToBinary(s *pb.ServerInfo) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func ServerDataToBinary(s *pb.ServerInfo) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(message.SVCServerData)
 	msg.WriteLong(int32(s.GetProtocol()))
 	msg.WriteLong(int32(s.GetServerCount()))
@@ -32,7 +32,7 @@ func ServerDataToBinary(s *pb.ServerInfo) message.MessageBuffer {
 	return msg
 }
 
-func ConfigstringToProto(data *message.MessageBuffer) *pb.CString {
+func ConfigstringToProto(data *message.Buffer) *pb.CString {
 	cs := data.ParseConfigString()
 	return &pb.CString{
 		Index:   uint32(cs.Index),
@@ -40,15 +40,15 @@ func ConfigstringToProto(data *message.MessageBuffer) *pb.CString {
 	}
 }
 
-func ConfigstringToBinary(cs *pb.CString) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func ConfigstringToBinary(cs *pb.CString) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(message.SVCConfigString)
 	msg.WriteShort(uint16(cs.GetIndex()))
 	msg.WriteString(cs.GetString_())
 	return msg
 }
 
-func EntityToProto(data *message.MessageBuffer, bitmask uint32, number uint16) *pb.PackedEntity {
+func EntityToProto(data *message.Buffer, bitmask uint32, number uint16) *pb.PackedEntity {
 	b := &pb.PackedEntity{}
 	ent := data.ParseEntity(message.PackedEntity{}, number, bitmask)
 	b.Number = uint32(number)
@@ -77,21 +77,21 @@ func EntityToProto(data *message.MessageBuffer, bitmask uint32, number uint16) *
 }
 
 // finish this later
-func EntityToBinary(ent *pb.PackedEntity) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func EntityToBinary(ent *pb.PackedEntity) message.Buffer {
+	msg := message.Buffer{}
 	DeltaEntity(&pb.PackedEntity{}, ent, &msg)
 	return msg
 }
 
-func StuffTextToProto(data *message.MessageBuffer) *pb.StuffText {
+func StuffTextToProto(data *message.Buffer) *pb.StuffText {
 	st := data.ParseStuffText()
 	s := &pb.StuffText{}
 	s.String_ = st.String
 	return s
 }
 
-func StuffTextToBinary(st *pb.StuffText) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func StuffTextToBinary(st *pb.StuffText) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteString(st.GetString_())
 	return msg
 }
@@ -147,7 +147,7 @@ func PlayerstateToProto(player *message.PackedPlayer) *pb.PackedPlayer {
 
 // parse a frame first, then playerstate, then delta entities. It should
 // always be in that order
-func FrameToProto(data *message.MessageBuffer, oldframes map[int32]*pb.Frame) *pb.Frame {
+func FrameToProto(data *message.Buffer, oldframes map[int32]*pb.Frame) *pb.Frame {
 	frame := data.ParseFrame()
 	fr := &pb.Frame{}
 	fr.Number = frame.Number
@@ -182,8 +182,8 @@ func FrameToProto(data *message.MessageBuffer, oldframes map[int32]*pb.Frame) *p
 	return fr
 }
 
-func FrameToBinary(fr *pb.Frame) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func FrameToBinary(fr *pb.Frame) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(message.SVCFrame)
 	msg.WriteLong(fr.Number)
 	msg.WriteLong(fr.Delta)
@@ -306,7 +306,7 @@ func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
 	return bits
 }
 
-func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.MessageBuffer) {
+func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.Buffer) {
 	bits := DeltaPlayerBitmask(from, to)
 	msg.WriteByte(message.SVCPlayerInfo)
 	msg.WriteShort(bits)
@@ -395,7 +395,7 @@ func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.Messag
 	ReconcilePlayerstateStats(to, from, msg)
 }
 
-func ReconcilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *message.MessageBuffer) {
+func ReconcilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *message.Buffer) {
 	bits := uint32(0)
 	toStats := [32]int16{}
 	for _, s := range to.GetStats() {
@@ -541,7 +541,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	return bits
 }
 
-func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *message.MessageBuffer) {
+func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *message.Buffer) {
 	bits := DeltaEntityBitmask(to, from)
 
 	// write the bitmask first
@@ -653,7 +653,7 @@ func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *message.MessageB
 	}
 }
 
-func PrintToProto(data *message.MessageBuffer) *pb.Print {
+func PrintToProto(data *message.Buffer) *pb.Print {
 	pr := data.ParsePrint()
 	p := &pb.Print{}
 	p.Level = uint32(pr.Level)
@@ -661,14 +661,14 @@ func PrintToProto(data *message.MessageBuffer) *pb.Print {
 	return p
 }
 
-func PrintToBinary(p *pb.Print) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func PrintToBinary(p *pb.Print) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(byte(p.GetLevel()))
 	msg.WriteString(p.GetString_())
 	return msg
 }
 
-func FlashToProto(data *message.MessageBuffer) *pb.MuzzleFlash {
+func FlashToProto(data *message.Buffer) *pb.MuzzleFlash {
 	f := &pb.MuzzleFlash{}
 	mf := data.ParseMuzzleFlash()
 	f.Entity = uint32(mf.Entity)
@@ -676,14 +676,14 @@ func FlashToProto(data *message.MessageBuffer) *pb.MuzzleFlash {
 	return f
 }
 
-func FlashToBinary(mf *pb.MuzzleFlash) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func FlashToBinary(mf *pb.MuzzleFlash) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteShort(uint16(mf.GetEntity()))
 	msg.WriteByte(byte(mf.GetWeapon()))
 	return msg
 }
 
-func TempEntToProto(data *message.MessageBuffer) *pb.TemporaryEntity {
+func TempEntToProto(data *message.Buffer) *pb.TemporaryEntity {
 	t := &pb.TemporaryEntity{}
 	te := data.ParseTempEntity()
 	t.Type = uint32(te.Type)
@@ -705,8 +705,8 @@ func TempEntToProto(data *message.MessageBuffer) *pb.TemporaryEntity {
 	return t
 }
 
-func TempEntToBinary(te *pb.TemporaryEntity) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func TempEntToBinary(te *pb.TemporaryEntity) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(byte(te.GetType()))
 	switch te.GetType() {
 	case message.TentBlood:
@@ -883,20 +883,20 @@ func TempEntToBinary(te *pb.TemporaryEntity) message.MessageBuffer {
 	return msg
 }
 
-func LayoutToProto(data *message.MessageBuffer) *pb.Layout {
+func LayoutToProto(data *message.Buffer) *pb.Layout {
 	lo := &pb.Layout{}
 	layout := data.ParseLayout()
 	lo.String_ = layout.Data
 	return lo
 }
 
-func LayoutToBinary(lo *pb.Layout) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func LayoutToBinary(lo *pb.Layout) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteString(lo.GetString_())
 	return msg
 }
 
-func SoundToProto(data *message.MessageBuffer) *pb.PackedSound {
+func SoundToProto(data *message.Buffer) *pb.PackedSound {
 	sound := &pb.PackedSound{}
 	s := data.ParseSound()
 	sound.Flags = uint32(s.Flags)
@@ -912,8 +912,8 @@ func SoundToProto(data *message.MessageBuffer) *pb.PackedSound {
 	return sound
 }
 
-func SoundToBinary(s *pb.PackedSound) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func SoundToBinary(s *pb.PackedSound) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteByte(byte(s.GetFlags()))
 	msg.WriteByte(byte(s.GetIndex()))
 	if (s.GetFlags() & message.SoundVolume) > 0 {
@@ -940,15 +940,15 @@ func SoundToBinary(s *pb.PackedSound) message.MessageBuffer {
 	return msg
 }
 
-func CenterPrintToProto(data *message.MessageBuffer) *pb.CenterPrint {
+func CenterPrintToProto(data *message.Buffer) *pb.CenterPrint {
 	cp := &pb.CenterPrint{}
 	center := data.ParseCenterPrint()
 	cp.String_ = center.Data
 	return cp
 }
 
-func CenterPrintToBinary(cp *pb.CenterPrint) message.MessageBuffer {
-	msg := message.MessageBuffer{}
+func CenterPrintToBinary(cp *pb.CenterPrint) message.Buffer {
+	msg := message.Buffer{}
 	msg.WriteString(cp.GetString_())
 	return msg
 }

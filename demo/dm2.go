@@ -68,29 +68,29 @@ func (demo *DM2Demo) Unmarshal() error {
 // modern clients using protocols 35/36 will still write demos for protocol
 // 34 to maximize compatability. Although it is possible to force these clients
 // to record in their native protocol version.
-func (demo *DM2Demo) NextPacket() (message.MessageBuffer, int, error) {
+func (demo *DM2Demo) NextPacket() (message.Buffer, int, error) {
 	// shouldn't happen, but gracefully handle just in case
 	if demo.binaryPosition >= len(demo.binaryData) {
-		return message.MessageBuffer{}, 0, errors.New("trying to read past end of packet")
+		return message.Buffer{}, 0, errors.New("trying to read past end of packet")
 	}
-	sizebytes := message.NewMessageBuffer(demo.binaryData[demo.binaryPosition : demo.binaryPosition+4])
+	sizebytes := message.NewBuffer(demo.binaryData[demo.binaryPosition : demo.binaryPosition+4])
 	packetLen := int(sizebytes.ReadLong())
 	if packetLen == -1 {
 		// reached the end of the demo
-		return message.MessageBuffer{}, 0, nil
+		return message.Buffer{}, 0, nil
 	}
 	demo.binaryPosition += 4
-	packet := message.MessageBuffer{
-		Buffer: demo.binaryData[demo.binaryPosition : demo.binaryPosition+packetLen],
+	packet := message.Buffer{
+		Data: demo.binaryData[demo.binaryPosition : demo.binaryPosition+packetLen],
 	}
 	demo.binaryPosition += packetLen
 	return packet, packetLen, nil
 }
 
 // Parse all the messages in a particular chunk of data
-func (demo *DM2Demo) UnmarshalPacket(data message.MessageBuffer) error {
+func (demo *DM2Demo) UnmarshalPacket(data message.Buffer) error {
 	textpb := demo.textProto
-	for data.Index < len(data.Buffer) {
+	for data.Index < len(data.Data) {
 		cmd := data.ReadByte()
 		switch cmd {
 		case message.SVCServerData:
@@ -166,8 +166,8 @@ func (demo *DM2Demo) GetTextProto() *pb.DM2Demo {
 // Convert the textproto demo back into a quake 2 playable binary demo. The
 // returned byte slice just needs to be written to a file as is.
 func (demo *DM2Demo) Marshal() ([]byte, error) {
-	out := message.MessageBuffer{}    // the overall demo
-	packet := message.MessageBuffer{} // the current packet
+	out := message.Buffer{}    // the overall demo
+	packet := message.Buffer{} // the current packet
 
 	textpb := demo.GetTextProto()
 
@@ -185,11 +185,11 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		if !ok {
 			continue
 		}
-		tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
+		tmp := message.Buffer{Data: []byte{SvcSpawnBaseline}}
 		tmp.Append(EntityToBinary(bl))
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
-	tmp := message.MessageBuffer{Buffer: []byte{SvcStuffText}}
+	tmp := message.Buffer{Data: []byte{SvcStuffText}}
 	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
 	buildDemoPacket(&out, &packet, tmp, false)
 
@@ -206,7 +206,7 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		total++
 	}
 	out.WriteLong(-1) // end of demo
-	return out.Buffer, nil
+	return out.Data, nil
 }
 
 // Append msg to packet until it can't fit anymore, then append packet to final.
@@ -215,9 +215,9 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 // If force is true don't wait until the buffer is full, write it and reset.
 //
 // Note first two buffer args are pointers since they get updated
-func buildDemoPacket(final, packet *message.MessageBuffer, msg message.MessageBuffer, force bool) {
-	if ((len(packet.Buffer) + len(msg.Buffer)) > message.MaxMessageLength) || force {
-		final.WriteLong(int32(len(packet.Buffer)))
+func buildDemoPacket(final, packet *message.Buffer, msg message.Buffer, force bool) {
+	if ((len(packet.Data) + len(msg.Data)) > message.MaxMessageLength) || force {
+		final.WriteLong(int32(len(packet.Data)))
 		final.Append(*packet)
 		packet.Reset()
 	}

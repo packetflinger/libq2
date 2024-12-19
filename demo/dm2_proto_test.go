@@ -45,13 +45,13 @@ func TestMarshal(t *testing.T) {
 func TestServerDataToProto(t *testing.T) {
 	tests := []struct {
 		name string
-		in   *message.MessageBuffer
+		in   *message.Buffer
 		want *pb.ServerInfo
 	}{
 		{
 			name: "test 1",
-			in: &message.MessageBuffer{
-				Buffer: []byte{
+			in: &message.Buffer{
+				Data: []byte{
 					34, 0, 0, 0, 66, 133, 164, 102,
 					1, 0, 0, 0, 84, 104, 101, 32,
 					69, 100, 103, 101, 0,
@@ -83,7 +83,7 @@ func TestServerDataToBinary(t *testing.T) {
 	tests := []struct {
 		name string
 		in   *pb.ServerInfo
-		want message.MessageBuffer
+		want message.Buffer
 	}{
 		{
 			name: "test 1",
@@ -95,8 +95,8 @@ func TestServerDataToBinary(t *testing.T) {
 				ClientNumber: 0,
 				MapName:      "The Edge",
 			},
-			want: message.MessageBuffer{
-				Buffer: []byte{
+			want: message.Buffer{
+				Data: []byte{
 					12, 34, 0, 0, 0, 66, 133, 164, 102,
 					1, 0, 0, 0, 84, 104, 101, 32,
 					69, 100, 103, 101, 0,
@@ -109,7 +109,7 @@ func TestServerDataToBinary(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := ServerDataToBinary(tc.in)
-			if !bytes.Equal(got.Buffer, tc.want.Buffer) {
+			if !bytes.Equal(got.Data, tc.want.Data) {
 				t.Error("\ngot:\n", got, "\nwant\n", tc.want)
 			}
 		})
@@ -119,13 +119,13 @@ func TestServerDataToBinary(t *testing.T) {
 func TestParseEntityBitmask(t *testing.T) {
 	tests := []struct {
 		name string
-		in   *message.MessageBuffer
+		in   *message.Buffer
 		want uint32
 	}{
 		{
 			name: "test 1",
-			in: &message.MessageBuffer{
-				Buffer: []byte{
+			in: &message.Buffer{
+				Data: []byte{
 					131, 130, 128, 4,
 				},
 				Length: 4,
@@ -184,13 +184,13 @@ func TestDeltaEntityBitmask(t *testing.T) {
 func TestEntityToProto(t *testing.T) {
 	tests := []struct {
 		name string
-		in   *message.MessageBuffer
+		in   *message.Buffer
 		want *pb.PackedEntity
 	}{
 		{
 			name: "test 1",
-			in: &message.MessageBuffer{
-				Buffer: []byte{
+			in: &message.Buffer{
+				Data: []byte{
 					131, 130, 128, 4, 22, 160, 7, 160, 243, 96, 16, 43,
 				},
 				Length: 12,
@@ -267,13 +267,13 @@ func TestDeltaPlayerstateBitmask(t *testing.T) {
 func TestPlayerstateToProto(t *testing.T) {
 	tests := []struct {
 		name string
-		in   *message.MessageBuffer
+		in   *message.Buffer
 		want *pb.PackedPlayer
 	}{
 		{
 			name: "test 1",
-			in: &message.MessageBuffer{
-				Buffer: []byte{
+			in: &message.Buffer{
+				Data: []byte{
 					242, 57, 169, 48, 143, 31, 193, 32, // bitmask, origin
 					4, 32, 3, 0, 0, 0, 128, 0, 0, // flags, gravity, delta angles
 					0, 0, 88, 168, 13, 157, 181, 0, 0, // view offset, view angles
@@ -360,13 +360,13 @@ func TestPlayerstateToProto(t *testing.T) {
 func TestPlayerstateToBinary(t *testing.T) {
 	tests := []struct {
 		name string
-		want *message.MessageBuffer
+		want *message.Buffer
 		in   *pb.PackedPlayer
 	}{
 		{
 			name: "test 1",
-			want: &message.MessageBuffer{
-				Buffer: []byte{
+			want: &message.Buffer{
+				Data: []byte{
 					17,    // svc_playerstate
 					50, 8, // bitmask
 					50, 0, 0, 0, 25, 0, // origin
@@ -390,8 +390,8 @@ func TestPlayerstateToBinary(t *testing.T) {
 		},
 		{
 			name: "test 2 with stats",
-			want: &message.MessageBuffer{
-				Buffer: []byte{
+			want: &message.Buffer{
+				Data: []byte{
 					17,    // svc_playerstate
 					32, 0, // bitmask
 					32, 3, // gravity
@@ -413,9 +413,9 @@ func TestPlayerstateToBinary(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := message.MessageBuffer{}
+			got := message.Buffer{}
 			DeltaPlayer(&pb.PackedPlayer{}, tc.in, &got)
-			if !bytes.Equal(got.Buffer, tc.want.Buffer) {
+			if !bytes.Equal(got.Data, tc.want.Data) {
 				t.Error("\ngot:\n", got, "\nwant\n", tc.want)
 			}
 		})
@@ -441,11 +441,11 @@ func TestSound(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			msg := message.NewMessageBuffer(tc.data)
+			msg := message.NewBuffer(tc.data)
 			sndproto := SoundToProto(&msg)
 			got := SoundToBinary(sndproto)
-			if !bytes.Equal(got.Buffer, tc.want) {
-				t.Error("\ngot:\n", got.Buffer, "\nwant\n", tc.want)
+			if !bytes.Equal(got.Data, tc.want) {
+				t.Error("\ngot:\n", got.Data, "\nwant\n", tc.want)
 			}
 		})
 	}
@@ -495,10 +495,10 @@ func TestReconcilePlayerstateStats(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := message.MessageBuffer{}
+			got := message.Buffer{}
 			ReconcilePlayerstateStats(tc.ps2, tc.ps1, &got)
-			if !bytes.Equal(got.Buffer, tc.want) {
-				t.Error("\ngot:\n", got.Buffer, "\nwant\n", tc.want)
+			if !bytes.Equal(got.Data, tc.want) {
+				t.Error("\ngot:\n", got.Data, "\nwant\n", tc.want)
 			}
 		})
 	}

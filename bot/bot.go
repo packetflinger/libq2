@@ -33,8 +33,8 @@ type Connection struct {
 }
 
 type NetChan struct {
-	msgIn      message.MessageBuffer
-	msgOut     message.MessageBuffer
+	msgIn      message.Buffer
+	msgOut     message.Buffer
 	QPort      uint16
 	Sequence1  int32
 	Sequence2  int32
@@ -44,7 +44,7 @@ type NetChan struct {
 
 // is there anything that needs to be sent?
 func (bot *Bot) OutPending() bool {
-	return len(bot.Netchan.msgOut.Buffer) > 0
+	return len(bot.Netchan.msgOut.Data) > 0
 }
 
 // was a recently received msg reliable and needs an ack?
@@ -62,7 +62,7 @@ func (bot *Bot) SendAck() error {
 }
 
 func (bot *Bot) ClientCommand(str string, reliable bool) error {
-	msg := message.MessageBuffer{}
+	msg := message.Buffer{}
 	msg.WriteString(str)
 	p := message.ClientPacket{
 		Sequence1:   bot.Netchan.Sequence1,
@@ -71,7 +71,7 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 		Reliable1:   reliable,
 		Reliable2:   bot.Netchan.ReliableS2,
 		MessageType: message.CLCStringCommand,
-		Data:        msg.Buffer,
+		Data:        msg.Data,
 	}
 	packet := p.Marshal()
 	if bot.Debug {
@@ -112,7 +112,7 @@ func (bot *Bot) Run(cb message.Callback) error {
 		return e
 	}
 
-	cmsg := message.MessageBuffer{Buffer: chal}
+	cmsg := message.Buffer{Data: chal}
 	ch, err := cmsg.ParseChallenge()
 	if err != nil {
 		return err
@@ -217,29 +217,29 @@ func (bot *Bot) Run(cb message.Callback) error {
 
 func (bot *Bot) Send() error {
 	msg2 := &bot.Netchan.msgOut
-	msg := message.MessageBuffer{}
+	msg := message.Buffer{}
 	msg.WriteLong(bot.Netchan.Sequence1)
 	if bot.Netchan.ReliableS1 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteLong(bot.Netchan.Sequence2)
 	if bot.Netchan.ReliableS2 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteShort(uint16(bot.Netchan.QPort))
 
-	if len(msg2.Buffer) > 0 {
-		msg.Buffer = append(msg.Buffer, msg2.Buffer...)
+	if len(msg2.Data) > 0 {
+		msg.Data = append(msg.Data, msg2.Data...)
 		msg.Index += msg2.Index
 	}
 
-	_, e := bot.Net.Conn.Write(msg.Buffer)
+	_, e := bot.Net.Conn.Write(msg.Data)
 	if e != nil {
 		return e
 	}
 
 	if bot.Debug {
-		fmt.Printf("sent:\n%s\n", hex.Dump(msg.Buffer))
+		fmt.Printf("sent:\n%s\n", hex.Dump(msg.Data))
 	}
 
 	bot.Netchan.Sequence1++
@@ -257,10 +257,10 @@ func (bot *Bot) Receive() (int, error) {
 
 	msg := &bot.Netchan.msgIn
 	msg.Reset()
-	msg.Buffer = in[:bytes]
+	msg.Data = in[:bytes]
 
 	if bot.Debug {
-		fmt.Printf("received\n%s\n", hex.Dump(msg.Buffer))
+		fmt.Printf("received\n%s\n", hex.Dump(msg.Data))
 	}
 
 	// normally this would be a ReadLong(), but we need it to stay in byte slice format
@@ -276,7 +276,7 @@ func (bot *Bot) Receive() (int, error) {
 	} else {
 		bot.Netchan.ReliableS2 = false
 	}
-	tmpmsg := message.MessageBuffer{Buffer: sequence}
+	tmpmsg := message.Buffer{Data: sequence}
 	bot.Netchan.Sequence2 = tmpmsg.ReadLong()
 
 	// we don't care about the ack sequence

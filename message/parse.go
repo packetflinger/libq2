@@ -47,9 +47,9 @@ type Callback struct {
 	Flash2       func(*MuzzleFlash)
 
 	// event specific callbacks
-	OnConnect func()               // connection to gameserver made
-	OnEnter   func()               // you entered the game (begin)
-	PreSend   func(*MessageBuffer) //
+	OnConnect func()        // connection to gameserver made
+	OnEnter   func()        // you entered the game (begin)
+	PreSend   func(*Buffer) //
 
 	// needed for parsing compressed things like playerstates and
 	// packetentities
@@ -213,12 +213,12 @@ type ChallengeResponse struct {
 //
 // External callbacks are for logic outside the library, like custom programs
 // that import this library.
-func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (ServerFrame, error) {
+func ParseMessageLump(buf Buffer, intcb Callback, extcb Callback) (ServerFrame, error) {
 	sf := NewServerFrame()
 	//frameMap := intcb.FrameMap
 	deltaFrame := &ServerFrame{}
 
-	for buf.Index < len(buf.Buffer) {
+	for buf.Index < len(buf.Data) {
 		cmd := buf.ReadByte()
 
 		switch cmd {
@@ -374,13 +374,13 @@ func ParseMessageLump(buf MessageBuffer, intcb Callback, extcb Callback) (Server
 			return ServerFrame{}, fmt.Errorf("received disconnect message")
 
 		default:
-			return ServerFrame{}, fmt.Errorf("unknown CMD: %d\n%s", cmd, hex.Dump(buf.Buffer[buf.Index-1:]))
+			return ServerFrame{}, fmt.Errorf("unknown CMD: %d\n%s", cmd, hex.Dump(buf.Data[buf.Index-1:]))
 		}
 	}
 	return sf, nil
 }
 
-func (m *MessageBuffer) ParseServerData() ServerData {
+func (m *Buffer) ParseServerData() ServerData {
 	return ServerData{
 		Protocol:     m.ReadLong(),
 		ServerCount:  m.ReadLong(),
@@ -391,8 +391,8 @@ func (m *MessageBuffer) ParseServerData() ServerData {
 	}
 }
 
-func (sd ServerData) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (sd ServerData) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteLong(sd.Protocol)
 	msg.WriteLong(sd.ServerCount)
 	msg.WriteByte(byte(sd.Demo))
@@ -405,15 +405,15 @@ func (sd ServerData) Marshal() *MessageBuffer {
 // Configstrings are strings sent to each client and associated
 // with an index. They're referenced by index in various playces
 // such as layouts, etc.
-func (m *MessageBuffer) ParseConfigString() ConfigString {
+func (m *Buffer) ParseConfigString() ConfigString {
 	return ConfigString{
 		Index:  m.ReadShort(),
 		String: m.ReadString(),
 	}
 }
 
-func (cs ConfigString) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (cs ConfigString) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteShort(cs.Index)
 	msg.WriteString(cs.String)
 	return &msg
@@ -421,7 +421,7 @@ func (cs ConfigString) Marshal() *MessageBuffer {
 
 // A baseline is just a normal entity in its default state, from
 // a client's perspective
-func (m *MessageBuffer) ParseSpawnBaseline() PackedEntity {
+func (m *Buffer) ParseSpawnBaseline() PackedEntity {
 	bitmask := m.ParseEntityBitmask()
 	number := m.ParseEntityNumber(bitmask)
 	return m.ParseEntity(PackedEntity{}, number, bitmask)
@@ -430,7 +430,7 @@ func (m *MessageBuffer) ParseSpawnBaseline() PackedEntity {
 // Read up to the first 4 bytes of an entity, depending on the
 // previous ones. This value tells you what data is in the rest
 // of the entity message.
-func (m *MessageBuffer) ParseEntityBitmask() uint32 {
+func (m *Buffer) ParseEntityBitmask() uint32 {
 	bits := uint32(m.ReadByte())
 
 	if bits&EntityMoreBits1 != 0 {
@@ -448,7 +448,7 @@ func (m *MessageBuffer) ParseEntityBitmask() uint32 {
 	return uint32(bits)
 }
 
-func (m *MessageBuffer) ParseEntityNumber(flags uint32) uint16 {
+func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
 	num := uint16(0)
 	if flags&EntityNumber16 != 0 {
 		num = uint16(m.ReadShort())
@@ -459,7 +459,7 @@ func (m *MessageBuffer) ParseEntityNumber(flags uint32) uint16 {
 	return num
 }
 
-func (m *MessageBuffer) ParseEntity(from PackedEntity, num uint16, bits uint32) PackedEntity {
+func (m *Buffer) ParseEntity(from PackedEntity, num uint16, bits uint32) PackedEntity {
 	to := from
 	to.Number = uint32(num)
 
@@ -564,11 +564,11 @@ func (m *MessageBuffer) ParseEntity(from PackedEntity, num uint16, bits uint32) 
 	return to
 }
 
-func (m *MessageBuffer) ParseStuffText() StuffText {
+func (m *Buffer) ParseStuffText() StuffText {
 	return StuffText{String: m.ReadString()}
 }
 
-func (msg *MessageBuffer) ParseFrame() FrameMsg {
+func (msg *Buffer) ParseFrame() FrameMsg {
 	name := int32(msg.ReadLong())
 	delta := int32(msg.ReadLong())
 	suppressed := int8(msg.ReadByte())
@@ -584,7 +584,7 @@ func (msg *MessageBuffer) ParseFrame() FrameMsg {
 	}
 }
 
-func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
+func (m *Buffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 	bits := m.ReadWord()
 	pm := PlayerMoveState{}
 
@@ -682,7 +682,7 @@ func (m *MessageBuffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 
 // ParseDeltaPlayerstateProto will merge a previous playerstate with one parsed
 // from the receiver. Only the changed values are copied.
-func (m *MessageBuffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.PackedPlayer {
+func (m *Buffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.PackedPlayer {
 	ps := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
 	stats := []*pb.PlayerStat{}
@@ -792,7 +792,7 @@ func (m *MessageBuffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.Pa
 
 // A server-to-client message containing all entities the client should know
 // about for a particular frame
-func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
+func (m *Buffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 	froments := map[int]PackedEntity{}
 	ents := []PackedEntity{}
 	for {
@@ -823,7 +823,7 @@ func (m *MessageBuffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 // This has to decompress entities as they're parsed or else there is no way to
 // tell new values from existing. This makes it impossible to decompress all
 // entities after the fact.
-func (m *MessageBuffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
+func (m *Buffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
 	out := make(map[int32]*pb.PackedEntity)
 	for k := range from {
 		out[k] = proto.Clone(from[k]).(*pb.PackedEntity)
@@ -846,7 +846,7 @@ func (m *MessageBuffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity
 // ParseEntityProto will parse an entity from stream and return an uncompressed
 // PackedEntity proto. It uses the `from` param to decompress, this acts as a
 // baseline, applies the changes and returns a clone of that full PackedEntity.
-func (m *MessageBuffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
+func (m *Buffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
 	to := &pb.PackedEntity{}
 	if from != nil {
 		to = proto.Clone(from).(*pb.PackedEntity)
@@ -953,7 +953,7 @@ func (m *MessageBuffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits
 	return to
 }
 
-func (m *MessageBuffer) ParsePrint() Print {
+func (m *Buffer) ParsePrint() Print {
 	return Print{
 		Level:  uint8(m.ReadByte()),
 		String: m.ReadString(),
@@ -961,7 +961,7 @@ func (m *MessageBuffer) ParsePrint() Print {
 }
 
 // This is a start-sound packet
-func (m *MessageBuffer) ParseSound() PackedSound {
+func (m *Buffer) ParseSound() PackedSound {
 	s := PackedSound{}
 	s.Flags = m.ReadByte()
 	s.Index = m.ReadByte()
@@ -1070,7 +1070,7 @@ func (to *PackedPlayer) DeltaPlayerstateBitmask(from *PackedPlayer) uint16 {
 }
 
 // Build a playerstate message, but only the differences between to and from.
-func (msg *MessageBuffer) WriteDeltaPlayerstate(to *PackedPlayer, from *PackedPlayer) {
+func (msg *Buffer) WriteDeltaPlayerstate(to *PackedPlayer, from *PackedPlayer) {
 	bits := to.DeltaPlayerstateBitmask(from)
 	msg.WriteByte(SVCPlayerInfo)
 	msg.WriteShort(bits)
@@ -1283,7 +1283,7 @@ func (to *PackedEntity) DeltaEntityBitmask(from *PackedEntity) int {
 
 // Compare from and to and only write what's different.
 // This is "delta compression"
-func (m *MessageBuffer) WriteDeltaEntity(from PackedEntity, to PackedEntity) {
+func (m *Buffer) WriteDeltaEntity(from PackedEntity, to PackedEntity) {
 	bits := to.DeltaEntityBitmask(&from)
 
 	// write the bitmask first
@@ -1395,7 +1395,7 @@ func (m *MessageBuffer) WriteDeltaEntity(from PackedEntity, to PackedEntity) {
 	}
 }
 
-func (m *MessageBuffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
+func (m *Buffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
 	m.WriteByte(SVCFrame)
 	m.WriteLong(to.Frame.Number)
 	m.WriteLong(from.Frame.Number)
@@ -1404,7 +1404,7 @@ func (m *MessageBuffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
 	m.WriteData(to.Frame.AreaBits)
 }
 
-func (m *MessageBuffer) ParseTempEntity() TemporaryEntity {
+func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	te := TemporaryEntity{}
 
 	te.Type = m.ReadByte()
@@ -1549,7 +1549,7 @@ func (m *MessageBuffer) ParseTempEntity() TemporaryEntity {
 }
 
 // A gun fired, nearby clients should see the flash
-func (m *MessageBuffer) ParseMuzzleFlash() MuzzleFlash {
+func (m *Buffer) ParseMuzzleFlash() MuzzleFlash {
 	return MuzzleFlash{
 		Entity: m.ReadShort(),
 		Weapon: m.ReadByte(),
@@ -1560,14 +1560,14 @@ func (m *MessageBuffer) ParseMuzzleFlash() MuzzleFlash {
 // to be arranged on the screen. The intermission screen
 // after a TDM match for example with players, scores, pings,
 // stats, etc is an example
-func (m *MessageBuffer) ParseLayout() Layout {
+func (m *Buffer) ParseLayout() Layout {
 	return Layout{
 		Data: m.ReadString(),
 	}
 }
 
 // 2 bytes for every item
-func (m *MessageBuffer) ParseInventory() {
+func (m *Buffer) ParseInventory() {
 	// we don't actually care about this, just parsing it
 	for i := 0; i < MaxItems; i++ {
 		_ = m.ReadShort()
@@ -1575,13 +1575,13 @@ func (m *MessageBuffer) ParseInventory() {
 }
 
 // A string that should appear temporarily in the center of the screen
-func (m *MessageBuffer) ParseCenterPrint() CenterPrint {
+func (m *Buffer) ParseCenterPrint() CenterPrint {
 	return CenterPrint{
 		Data: m.ReadString(),
 	}
 }
 
-func (m *MessageBuffer) ParseChallenge() (ChallengeResponse, error) {
+func (m *Buffer) ParseChallenge() (ChallengeResponse, error) {
 	cl := m.ReadLong()
 	if cl != -1 {
 		return ChallengeResponse{}, errors.New("not connectionless message, invalid challenge response")
@@ -1673,14 +1673,14 @@ func (lo Layout) RenderSVG() {
 	fmt.Println("")
 }
 
-func (ent PackedEntity) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (ent PackedEntity) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteDeltaEntity(PackedEntity{}, ent)
 	return &msg
 }
 
-func (fr FrameMsg) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (fr FrameMsg) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteLong(fr.Number)
 	msg.WriteLong(fr.Delta)
 	msg.WriteByte(byte(fr.Suppressed))
@@ -1689,22 +1689,22 @@ func (fr FrameMsg) Marshal() *MessageBuffer {
 	return &msg
 }
 
-func (ps PackedPlayer) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (ps PackedPlayer) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteDeltaPlayerstate(&ps, &PackedPlayer{})
 	return &msg
 }
 
-func (st StuffText) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
+func (st StuffText) Marshal() *Buffer {
+	msg := Buffer{}
 	msg.WriteString(st.String)
 	return &msg
 }
 
 // Write the entire header to a buffer
-func (header *GamestateHeader) Marshal() *MessageBuffer {
-	msg := MessageBuffer{}
-	current := MessageBuffer{}
+func (header *GamestateHeader) Marshal() *Buffer {
+	msg := Buffer{}
+	current := Buffer{}
 
 	current.WriteByte(SVCServerData)
 	current.Append(*header.Serverdata.Marshal())
@@ -1713,7 +1713,7 @@ func (header *GamestateHeader) Marshal() *MessageBuffer {
 		csmsg := cs.Marshal()
 		fmt.Println("cstring len", csmsg.Size())
 		if csmsg.Size()+current.Size()+1 >= MaxMessageLength {
-			msg.WriteLong(int32(len(current.Buffer)))
+			msg.WriteLong(int32(len(current.Data)))
 			msg.Append(current)
 			current.Reset()
 		}
@@ -1724,7 +1724,7 @@ func (header *GamestateHeader) Marshal() *MessageBuffer {
 	for _, bl := range header.Baselines {
 		blmsg := bl.Marshal()
 		if blmsg.Size()+current.Size()+1 >= MaxMessageLength {
-			msg.WriteLong(int32(len(current.Buffer)))
+			msg.WriteLong(int32(len(current.Data)))
 			msg.Append(current)
 			current.Reset()
 		}
@@ -1735,14 +1735,14 @@ func (header *GamestateHeader) Marshal() *MessageBuffer {
 	precache := StuffText{String: "precache\n"}
 	pc := precache.Marshal()
 	if pc.Size()+current.Size()+1 >= MaxMessageLength {
-		msg.WriteLong(int32(len(current.Buffer)))
+		msg.WriteLong(int32(len(current.Data)))
 		msg.Append(current)
 		current.Reset()
 	}
 	current.WriteByte(SVCStuffText)
 	current.Append(*precache.Marshal())
 
-	msg.WriteLong(int32(len(current.Buffer)))
+	msg.WriteLong(int32(len(current.Data)))
 	msg.Append(current)
 
 	return &msg

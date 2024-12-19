@@ -8,7 +8,7 @@ type Visibility struct {
 func (bsp *BSPFile) FetchVisibility() []Visibility {
 	vis := []Visibility{}
 	visdata := bsp.LumpData[VisibilityLump]
-	visCount := len(visdata.Data.Buffer) / 8
+	visCount := len(visdata.Data.Data) / 8
 
 	visdata.Data.Index = 0
 

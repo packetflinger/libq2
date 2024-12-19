@@ -18,14 +18,14 @@ const (
 )
 
 func Unmarshal(data []byte) (*pb.PAKArchive, error) {
-	header := message.NewMessageBuffer(data[:HeaderLength])
+	header := message.NewBuffer(data[:HeaderLength])
 	if header.ReadLong() != Magic {
 		return nil, errors.New("not a valid PAK file")
 	}
 	location := header.ReadLong()
 	length := header.ReadLong()
-	index := message.NewMessageBuffer(data[location : location+length])
-	fileCount := len(index.Buffer) / FileBlockLength
+	index := message.NewBuffer(data[location : location+length])
+	fileCount := len(index.Data) / FileBlockLength
 	files := []*pb.PAKFile{}
 	for i := 0; i < fileCount; i++ {
 		name := index.ReadString()
@@ -45,9 +45,9 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 
 // generate a binary pak, it should be written to disk after.
 func Marshal(archive *pb.PAKArchive) ([]byte, error) {
-	buf := message.MessageBuffer{}
-	dataLump := message.MessageBuffer{}
-	metaLump := message.MessageBuffer{}
+	buf := message.Buffer{}
+	dataLump := message.Buffer{}
+	metaLump := message.Buffer{}
 	for _, f := range archive.GetFiles() {
 		metaLump.WriteString(f.Name)
 		for i := len(f.Name); i < FileNameLength-1; i++ {
@@ -58,11 +58,11 @@ func Marshal(archive *pb.PAKArchive) ([]byte, error) {
 		dataLump.WriteData(f.Data)
 	}
 	buf.WriteLong(Magic)
-	buf.WriteLong(int32(len(dataLump.Buffer) + HeaderLength))
-	buf.WriteLong(int32(len(metaLump.Buffer)))
+	buf.WriteLong(int32(len(dataLump.Data) + HeaderLength))
+	buf.WriteLong(int32(len(metaLump.Data)))
 	buf.Append(dataLump)
 	buf.Append(metaLump)
-	return buf.Buffer, nil
+	return buf.Data, nil
 }
 
 // Add a new file to the contents of the PAK. You'll need to have already

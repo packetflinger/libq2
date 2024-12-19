@@ -87,7 +87,7 @@ type MVD2File struct {
 	Filename string
 	Handle   *os.File
 	Position int // needed?
-	Msg      *message.MessageBuffer
+	Msg      *message.Buffer
 }
 
 type MVDGameState struct {
@@ -120,7 +120,7 @@ func OpenMVD2File(f string) (*MVD2File, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg := message.NewMessageBuffer(buffer)
+	msg := message.NewBuffer(buffer)
 	if msg.ReadLong() != MVDMagic {
 		return nil, errors.New("not a valid multi-view demo file")
 	}
@@ -151,7 +151,7 @@ func (d *MVD2File) Parse(extcb message.Callback) error {
 			break
 		}
 		d.Position += size
-		buffer := message.NewMessageBuffer(lump)
+		buffer := message.NewBuffer(lump)
 		d.Msg = &buffer
 
 		d.ParseLump(buffer)
@@ -180,7 +180,7 @@ func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 		return []byte{}, 0, err
 	}
 
-	lenbuf := message.MessageBuffer{Buffer: lumplen, Index: 0}
+	lenbuf := message.Buffer{Data: lumplen, Index: 0}
 	length := lenbuf.ReadShort()
 
 	// EOF
@@ -202,8 +202,8 @@ func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 	return lump, read + 2, nil
 }
 
-func (d *MVD2File) ParseLump(buf message.MessageBuffer) {
-	for buf.Index < len(buf.Buffer) {
+func (d *MVD2File) ParseLump(buf message.Buffer) {
+	for buf.Index < len(buf.Data) {
 		cmd := buf.ReadByte()
 		bits := cmd >> MVD2CMDBits
 		cmd &= MVD2CMDMask

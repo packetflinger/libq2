@@ -17,6 +17,6 @@ func TestFetchServers(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("%s\n", hex.Dump(msg.Buffer))
+	fmt.Printf("%s\n", hex.Dump(msg.Data))
 	t.Error()
 }

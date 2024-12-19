@@ -26,7 +26,7 @@ func (s *Server) FetchInfo() (ServerInfo, error) {
 		return ServerInfo{}, err
 	}
 
-	lines := strings.Split(strings.Trim(string(out.Buffer[4:]), " \n\t"), "\n")
+	lines := strings.Split(strings.Trim(string(out.Data[4:]), " \n\t"), "\n")
 	return parseServerinfo(lines)
 }
 
