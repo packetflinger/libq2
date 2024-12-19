@@ -166,19 +166,19 @@ func (demo *DM2Demo) GetTextProto() *pb.DM2Demo {
 // Convert the textproto demo back into a quake 2 playable binary demo. The
 // returned byte slice just needs to be written to a file as is.
 func (demo *DM2Demo) Marshal() ([]byte, error) {
-	out := message.MessageBuffer{}  // the overall demo
-	lump := message.MessageBuffer{} // the current lump
+	out := message.MessageBuffer{}    // the overall demo
+	packet := message.MessageBuffer{} // the current packet
 
 	textpb := demo.GetTextProto()
 
-	lump.Append(ServerDataToBinary(textpb.Serverinfo))
+	packet.Append(ServerDataToBinary(textpb.Serverinfo))
 	for i := 0; i < MaxConfigStrings; i++ {
 		cs, ok := textpb.Configstrings[int32(i)]
 		if !ok {
 			continue
 		}
 		tmp := ConfigstringToBinary(cs)
-		buildDemoPacket(&out, &lump, tmp, false)
+		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	for i := 0; i < MaxEdicts; i++ {
 		bl, ok := textpb.Baselines[int32(i)]
@@ -187,11 +187,11 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		}
 		tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
 		tmp.Append(EntityToBinary(bl))
-		buildDemoPacket(&out, &lump, tmp, false)
+		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	tmp := message.MessageBuffer{Buffer: []byte{SvcStuffText}}
 	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
-	buildDemoPacket(&out, &lump, tmp, false)
+	buildDemoPacket(&out, &packet, tmp, false)
 
 	frameNum := int32(0)
 	total := 0
@@ -202,7 +202,7 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 			continue
 		}
 		tmp := FrameToBinary(fr)
-		buildDemoPacket(&out, &lump, tmp, true)
+		buildDemoPacket(&out, &packet, tmp, true)
 		total++
 	}
 	out.WriteLong(-1) // end of demo
