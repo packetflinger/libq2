@@ -171,7 +171,7 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 			continue
 		}
 		tmp := ConfigstringToBinary(cs)
-		buildDemoBuffer(&out, &lump, tmp, false)
+		buildDemoPacket(&out, &lump, tmp, false)
 	}
 	for i := 0; i < MaxEdicts; i++ {
 		bl, ok := textpb.Baselines[int32(i)]
@@ -180,11 +180,11 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		}
 		tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
 		tmp.Append(EntityToBinary(bl))
-		buildDemoBuffer(&out, &lump, tmp, false)
+		buildDemoPacket(&out, &lump, tmp, false)
 	}
 	tmp := message.MessageBuffer{Buffer: []byte{SvcStuffText}}
 	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
-	buildDemoBuffer(&out, &lump, tmp, false)
+	buildDemoPacket(&out, &lump, tmp, false)
 
 	i := int32(0)
 	total := 0
@@ -195,18 +195,20 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 			continue
 		}
 		tmp := FrameToBinary(fr)
-		buildDemoBuffer(&out, &lump, tmp, true)
+		buildDemoPacket(&out, &lump, tmp, true)
 		total++
 	}
 	out.WriteLong(-1) // end of demo
 	return out.Buffer, nil
 }
 
-// append msg to lump until it can't fit anymore, then append lump to final.
-// Each lump is prefixed with its length (4 bytes).
+// append msg to packet until it can't fit anymore, then append packet to final.
+// Each packet is prefixed with its length (4 bytes).
 //
 // If force is true don't wait until the buffer is full, write it and reset.
-func buildDemoBuffer(final *message.MessageBuffer, lump *message.MessageBuffer, msg message.MessageBuffer, force bool) {
+//
+// Note first two buffer args are pointers since they get updated
+func buildDemoPacket(final, lump *message.MessageBuffer, msg message.MessageBuffer, force bool) {
 	if ((len(lump.Buffer) + len(msg.Buffer)) > message.MaxMessageLength) || force {
 		final.WriteLong(int32(len(lump.Buffer)))
 		final.Append(*lump)
