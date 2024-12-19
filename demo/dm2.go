@@ -165,12 +165,6 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 	textpb := demo.GetTextProto()
 
 	lump.Append(ServerDataToBinary(textpb.Serverinfo))
-	/*
-		for _, cs := range textpb.GetConfigstrings() {
-			tmp := ConfigstringToBinary(cs)
-			buildDemoBuffer(&out, &lump, tmp, false)
-		}
-	*/
 	for i := 0; i < MaxConfigStrings; i++ {
 		cs, ok := textpb.Configstrings[int32(i)]
 		if !ok {
@@ -179,13 +173,6 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		tmp := ConfigstringToBinary(cs)
 		buildDemoBuffer(&out, &lump, tmp, false)
 	}
-	/*
-		for _, bl := range textpb.GetBaselines() {
-			tmp := message.MessageBuffer{Buffer: []byte{SvcSpawnBaseline}}
-			tmp.Append(EntityToBinary(bl))
-			buildDemoBuffer(&out, &lump, tmp, false)
-		}
-	*/
 	for i := 0; i < MaxEdicts; i++ {
 		bl, ok := textpb.Baselines[int32(i)]
 		if !ok {
@@ -195,18 +182,9 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 		tmp.Append(EntityToBinary(bl))
 		buildDemoBuffer(&out, &lump, tmp, false)
 	}
-	precache := StuffTextToBinary(&pb.StuffText{String_: "precache\n"})
 	tmp := message.MessageBuffer{Buffer: []byte{SvcStuffText}}
-	tmp.Append(precache)
+	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
 	buildDemoBuffer(&out, &lump, tmp, false)
-
-	// each frame is a new lump at this point
-	/*
-		for _, fr := range textpb.GetFrames() {
-			tmp := FrameToBinary(fr)
-			buildDemoBuffer(&out, &lump, tmp, true)
-		}
-	*/
 
 	i := int32(0)
 	total := 0
