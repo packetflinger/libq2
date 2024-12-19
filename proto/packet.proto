@@ -17,4 +17,6 @@ message Packet {
     repeated Layout layouts = 7;
     repeated CenterPrint centerprints = 8;
     repeated StuffText stuffs = 9;
+    repeated PackedEntity baselines = 11;
+    ServerInfo server_data = 10;
 }
