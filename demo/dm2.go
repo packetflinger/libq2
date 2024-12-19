@@ -265,13 +265,6 @@ func (demo *DM2Demo) Decompress() (*pb.DM2Demo, error) {
 }
 
 /*
-func mergeFrame(base, current *pb.Frame) *pb.Frame {
-	fr := proto.Clone(base).(*pb.Frame)
-	fr.Number = current.GetNumber()
-	fr.Delta = current.GetDelta()
-
-	return fr
-}
 
 func mergePlayerstate(base, current *pb.PackedPlayer) *pb.PackedPlayer {
 	ms := proto.Clone(base.Movestate).(*pb.PlayerMove)
