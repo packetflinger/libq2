@@ -15,9 +15,9 @@ type DM2Demo struct {
 	textProto      *pb.DM2Demo
 	binaryData     []byte // the contents of a .dm2 file
 	binaryPosition int    // where in those contents we are
-	currentFrame   *pb.Frame
-	compressed     bool // every frame contains every edict
-	frames         map[int32]*pb.Frame
+	// currentFrame   *pb.Frame
+	compressed bool // every frame contains every edict
+	frames     map[int32]*pb.Frame
 }
 
 // Read the entire binary demo file into memory
@@ -43,7 +43,7 @@ func NewDM2Demo(filename string) (*DM2Demo, error) {
 // Load the binary demo into protobuf
 func (demo *DM2Demo) Unmarshal() error {
 	for {
-		lump, length, err := demo.nextLump()
+		lump, length, err := demo.NextPacket()
 		if err != nil {
 			return err
 		}
@@ -59,25 +59,32 @@ func (demo *DM2Demo) Unmarshal() error {
 	return nil
 }
 
-// Demos are organized by "lumps" of data. Each lump beings with a 32 bit
-// integer containing the size of the lump and then a bunch of individual
-// messages
-func (demo *DM2Demo) nextLump() (message.MessageBuffer, int, error) {
+// Demos are organized by "lumps" of data that are essentially packets. Even
+// though all the data is already known, each lump represents a server packet's
+// worth of game data. Each packet is prefixed with a 32 bit integer of the
+// size of the packet and then a bunch of individual messages.
+//
+// The default packet size for protocol 34 is 1390 bytes. Demos created by
+// modern clients using protocols 35/36 will still write demos for protocol
+// 34 to maximize compatability. Although it is possible to force these clients
+// to record in their native protocol version.
+func (demo *DM2Demo) NextPacket() (message.MessageBuffer, int, error) {
 	// shouldn't happen, but gracefully handle just in case
 	if demo.binaryPosition >= len(demo.binaryData) {
-		return message.MessageBuffer{}, 0, errors.New("trying to read past end of lump")
+		return message.MessageBuffer{}, 0, errors.New("trying to read past end of packet")
 	}
 	sizebytes := message.NewMessageBuffer(demo.binaryData[demo.binaryPosition : demo.binaryPosition+4])
-	lumpSize := int(sizebytes.ReadLong())
-	if lumpSize == -1 {
+	packetLen := int(sizebytes.ReadLong())
+	if packetLen == -1 {
+		// reached the end of the demo
 		return message.MessageBuffer{}, 0, nil
 	}
 	demo.binaryPosition += 4
-	lump := message.MessageBuffer{
-		Buffer: demo.binaryData[demo.binaryPosition : demo.binaryPosition+lumpSize],
+	packet := message.MessageBuffer{
+		Buffer: demo.binaryData[demo.binaryPosition : demo.binaryPosition+packetLen],
 	}
-	demo.binaryPosition += lumpSize
-	return lump, lumpSize, nil
+	demo.binaryPosition += packetLen
+	return packet, packetLen, nil
 }
 
 // Parse all the messages in a particular chunk of data
