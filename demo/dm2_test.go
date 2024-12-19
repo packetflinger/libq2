@@ -168,34 +168,3 @@ func TestMarshal(t *testing.T) {
 		})
 	}
 }
-
-/*
-func TestDecompress(t *testing.T) {
-	tests := []struct {
-		name   string
-		inFile string
-	}{
-		{
-			name:   "Test 1",
-			inFile: "../testdata/test.dm2",
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.inFile)
-			if err != nil {
-				t.Error(err)
-			}
-			err = demo.Unmarshal()
-			if err != nil {
-				t.Error(err)
-			}
-			_, err = demo.Decompress()
-			if err != nil {
-				t.Error(err)
-			}
-			t.Error()
-		})
-	}
-}
-*/
