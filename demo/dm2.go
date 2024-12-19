@@ -43,14 +43,14 @@ func NewDM2Demo(filename string) (*DM2Demo, error) {
 // Load the binary demo into protobuf
 func (demo *DM2Demo) Unmarshal() error {
 	for {
-		lump, length, err := demo.NextPacket()
+		packet, length, err := demo.NextPacket()
 		if err != nil {
 			return err
 		}
 		if length == 0 {
 			break
 		}
-		err = demo.UnmarshalLump(lump)
+		err = demo.UnmarshalPacket(packet)
 		if err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func (demo *DM2Demo) NextPacket() (message.MessageBuffer, int, error) {
 }
 
 // Parse all the messages in a particular chunk of data
-func (demo *DM2Demo) UnmarshalLump(data message.MessageBuffer) error {
+func (demo *DM2Demo) UnmarshalPacket(data message.MessageBuffer) error {
 	textpb := demo.textProto
 	for data.Index < len(data.Buffer) {
 		cmd := data.ReadByte()

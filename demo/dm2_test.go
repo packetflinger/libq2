@@ -97,7 +97,7 @@ func TestNextLump(t *testing.T) {
 			demo := &DM2Demo{
 				binaryData: tc.data,
 			}
-			_, got, err := demo.nextLump()
+			_, got, err := demo.NextPacket()
 			if err != nil {
 				t.Error(err)
 			}
