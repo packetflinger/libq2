@@ -186,11 +186,11 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
 	buildDemoPacket(&out, &lump, tmp, false)
 
-	i := int32(0)
+	frameNum := int32(0)
 	total := 0
 	for total < len(textpb.GetFrames()) {
-		i++
-		fr, ok := textpb.Frames[i]
+		frameNum++
+		fr, ok := textpb.Frames[frameNum]
 		if !ok {
 			continue
 		}
