@@ -1,10 +1,12 @@
 package message
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	pb "github.com/packetflinger/libq2/proto"
+	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
@@ -472,6 +474,68 @@ func TestParseEntityProto(t *testing.T) {
 			got := tc.msg.ParseEntityProto(tc.from, num, bits)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Errorf("ParseEntityProto(%v) = %v, want: %v\n", tc.from, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestPlayerstateDiff(t *testing.T) {
+	tests := []struct {
+		name  string
+		data1 string
+		data2 string
+	}{
+		{
+			name:  "original",
+			data1: "96265F225013C10E5D07F10200000400003654000016FB0AF501FDFFFF000033028000005E000100",
+			data2: "96265F225013C10E5D07F10200000400003654000016FB0AF501FDFFFF000033028000005E000100",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			b1, err := hex.DecodeString(tc.data1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			b2, err := hex.DecodeString(tc.data2)
+			if err != nil {
+				t.Fatal(err)
+			}
+			msg1 := NewBuffer(b1)
+			msg2 := NewBuffer(b2)
+			ps1 := msg1.ParseDeltaPlayerstateProto(nil)
+			ps2 := msg2.ParseDeltaPlayerstateProto(nil)
+			if diff := cmp.Diff(ps1, ps2, protocmp.Transform()); diff != "" {
+				t.Errorf("Playerstate diff: (+got/-want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestPacketEntitiesDump(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+	}{
+		{
+			name: "original",
+			data: "B3828001013A5F225013C10E5F225013C10E04000003015F225013C10E0054000000",
+		},
+		{
+			name: "new",
+			data: "B302013A5F225013C10E04000003015F225013C10E00",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.data)
+			if err != nil {
+				t.Fatal(err)
+			}
+			msg := NewBuffer(bytes)
+			ents := msg.ParsePacketEntitiesProto(nil)
+			for _, ent := range ents {
+				t.Error("\n" + prototext.Format(ent))
 			}
 		})
 	}
