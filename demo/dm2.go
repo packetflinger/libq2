@@ -209,19 +209,19 @@ func (demo *DM2Demo) Marshal() ([]byte, error) {
 	return out.Buffer, nil
 }
 
-// append msg to packet until it can't fit anymore, then append packet to final.
+// Append msg to packet until it can't fit anymore, then append packet to final.
 // Each packet is prefixed with its length (4 bytes).
 //
 // If force is true don't wait until the buffer is full, write it and reset.
 //
 // Note first two buffer args are pointers since they get updated
-func buildDemoPacket(final, lump *message.MessageBuffer, msg message.MessageBuffer, force bool) {
-	if ((len(lump.Buffer) + len(msg.Buffer)) > message.MaxMessageLength) || force {
-		final.WriteLong(int32(len(lump.Buffer)))
-		final.Append(*lump)
-		lump.Reset()
+func buildDemoPacket(final, packet *message.MessageBuffer, msg message.MessageBuffer, force bool) {
+	if ((len(packet.Buffer) + len(msg.Buffer)) > message.MaxMessageLength) || force {
+		final.WriteLong(int32(len(packet.Buffer)))
+		final.Append(*packet)
+		packet.Reset()
 	}
-	lump.Append(msg)
+	packet.Append(msg)
 }
 
 // Demos use delta-compression for things like packetentities and playerstates.
