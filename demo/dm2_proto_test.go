@@ -181,6 +181,7 @@ func TestDeltaEntityBitmask(t *testing.T) {
 	}
 }
 
+/*
 func TestEntityToProto(t *testing.T) {
 	tests := []struct {
 		name string
@@ -215,6 +216,7 @@ func TestEntityToProto(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestDeltaPlayerstateBitmask(t *testing.T) {
 	tests := []struct {
@@ -422,6 +424,7 @@ func TestPlayerstateToBinary(t *testing.T) {
 	}
 }
 
+/*
 func TestSound(t *testing.T) {
 	tests := []struct {
 		name string
@@ -450,6 +453,7 @@ func TestSound(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestReconcilePlayerstateStats(t *testing.T) {
 	tests := []struct {

@@ -5,6 +5,7 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
+/*
 func ServerDataToProto(data *message.Buffer) *pb.ServerInfo {
 	sd := &pb.ServerInfo{}
 	sd.Protocol = data.ReadULong()
@@ -15,6 +16,7 @@ func ServerDataToProto(data *message.Buffer) *pb.ServerInfo {
 	sd.MapName = data.ReadString()
 	return sd
 }
+*/
 
 func ServerDataToBinary(s *pb.ServerInfo) message.Buffer {
 	msg := message.Buffer{}
@@ -32,48 +34,12 @@ func ServerDataToBinary(s *pb.ServerInfo) message.Buffer {
 	return msg
 }
 
-func ConfigstringToProto(data *message.Buffer) *pb.CString {
-	cs := data.ParseConfigString()
-	return &pb.CString{
-		Index:   uint32(cs.Index),
-		String_: cs.String,
-	}
-}
-
 func ConfigstringToBinary(cs *pb.CString) message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteByte(message.SVCConfigString)
 	msg.WriteShort(uint16(cs.GetIndex()))
 	msg.WriteString(cs.GetString_())
 	return msg
-}
-
-func EntityToProto(data *message.Buffer, bitmask uint32, number uint16) *pb.PackedEntity {
-	b := &pb.PackedEntity{}
-	ent := data.ParseEntity(message.PackedEntity{}, number, bitmask)
-	b.Number = uint32(number)
-	b.ModelIndex = uint32(ent.ModelIndex)
-	b.ModelIndex2 = uint32(ent.ModelIndex2)
-	b.ModelIndex3 = uint32(ent.ModelIndex3)
-	b.ModelIndex4 = uint32(ent.ModelIndex4)
-	b.Frame = uint32(ent.Frame)
-	b.Skin = ent.SkinNum
-	b.Effects = ent.Effects
-	b.RenderFx = ent.RenderFX
-	b.OriginX = int32(ent.Origin[0])
-	b.OriginY = int32(ent.Origin[1])
-	b.OriginZ = int32(ent.Origin[2])
-	b.AngleX = int32(ent.Angles[0])
-	b.AngleY = int32(ent.Angles[1])
-	b.AngleZ = int32(ent.Angles[2])
-	b.OldOriginX = int32(ent.OldOrigin[0])
-	b.OldOriginY = int32(ent.OldOrigin[1])
-	b.OldOriginZ = int32(ent.OldOrigin[2])
-	b.Sound = uint32(ent.Sound)
-	b.Event = uint32(ent.Event)
-	b.Solid = ent.Solid
-	b.Remove = ent.Remove
-	return b
 }
 
 // finish this later
@@ -83,103 +49,10 @@ func EntityToBinary(ent *pb.PackedEntity) message.Buffer {
 	return msg
 }
 
-func StuffTextToProto(data *message.Buffer) *pb.StuffText {
-	st := data.ParseStuffText()
-	s := &pb.StuffText{}
-	s.String_ = st.String
-	return s
-}
-
 func StuffTextToBinary(st *pb.StuffText) message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteString(st.GetString_())
 	return msg
-}
-
-func PlayerstateToProto(player *message.PackedPlayer) *pb.PackedPlayer {
-	ps := &pb.PackedPlayer{}
-	pm := &pb.PlayerMove{}
-
-	pm.Type = uint32(player.PlayerMove.Type)
-	pm.OriginX = int32(player.PlayerMove.Origin[0])
-	pm.OriginY = int32(player.PlayerMove.Origin[1])
-	pm.OriginZ = int32(player.PlayerMove.Origin[2])
-	pm.VelocityX = uint32(player.PlayerMove.Velocity[0])
-	pm.VelocityY = uint32(player.PlayerMove.Velocity[1])
-	pm.VelocityZ = uint32(player.PlayerMove.Velocity[2])
-	pm.Flags = uint32(player.PlayerMove.Flags)
-	pm.Time = uint32(player.PlayerMove.Time)
-	pm.Gravity = int32(player.PlayerMove.Gravity)
-	pm.DeltaAngleX = int32(player.PlayerMove.DeltaAngles[0])
-	pm.DeltaAngleY = int32(player.PlayerMove.DeltaAngles[1])
-	pm.DeltaAngleZ = int32(player.PlayerMove.DeltaAngles[2])
-	ps.Movestate = pm
-
-	ps.ViewAnglesX = int32(player.ViewAngles[0])
-	ps.ViewAnglesY = int32(player.ViewAngles[1])
-	ps.ViewAnglesZ = int32(player.ViewAngles[2])
-	ps.ViewOffsetX = int32(player.ViewOffset[0])
-	ps.ViewOffsetY = int32(player.ViewOffset[1])
-	ps.ViewOffsetZ = int32(player.ViewOffset[2])
-	ps.KickAnglesX = int32(player.KickAngles[0])
-	ps.KickAnglesY = int32(player.KickAngles[1])
-	ps.KickAnglesZ = int32(player.KickAngles[2])
-	ps.GunAnglesX = int32(player.GunAngles[0])
-	ps.GunAnglesY = int32(player.GunAngles[1])
-	ps.GunAnglesZ = int32(player.GunAngles[2])
-	ps.GunOffsetX = int32(player.GunOffset[0])
-	ps.GunOffsetY = int32(player.GunOffset[1])
-	ps.GunOffsetZ = int32(player.GunOffset[2])
-	ps.GunIndex = uint32(player.GunIndex)
-	ps.GunFrame = uint32(player.GunFrame)
-	ps.BlendW = uint32(player.Blend[0])
-	ps.BlendX = uint32(player.Blend[1])
-	ps.BlendY = uint32(player.Blend[2])
-	ps.BlendZ = uint32(player.Blend[3])
-	ps.Fov = uint32(player.FOV)
-	ps.RdFlags = uint32(player.RDFlags)
-
-	for i, s := range player.Stats {
-		ps.Stats = append(ps.Stats, &pb.PlayerStat{Index: uint32(i), Value: int32(s)})
-	}
-	return ps
-}
-
-// parse a frame first, then playerstate, then delta entities. It should
-// always be in that order
-func FrameToProto(data *message.Buffer, oldframes map[int32]*pb.Frame) *pb.Frame {
-	frame := data.ParseFrame()
-	fr := &pb.Frame{}
-	fr.Number = frame.Number
-	fr.Delta = frame.Delta
-	fr.Suppressed = uint32(frame.Suppressed)
-	fr.AreaBytes = uint32(frame.AreaBytes)
-	for _, ab := range frame.AreaBits {
-		fr.AreaBits = append(fr.AreaBits, uint32(ab))
-	}
-	deltaFrame := oldframes[fr.Delta]
-
-	ps := &pb.PackedPlayer{}
-	if data.ReadByte() == message.SVCPlayerInfo {
-		ps = data.ParseDeltaPlayerstateProto(deltaFrame.GetPlayerState())
-	}
-	fr.PlayerState = ps
-
-	if data.ReadByte() == message.SVCPacketEntities {
-		fr.Entities = data.ParsePacketEntitiesProto(fr.Entities)
-		/*
-			for {
-				bits := data.ParseEntityBitmask()
-				num := data.ParseEntityNumber(bits)
-				if num <= 0 {
-					break
-				}
-				entity := data.ParseEntityProto(fr.Entities[int32(num)], num, bits)
-				fr.Entities[int32(num)] = entity
-			}
-		*/
-	}
-	return fr
 }
 
 func FrameToBinary(fr *pb.Frame) message.Buffer {
@@ -653,14 +526,6 @@ func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *message.Buffer) 
 	}
 }
 
-func PrintToProto(data *message.Buffer) *pb.Print {
-	pr := data.ParsePrint()
-	p := &pb.Print{}
-	p.Level = uint32(pr.Level)
-	p.String_ = pr.String
-	return p
-}
-
 func PrintToBinary(p *pb.Print) message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteByte(byte(p.GetLevel()))
@@ -668,6 +533,7 @@ func PrintToBinary(p *pb.Print) message.Buffer {
 	return msg
 }
 
+/*
 func FlashToProto(data *message.Buffer) *pb.MuzzleFlash {
 	f := &pb.MuzzleFlash{}
 	mf := data.ParseMuzzleFlash()
@@ -675,34 +541,13 @@ func FlashToProto(data *message.Buffer) *pb.MuzzleFlash {
 	f.Weapon = uint32(mf.Weapon)
 	return f
 }
+*/
 
 func FlashToBinary(mf *pb.MuzzleFlash) message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteShort(uint16(mf.GetEntity()))
 	msg.WriteByte(byte(mf.GetWeapon()))
 	return msg
-}
-
-func TempEntToProto(data *message.Buffer) *pb.TemporaryEntity {
-	t := &pb.TemporaryEntity{}
-	te := data.ParseTempEntity()
-	t.Type = uint32(te.Type)
-	t.Position1X = uint32(te.Position1[0])
-	t.Position1Y = uint32(te.Position1[1])
-	t.Position1Z = uint32(te.Position1[2])
-	t.Position2X = uint32(te.Position2[0])
-	t.Position2Y = uint32(te.Position2[1])
-	t.Position2Z = uint32(te.Position2[2])
-	t.OffsetX = uint32(te.Offset[0])
-	t.OffsetY = uint32(te.Offset[1])
-	t.OffsetZ = uint32(te.Offset[2])
-	t.Direction = uint32(te.Direction)
-	t.Count = uint32(te.Count)
-	t.Color = uint32(te.Color)
-	t.Entity1 = uint32(te.Entity1)
-	t.Entity2 = uint32(te.Entity2)
-	t.Time = uint32(te.Time)
-	return t
 }
 
 func TempEntToBinary(te *pb.TemporaryEntity) message.Buffer {
@@ -883,33 +728,10 @@ func TempEntToBinary(te *pb.TemporaryEntity) message.Buffer {
 	return msg
 }
 
-func LayoutToProto(data *message.Buffer) *pb.Layout {
-	lo := &pb.Layout{}
-	layout := data.ParseLayout()
-	lo.String_ = layout.Data
-	return lo
-}
-
 func LayoutToBinary(lo *pb.Layout) message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteString(lo.GetString_())
 	return msg
-}
-
-func SoundToProto(data *message.Buffer) *pb.PackedSound {
-	sound := &pb.PackedSound{}
-	s := data.ParseSound()
-	sound.Flags = uint32(s.Flags)
-	sound.Index = uint32(s.Index)
-	sound.Volume = uint32(s.Volume)
-	sound.Attenuation = uint32(s.Attenuation)
-	sound.TimeOffset = uint32(s.TimeOffset)
-	sound.Channel = uint32(s.Channel)
-	sound.Entity = uint32(s.Entity)
-	sound.PositionX = uint32(s.Position[0])
-	sound.PositionY = uint32(s.Position[1])
-	sound.PositionZ = uint32(s.Position[2])
-	return sound
 }
 
 func SoundToBinary(s *pb.PackedSound) message.Buffer {
@@ -938,13 +760,6 @@ func SoundToBinary(s *pb.PackedSound) message.Buffer {
 		msg.WriteCoord(uint16(s.GetPositionZ()))
 	}
 	return msg
-}
-
-func CenterPrintToProto(data *message.Buffer) *pb.CenterPrint {
-	cp := &pb.CenterPrint{}
-	center := data.ParseCenterPrint()
-	cp.String_ = center.Data
-	return cp
 }
 
 func CenterPrintToBinary(cp *pb.CenterPrint) message.Buffer {

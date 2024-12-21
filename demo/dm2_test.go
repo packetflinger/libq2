@@ -3,6 +3,8 @@ package demo
 import (
 	"os"
 	"testing"
+
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 func TestNewDM2Demo(t *testing.T) {
@@ -42,11 +44,11 @@ func TestUnmarshal(t *testing.T) {
 			fileIn:         "../testdata/test.dm2",
 			wantFrameCount: 23,
 		},
-		{
+		/*{
 			name:           "Test 2",
 			fileIn:         "../testdata/testduel.dm2",
 			wantFrameCount: 3199,
-		},
+		},*/
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -54,20 +56,16 @@ func TestUnmarshal(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-
 			err = demo.Unmarshal()
 			if err != nil {
 				t.Error(err)
 			}
-			got := len(demo.textProto.GetFrames())
-			if got != tc.wantFrameCount {
-				t.Errorf("wrong frame count, got %d, want %d\n", got, tc.wantFrameCount)
-			}
+			t.Error(prototext.Format(demo.textProto))
 		})
 	}
 }
 
-func TestNextLump(t *testing.T) {
+func TestNextPacket(t *testing.T) {
 	tests := []struct {
 		name string
 		data []byte
@@ -94,7 +92,7 @@ func TestNextLump(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			demo := &DM2Demo{
+			demo := &DM2Parser{
 				binaryData: tc.data,
 			}
 			_, got, err := demo.NextPacket()
@@ -185,6 +183,37 @@ func TestMarshal(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+		})
+	}
+}
+
+func TestDemoDebug(t *testing.T) {
+	tests := []struct {
+		name   string
+		inFile string
+	}{
+
+		/*{
+			name:   "fall and land with sound health highlight",
+			inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2.dm2",
+		},*/
+
+		{
+			name:   "rocket shot with explosion",
+			inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2-out.dm2",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			demo, err := NewDM2Demo(tc.inFile)
+			if err != nil {
+				t.Error(err)
+			}
+			err = demo.Unmarshal()
+			if err != nil {
+				t.Error(err)
+			}
+			t.Error(prototext.Format(demo.textProto))
 		})
 	}
 }

@@ -157,9 +157,9 @@ message TemporaryEntity {
     uint32 direction = 11;  // 8 bits
     uint32 count = 12;      // 8 bits
     uint32 color = 13;      // 8 bits
-    uint32 entity1 = 14;    // 16 bits
-    uint32 entity2 = 15;    // 16 bits
-    uint32 time = 16;       // 32 bits
+    int32 entity1 = 14;    // 16 bits
+    int32 entity2 = 15;    // 16 bits
+    int32 time = 16;       // 32 bits
 }
 
 message MuzzleFlash {

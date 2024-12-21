@@ -199,6 +199,7 @@ func (m *Buffer) Reset() {
 func (m *Buffer) Append(m2 Buffer) {
 	m.Data = append(m.Data, m2.Data...)
 	m.Index = len(m.Data)
+	m.Length = len(m.Data)
 }
 
 func (m *Buffer) Seek(offset int) {

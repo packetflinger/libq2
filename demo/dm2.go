@@ -1,9 +1,11 @@
 package demo
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/packetflinger/libq2/message"
 	"google.golang.org/protobuf/encoding/prototext"
@@ -11,17 +13,22 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
-type DM2Demo struct {
-	textProto      *pb.DM2Demo
-	binaryData     []byte // the contents of a .dm2 file
-	binaryPosition int    // where in those contents we are
-	// currentFrame   *pb.Frame
-	compressed bool // every frame contains every edict
-	frames     map[int32]*pb.Frame
+type DM2Parser struct {
+	textProto      *pb.DM2Demo    // uncompressed
+	binaryData     []byte         // .dm2 file contents
+	binaryPosition int            // where in those contents we are
+	currentFrame   int32          // index of frames map
+	callbacks      map[int]func() // index is svc_msg type
 }
 
+/*
+type DM2Writer struct {
+	textProto *pb.DM2Demo
+}
+*/
+
 // Read the entire binary demo file into memory
-func NewDM2Demo(filename string) (*DM2Demo, error) {
+func NewDM2Demo(filename string) (*DM2Parser, error) {
 	if filename == "" {
 		return nil, fmt.Errorf("no file specified")
 	}
@@ -29,33 +36,105 @@ func NewDM2Demo(filename string) (*DM2Demo, error) {
 	if err != nil {
 		return nil, err
 	}
-	demo := &DM2Demo{binaryData: data}
+	demo := &DM2Parser{binaryData: data}
 	demo.textProto = &pb.DM2Demo{}
 	demo.textProto.Baselines = make(map[int32]*pb.PackedEntity)
 	demo.textProto.Configstrings = make(map[int32]*pb.CString)
 	demo.textProto.Frames = make(map[int32]*pb.Frame)
-
-	// demo.currentFrame = &pb.Frame{}
-	//demo.frames = make(map[int32]*pb.Frame)
 	return demo, nil
 }
 
 // Load the binary demo into protobuf
-func (demo *DM2Demo) Unmarshal() error {
+func (p *DM2Parser) Unmarshal() error {
 	for {
-		packet, length, err := demo.NextPacket()
+		data, length, err := p.NextPacket()
 		if err != nil {
 			return err
 		}
 		if length == 0 {
 			break
 		}
-		err = demo.UnmarshalPacket(packet)
+		packet, err := data.ParsePacket(p.textProto.GetFrames())
+		if err != nil {
+			return err
+		}
+		err = p.ApplyPacket(packet)
 		if err != nil {
 			return err
 		}
 	}
-	demo.compressed = true
+	return nil
+}
+
+// ApplyPacket will add all the messages from the packet to the current demo.
+func (d *DM2Parser) ApplyPacket(packet *pb.Packet) error {
+	if sd := packet.GetServerData(); sd != nil {
+		d.textProto.Serverinfo = sd
+	}
+	cstrings := packet.GetConfigStrings()
+	if len(cstrings) > 0 {
+		if d.currentFrame > 0 {
+			if d.textProto.GetFrames()[d.currentFrame].Configstrings == nil {
+				d.textProto.GetFrames()[d.currentFrame].Configstrings = make(map[int32]*pb.CString)
+			}
+			for _, cs := range cstrings {
+				d.textProto.GetFrames()[d.currentFrame].Configstrings[int32(cs.GetIndex())] = cs
+			}
+		} else {
+			for _, cs := range cstrings {
+				d.textProto.GetConfigstrings()[int32(cs.GetIndex())] = cs
+			}
+		}
+	}
+	baselines := packet.GetBaselines()
+	if len(baselines) > 0 {
+		for _, bl := range baselines {
+			d.textProto.Baselines[int32(bl.GetNumber())] = bl
+		}
+	}
+	frames := packet.GetFrames()
+	if len(frames) > 0 {
+		// sort them by number ascending
+		if len(frames) > 1 {
+			slices.SortFunc(frames, func(a, b *pb.Frame) int {
+				return cmp.Compare(int(a.GetNumber()), int(b.GetNumber()))
+			})
+		}
+		for _, fr := range frames {
+			d.textProto.Frames[int32(fr.GetNumber())] = fr
+			d.currentFrame = fr.GetNumber()
+		}
+	}
+	prints := packet.GetPrints()
+	if len(prints) > 0 {
+		d.textProto.Frames[d.currentFrame].Prints = append(d.textProto.Frames[d.currentFrame].Prints, prints...)
+	}
+	sounds := packet.GetSounds()
+	if len(sounds) > 0 {
+		d.textProto.Frames[d.currentFrame].Sounds = append(d.textProto.Frames[d.currentFrame].Sounds, sounds...)
+	}
+	tempents := packet.GetTempEnts()
+	if len(tempents) > 0 {
+		d.textProto.Frames[d.currentFrame].TemporaryEntities = append(d.textProto.Frames[d.currentFrame].TemporaryEntities, tempents...)
+	}
+	mf := packet.GetMuzzleFlashes()
+	if len(mf) > 0 {
+		d.textProto.Frames[d.currentFrame].Flashes1 = append(d.textProto.Frames[d.currentFrame].Flashes1, mf...)
+	}
+	layouts := packet.GetLayouts()
+	if len(layouts) > 0 {
+		d.textProto.Frames[d.currentFrame].Layouts = append(d.textProto.Frames[d.currentFrame].Layouts, layouts...)
+	}
+	cp := packet.GetCenterprints()
+	if len(cp) > 0 {
+		d.textProto.Frames[d.currentFrame].Centerprints = append(d.textProto.Frames[d.currentFrame].Centerprints, cp...)
+	}
+	st := packet.GetStuffs()
+	if len(st) > 0 {
+		if d.currentFrame > 0 {
+			d.textProto.Frames[d.currentFrame].Stufftexts = append(d.textProto.Frames[d.currentFrame].Stufftexts, st...)
+		}
+	}
 	return nil
 }
 
@@ -68,7 +147,7 @@ func (demo *DM2Demo) Unmarshal() error {
 // modern clients using protocols 35/36 will still write demos for protocol
 // 34 to maximize compatability. Although it is possible to force these clients
 // to record in their native protocol version.
-func (demo *DM2Demo) NextPacket() (message.Buffer, int, error) {
+func (demo *DM2Parser) NextPacket() (message.Buffer, int, error) {
 	// shouldn't happen, but gracefully handle just in case
 	if demo.binaryPosition >= len(demo.binaryData) {
 		return message.Buffer{}, 0, errors.New("trying to read past end of packet")
@@ -87,64 +166,8 @@ func (demo *DM2Demo) NextPacket() (message.Buffer, int, error) {
 	return packet, packetLen, nil
 }
 
-// Parse all the messages in a particular chunk of data
-func (demo *DM2Demo) UnmarshalPacket(data message.Buffer) error {
-	textpb := demo.textProto
-	for data.Index < len(data.Data) {
-		cmd := data.ReadByte()
-		switch cmd {
-		case message.SVCServerData:
-			serverdata := ServerDataToProto(&data)
-			textpb.Serverinfo = serverdata
-		case message.SVCConfigString:
-			cs := ConfigstringToProto(&data)
-			if textpb.GetCurrentFrame() == 0 {
-				textpb.Configstrings[int32(cs.GetIndex())] = cs
-			} else {
-				textpb.Frames[textpb.GetCurrentFrame()].Configstrings[int32(cs.GetIndex())] = cs
-			}
-		case message.SVCSpawnBaseline:
-			bitmask := data.ParseEntityBitmask()
-			number := data.ParseEntityNumber(bitmask)
-			baseline := EntityToProto(&data, bitmask, number)
-			textpb.Baselines[int32(baseline.GetNumber())] = baseline
-		case message.SVCStuffText:
-			stuff := StuffTextToProto(&data)
-			if textpb.GetCurrentFrame() > 0 {
-				textpb.Frames[textpb.GetCurrentFrame()].Stufftexts = append(textpb.Frames[textpb.GetCurrentFrame()].Stufftexts, stuff)
-			}
-		case message.SVCFrame: // includes playerstate and packetentities
-			frame := FrameToProto(&data, demo.frames)
-			textpb.Frames[frame.GetNumber()] = frame
-			if textpb.Frames[frame.GetNumber()].Configstrings == nil {
-				textpb.Frames[frame.GetNumber()].Configstrings = make(map[int32]*pb.CString)
-			}
-			textpb.CurrentFrame = frame.GetNumber()
-		case message.SVCPrint:
-			print := PrintToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].Prints = append(textpb.Frames[textpb.GetCurrentFrame()].Prints, print)
-		case message.SVCMuzzleFlash:
-			flash := FlashToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].Flashes1 = append(textpb.Frames[textpb.GetCurrentFrame()].Flashes1, flash)
-		case message.SVCTempEntity:
-			te := TempEntToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].TemporaryEntities = append(textpb.Frames[textpb.GetCurrentFrame()].TemporaryEntities, te)
-		case message.SVCLayout:
-			layout := LayoutToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].Layouts = append(textpb.Frames[textpb.GetCurrentFrame()].Layouts, layout)
-		case message.SVCSound:
-			sound := SoundToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].Sounds = append(textpb.Frames[textpb.GetCurrentFrame()].Sounds, sound)
-		case message.SVCCenterPrint:
-			cp := CenterPrintToProto(&data)
-			textpb.Frames[textpb.GetCurrentFrame()].Centerprints = append(textpb.Frames[textpb.GetCurrentFrame()].Centerprints, cp)
-		}
-	}
-	return nil
-}
-
 // Turn a parsed demo structure back into a binary file
-func (demo *DM2Demo) WriteTextProto(filename string) error {
+func (demo *DM2Parser) WriteTextProto(filename string) error {
 	b, err := prototext.MarshalOptions{
 		Multiline: true,
 		Indent:    "  ",
@@ -159,13 +182,13 @@ func (demo *DM2Demo) WriteTextProto(filename string) error {
 	return nil
 }
 
-func (demo *DM2Demo) GetTextProto() *pb.DM2Demo {
+func (demo *DM2Parser) GetTextProto() *pb.DM2Demo {
 	return demo.textProto
 }
 
 // Convert the textproto demo back into a quake 2 playable binary demo. The
 // returned byte slice just needs to be written to a file as is.
-func (demo *DM2Demo) Marshal() ([]byte, error) {
+func (demo *DM2Parser) Marshal() ([]byte, error) {
 	out := message.Buffer{}    // the overall demo
 	packet := message.Buffer{} // the current packet
 
@@ -222,4 +245,12 @@ func buildDemoPacket(final, packet *message.Buffer, msg message.Buffer, force bo
 		packet.Reset()
 	}
 	packet.Append(msg)
+}
+
+func (p *DM2Parser) RegisterCallback(msgtype int, dofunc func()) {
+	p.callbacks[msgtype] = dofunc
+}
+
+func (p *DM2Parser) UnregisterCallback(msgtype int) {
+	delete(p.callbacks, msgtype)
 }

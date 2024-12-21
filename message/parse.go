@@ -1,7 +1,6 @@
 package message
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
@@ -27,6 +26,10 @@ const (
 	PrintLevelHigh   = 3
 	PrintLevelChat   = 3
 )
+
+type Parser interface {
+	ApplyPacket(packet *pb.Packet)
+}
 
 // function pointers for each message type
 type Callback struct {
@@ -204,6 +207,7 @@ type ChallengeResponse struct {
 	Protocols []int // protocols support by server (34=orig, 35=r1q2, 36=q2pro)
 }
 
+/*
 // Parse through a clod of various messages. In the case of demos, these lumps
 // will be read from disk, for a live client, they'll be received via the network
 // every 0.1 seconds
@@ -379,14 +383,15 @@ func ParseMessageLump(buf Buffer, intcb Callback, extcb Callback) (ServerFrame, 
 	}
 	return sf, nil
 }
+*/
 
-func (m *Buffer) ParseServerData() ServerData {
-	return ServerData{
-		Protocol:     m.ReadLong(),
-		ServerCount:  m.ReadLong(),
-		Demo:         int8(m.ReadByte()),
+func (m *Buffer) ParseServerData() *pb.ServerInfo {
+	return &pb.ServerInfo{
+		Protocol:     m.ReadULong(),
+		ServerCount:  m.ReadULong(),
+		Demo:         m.ReadByte() == 1,
 		GameDir:      m.ReadString(),
-		ClientNumber: int16(m.ReadShort()),
+		ClientNumber: uint32(m.ReadShort()),
 		MapName:      m.ReadString(),
 	}
 }
@@ -405,10 +410,10 @@ func (sd ServerData) Marshal() *Buffer {
 // Configstrings are strings sent to each client and associated
 // with an index. They're referenced by index in various playces
 // such as layouts, etc.
-func (m *Buffer) ParseConfigString() ConfigString {
-	return ConfigString{
-		Index:  m.ReadShort(),
-		String: m.ReadString(),
+func (m *Buffer) ParseConfigString() *pb.CString {
+	return &pb.CString{
+		Index:   uint32(m.ReadShort()),
+		String_: m.ReadString(),
 	}
 }
 
@@ -421,10 +426,10 @@ func (cs ConfigString) Marshal() *Buffer {
 
 // A baseline is just a normal entity in its default state, from
 // a client's perspective
-func (m *Buffer) ParseSpawnBaseline() PackedEntity {
+func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
 	bitmask := m.ParseEntityBitmask()
 	number := m.ParseEntityNumber(bitmask)
-	return m.ParseEntity(PackedEntity{}, number, bitmask)
+	return m.ParseEntity(&pb.PackedEntity{}, number, bitmask)
 }
 
 // Read up to the first 4 bytes of an entity, depending on the
@@ -459,44 +464,41 @@ func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
 	return num
 }
 
-func (m *Buffer) ParseEntity(from PackedEntity, num uint16, bits uint32) PackedEntity {
-	to := from
+/*
+func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
+	to := proto.Clone(from).(*pb.PackedEntity)
 	to.Number = uint32(num)
 
 	if bits == 0 {
-		return to
+		return &pb.PackedEntity{}
 	}
 
 	if bits&EntityModel != 0 {
-		to.ModelIndex = uint8(m.ReadByte())
+		to.ModelIndex = uint32(m.ReadByte())
 	}
-
 	if bits&EntityModel2 != 0 {
-		to.ModelIndex2 = uint8(m.ReadByte())
+		to.ModelIndex2 = uint32(m.ReadByte())
 	}
-
 	if bits&EntityModel3 != 0 {
-		to.ModelIndex3 = uint8(m.ReadByte())
+		to.ModelIndex3 = uint32(m.ReadByte())
 	}
-
 	if bits&EntityModel4 != 0 {
-		to.ModelIndex4 = uint8(m.ReadByte())
+		to.ModelIndex4 = uint32(m.ReadByte())
 	}
 
 	if bits&EntityFrame8 != 0 {
-		to.Frame = uint16(m.ReadByte())
+		to.Frame = uint32(m.ReadByte())
 	}
-
 	if bits&EntityFrame16 != 0 {
-		to.Frame = uint16(m.ReadShort())
+		to.Frame = uint32(m.ReadShort())
 	}
 
 	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
-		to.SkinNum = uint32(m.ReadLong())
+		to.Skin = uint32(m.ReadLong())
 	} else if bits&EntitySkin8 != 0 {
-		to.SkinNum = uint32(m.ReadByte())
+		to.Skin = uint32(m.ReadByte())
 	} else if bits&EntitySkin16 != 0 {
-		to.SkinNum = uint32(m.ReadWord())
+		to.Skin = uint32(m.ReadWord())
 	}
 
 	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
@@ -508,49 +510,45 @@ func (m *Buffer) ParseEntity(from PackedEntity, num uint16, bits uint32) PackedE
 	}
 
 	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
-		to.RenderFX = uint32(m.ReadLong())
+		to.RenderFx = uint32(m.ReadLong())
 	} else if bits&EntityRenderFX8 != 0 {
-		to.RenderFX = uint32(m.ReadByte())
+		to.RenderFx = uint32(m.ReadByte())
 	} else if bits&EntityRenderFX16 != 0 {
-		to.RenderFX = uint32(m.ReadWord())
+		to.RenderFx = uint32(m.ReadWord())
 	}
 
 	if bits&EntityOrigin1 != 0 {
-		to.Origin[0] = int16(m.ReadShort())
+		to.OriginX = int32(m.ReadShort())
 	}
-
 	if bits&EntityOrigin2 != 0 {
-		to.Origin[1] = int16(m.ReadShort())
+		to.OriginY = int32(m.ReadShort())
 	}
-
 	if bits&EntityOrigin3 != 0 {
-		to.Origin[2] = int16(m.ReadShort())
+		to.OriginZ = int32(m.ReadShort())
 	}
 
 	if bits&EntityAngle1 != 0 {
-		to.Angles[0] = int16(m.ReadByte())
+		to.AngleX = int32(m.ReadByte())
 	}
-
 	if bits&EntityAngle2 != 0 {
-		to.Angles[1] = int16(m.ReadByte())
+		to.AngleY = int32(m.ReadByte())
 	}
-
 	if bits&EntityAngle3 != 0 {
-		to.Angles[2] = int16(m.ReadByte())
+		to.AngleZ = int32(m.ReadByte())
 	}
 
 	if bits&EntityOldOrigin != 0 {
-		to.OldOrigin[0] = int16(m.ReadShort())
-		to.OldOrigin[1] = int16(m.ReadShort())
-		to.OldOrigin[2] = int16(m.ReadShort())
+		to.OldOriginX = int32(m.ReadShort())
+		to.OldOriginY = int32(m.ReadShort())
+		to.OldOriginZ = int32(m.ReadShort())
 	}
 
 	if bits&EntitySound != 0 {
-		to.Sound = uint8(m.ReadByte())
+		to.Sound = uint32(m.ReadByte())
 	}
 
 	if bits&EntityEvent != 0 {
-		to.Event = uint8(m.ReadByte())
+		to.Event = uint32(m.ReadByte())
 	}
 
 	if bits&EntitySolid != 0 {
@@ -560,30 +558,37 @@ func (m *Buffer) ParseEntity(from PackedEntity, num uint16, bits uint32) PackedE
 	if bits&EntityRemove != 0 {
 		to.Remove = true
 	}
-
 	return to
 }
+*/
 
-func (m *Buffer) ParseStuffText() StuffText {
-	return StuffText{String: m.ReadString()}
+func (m *Buffer) ParseStuffText() *pb.StuffText {
+	return &pb.StuffText{String_: m.ReadString()}
 }
 
-func (msg *Buffer) ParseFrame() FrameMsg {
-	name := int32(msg.ReadLong())
-	delta := int32(msg.ReadLong())
-	suppressed := int8(msg.ReadByte())
-	areabytes := int8(msg.ReadByte())
-	areabits := msg.ReadData(int(areabytes))
-
-	return FrameMsg{
-		Number:     name,
-		Delta:      delta,
-		Suppressed: suppressed,
-		AreaBytes:  areabytes,
-		AreaBits:   areabits,
+func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
+	fr := &pb.Frame{}
+	fr.Number = int32(m.ReadLong())
+	fr.Delta = int32(m.ReadLong())
+	fr.Suppressed = uint32(m.ReadByte())
+	fr.AreaBytes = uint32(m.ReadByte())
+	areabits := m.ReadData(int(fr.GetAreaBytes()))
+	for _, ab := range areabits {
+		fr.AreaBits = append(fr.AreaBits, uint32(ab))
 	}
+	deltaFrame := oldFrames[fr.Delta]
+	var ps *pb.PackedPlayer
+	if m.ReadByte() == SVCPlayerInfo {
+		ps = m.ParseDeltaPlayerstate(deltaFrame.GetPlayerState())
+	}
+	fr.PlayerState = ps
+	if m.ReadByte() == SVCPacketEntities {
+		fr.Entities = m.ParsePacketEntities(fr.Entities)
+	}
+	return fr
 }
 
+/*
 func (m *Buffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 	bits := m.ReadWord()
 	pm := PlayerMoveState{}
@@ -679,10 +684,11 @@ func (m *Buffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 	ps.PlayerMove = pm
 	return ps
 }
+*/
 
 // ParseDeltaPlayerstateProto will merge a previous playerstate with one parsed
 // from the receiver. Only the changed values are copied.
-func (m *Buffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.PackedPlayer {
+func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	ps := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
 	stats := []*pb.PlayerStat{}
@@ -790,6 +796,7 @@ func (m *Buffer) ParseDeltaPlayerstateProto(from *pb.PackedPlayer) *pb.PackedPla
 	return ps
 }
 
+/*
 // A server-to-client message containing all entities the client should know
 // about for a particular frame
 func (m *Buffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
@@ -813,8 +820,9 @@ func (m *Buffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 
 	return ents
 }
+*/
 
-// ParsePacketEntitiesProto will parse an `SVC_PACKETENTITIES` msg. This is the
+// ParsePacketEntities will parse an `SVC_PACKETENTITIES` msg. This is the
 // last of the 3-tuple of msgs sent from the server for each frame. There is no
 // delimiter between entities, once the entity is fully parsed it immediately
 // moves on to the next. If the entity number is 0, the end of the clod of ents
@@ -823,7 +831,7 @@ func (m *Buffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
 // This has to decompress entities as they're parsed or else there is no way to
 // tell new values from existing. This makes it impossible to decompress all
 // entities after the fact.
-func (m *Buffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
+func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
 	out := make(map[int32]*pb.PackedEntity)
 	for k := range from {
 		out[k] = proto.Clone(from[k]).(*pb.PackedEntity)
@@ -838,15 +846,15 @@ func (m *Buffer) ParsePacketEntitiesProto(from map[int32]*pb.PackedEntity) map[i
 		if !ok {
 			orig = &pb.PackedEntity{}
 		}
-		out[int32(num)] = m.ParseEntityProto(orig, num, bits)
+		out[int32(num)] = m.ParseEntity(orig, num, bits)
 	}
 	return out
 }
 
-// ParseEntityProto will parse an entity from stream and return an uncompressed
+// ParseEntity will parse an entity from stream and return an uncompressed
 // PackedEntity proto. It uses the `from` param to decompress, this acts as a
 // baseline, applies the changes and returns a clone of that full PackedEntity.
-func (m *Buffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
+func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
 	to := &pb.PackedEntity{}
 	if from != nil {
 		to = proto.Clone(from).(*pb.PackedEntity)
@@ -953,50 +961,45 @@ func (m *Buffer) ParseEntityProto(from *pb.PackedEntity, num uint16, bits uint32
 	return to
 }
 
-func (m *Buffer) ParsePrint() Print {
-	return Print{
-		Level:  uint8(m.ReadByte()),
-		String: m.ReadString(),
+func (m *Buffer) ParsePrint() *pb.Print {
+	return &pb.Print{
+		Level:   uint32(m.ReadByte()),
+		String_: m.ReadString(),
 	}
 }
 
 // This is a start-sound packet
-func (m *Buffer) ParseSound() PackedSound {
-	s := PackedSound{}
-	s.Flags = m.ReadByte()
-	s.Index = m.ReadByte()
-
+func (m *Buffer) ParseSound() *pb.PackedSound {
+	s := &pb.PackedSound{}
+	s.Flags = uint32(m.ReadByte())
+	s.Index = uint32(m.ReadByte())
 	if (s.Flags & SoundVolume) > 0 {
-		s.Volume = m.ReadByte()
+		s.Volume = uint32(m.ReadByte())
 	} else {
 		s.Volume = 1
 	}
-
 	if (s.Flags & SoundAttenuation) > 0 {
-		s.Attenuation = m.ReadByte()
+		s.Attenuation = uint32(m.ReadByte())
 	} else {
 		s.Attenuation = 1
 	}
-
 	if (s.Flags & SoundOffset) > 0 {
-		s.TimeOffset = m.ReadByte()
+		s.TimeOffset = uint32(m.ReadByte())
 	} else {
 		s.TimeOffset = 0
 	}
-
 	if (s.Flags & SoundEntity) > 0 {
-		tmp := m.ReadShort()
+		tmp := uint32(m.ReadShort())
 		s.Entity = tmp >> 3
 		s.Channel = tmp & 7
 	} else {
 		s.Channel = 0
 		s.Entity = 0
 	}
-
 	if (s.Flags & SoundPosition) > 0 {
-		s.Position = m.ReadPosition()
+		pos := m.ReadPosition()
+		s.PositionX, s.PositionY, s.PositionZ = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	}
-
 	return s
 }
 
@@ -1404,10 +1407,9 @@ func (m *Buffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
 	m.WriteData(to.Frame.AreaBits)
 }
 
-func (m *Buffer) ParseTempEntity() TemporaryEntity {
-	te := TemporaryEntity{}
-
-	te.Type = m.ReadByte()
+func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
+	te := &pb.TemporaryEntity{}
+	te.Type = uint32(m.ReadByte())
 	switch te.Type {
 	case TentBlood:
 		fallthrough
@@ -1438,8 +1440,9 @@ func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	case TentMoreBlood:
 		fallthrough
 	case TentElectricSparks:
-		te.Position1 = m.ReadPosition()
-		te.Direction = m.ReadDirection()
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		te.Direction = uint32(m.ReadDirection())
 	case TentSplash:
 		fallthrough
 	case TentLaserSparks:
@@ -1447,10 +1450,11 @@ func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	case TentWeldingSparks:
 		fallthrough
 	case TentTunnelSparks:
-		te.Count = m.ReadByte()
-		te.Position1 = m.ReadPosition()
-		te.Direction = m.ReadDirection()
-		te.Color = m.ReadByte()
+		te.Count = uint32(m.ReadByte())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		te.Direction = uint32(m.ReadDirection())
+		te.Color = uint32(m.ReadByte())
 	case TentBlueHyperBlaster:
 		fallthrough
 	case TentRailTrail:
@@ -1462,8 +1466,10 @@ func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	case TentBubbleTrail2:
 		fallthrough
 	case TentBFGLaser:
-		te.Position1 = m.ReadPosition()
-		te.Position2 = m.ReadPosition()
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.Position2X, te.Position2Y, te.Position2Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	case TentGrenadeExplosion:
 		fallthrough
 	case TentGrenadeExplosionWater:
@@ -1501,7 +1507,8 @@ func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	case TentWidowSplash:
 		fallthrough
 	case TentNukeBlast:
-		te.Position1 = m.ReadPosition()
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	case TentParasiteAttack:
 		fallthrough
 	case TentMedicCableAttack:
@@ -1509,50 +1516,63 @@ func (m *Buffer) ParseTempEntity() TemporaryEntity {
 	case TentHeatBeam:
 		fallthrough
 	case TentMonsterHeatBeam:
-		te.Entity1 = int16(m.ReadShort())
-		te.Position1 = m.ReadPosition()
-		te.Position2 = m.ReadPosition()
-		te.Offset = m.ReadPosition()
+		te.Entity1 = int32(m.ReadShort())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.Position2X, te.Position2Y, te.Position2Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.OffsetX, te.OffsetY, te.OffsetZ = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	case TentGrappleCable:
-		te.Entity1 = int16(m.ReadShort())
-		te.Position1 = m.ReadPosition()
-		te.Position2 = m.ReadPosition()
-		te.Offset = m.ReadPosition()
+		te.Entity1 = int32(m.ReadShort())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.Position2X, te.Position2Y, te.Position2Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.OffsetX, te.OffsetY, te.OffsetZ = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	case TentLightning:
-		te.Entity1 = int16(m.ReadShort())
-		te.Entity2 = int16(m.ReadShort())
-		te.Position1 = m.ReadPosition()
-		te.Position2 = m.ReadPosition()
+		te.Entity1 = int32(m.ReadShort())
+		te.Entity2 = int32(m.ReadShort())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.Position2X, te.Position2Y, te.Position2Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	case TentFlashlight:
-		te.Position1 = m.ReadPosition()
-		te.Entity1 = int16(m.ReadShort())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		te.Entity1 = int32(m.ReadShort())
 	case TentForceWall:
-		te.Position1 = m.ReadPosition()
-		te.Position2 = m.ReadPosition()
-		te.Color = m.ReadByte()
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		pos = m.ReadPosition()
+		te.Position2X, te.Position2Y, te.Position2Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		te.Color = uint32(m.ReadByte())
 	case TentSteam:
-		te.Entity1 = int16(m.ReadShort())
-		te.Count = m.ReadByte()
-		te.Position1 = m.ReadPosition()
-		te.Direction = m.ReadDirection()
-		te.Color = m.ReadByte()
-		te.Entity2 = int16(m.ReadShort())
+		te.Entity1 = int32(m.ReadShort())
+		te.Count = uint32(m.ReadByte())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
+		te.Direction = uint32(m.ReadDirection())
+		te.Color = uint32(m.ReadByte())
+		te.Entity2 = int32(m.ReadShort())
 		if te.Entity1 != -1 {
-			te.Time = m.ReadLong()
+			te.Time = int32(m.ReadLong())
 		}
 	case TentWidowBeamOut:
-		te.Entity1 = int16(m.ReadShort())
-		te.Position1 = m.ReadPosition()
+		te.Entity1 = int32(m.ReadShort())
+		pos := m.ReadPosition()
+		te.Position1X, te.Position1Y, te.Position1Z = uint32(pos[0]), uint32(pos[1]), uint32(pos[2])
 	}
 
 	return te
 }
 
 // A gun fired, nearby clients should see the flash
-func (m *Buffer) ParseMuzzleFlash() MuzzleFlash {
-	return MuzzleFlash{
-		Entity: m.ReadShort(),
-		Weapon: m.ReadByte(),
+func (m *Buffer) ParseMuzzleFlash() *pb.MuzzleFlash {
+	return &pb.MuzzleFlash{
+		Entity: uint32(m.ReadShort()),
+		Weapon: uint32(m.ReadByte()),
 	}
 }
 
@@ -1560,9 +1580,9 @@ func (m *Buffer) ParseMuzzleFlash() MuzzleFlash {
 // to be arranged on the screen. The intermission screen
 // after a TDM match for example with players, scores, pings,
 // stats, etc is an example
-func (m *Buffer) ParseLayout() Layout {
-	return Layout{
-		Data: m.ReadString(),
+func (m *Buffer) ParseLayout() *pb.Layout {
+	return &pb.Layout{
+		String_: m.ReadString(),
 	}
 }
 
@@ -1575,9 +1595,9 @@ func (m *Buffer) ParseInventory() {
 }
 
 // A string that should appear temporarily in the center of the screen
-func (m *Buffer) ParseCenterPrint() CenterPrint {
-	return CenterPrint{
-		Data: m.ReadString(),
+func (m *Buffer) ParseCenterPrint() *pb.CenterPrint {
+	return &pb.CenterPrint{
+		String_: m.ReadString(),
 	}
 }
 
@@ -1766,4 +1786,297 @@ func (sf ServerFrame) MergeCopy() ServerFrame {
 		nsf.Entities[k] = v
 	}
 	return nsf
+}
+
+// ParsePacket will parse all the messages in a particular server packet.
+func (p *Buffer) ParsePacket(oldFrames map[int32]*pb.Frame) (*pb.Packet, error) {
+	out := &pb.Packet{}
+	for p.Index < len(p.Data) {
+		cmd := p.ReadByte()
+		switch cmd {
+		case SVCServerData:
+			out.ServerData = p.ParseServerData()
+		case SVCConfigString:
+			out.ConfigStrings = append(out.ConfigStrings, p.ParseConfigString())
+		case SVCSpawnBaseline:
+			bitmask := p.ParseEntityBitmask()
+			number := p.ParseEntityNumber(bitmask)
+			out.Baselines = append(out.Baselines, p.ParseEntity(nil, number, bitmask))
+		case SVCStuffText:
+			out.Stuffs = append(out.Stuffs, p.ParseStuffText())
+		case SVCFrame: // includes playerstate and packetentities
+			out.Frames = append(out.Frames, p.ParseFrame(oldFrames))
+		case SVCPrint:
+			out.Prints = append(out.Prints, p.ParsePrint())
+		case SVCMuzzleFlash:
+			out.MuzzleFlashes = append(out.MuzzleFlashes, p.ParseMuzzleFlash())
+		case SVCTempEntity:
+			out.TempEnts = append(out.TempEnts, p.ParseTempEntity())
+		case SVCLayout:
+			out.Layouts = append(out.Layouts, p.ParseLayout())
+		case SVCSound:
+			out.Sounds = append(out.Sounds, p.ParseSound())
+		case SVCCenterPrint:
+			out.Centerprints = append(out.Centerprints, p.ParseCenterPrint())
+		}
+	}
+	return out, nil
+}
+
+func MarshalServerData(s *pb.ServerInfo) Buffer {
+	b := Buffer{}
+	b.WriteByte(SVCServerData)
+	b.WriteLong(int32(s.GetProtocol()))
+	b.WriteLong(int32(s.GetServerCount()))
+	if s.GetDemo() {
+		b.WriteByte(1)
+	} else {
+		b.WriteByte(0)
+	}
+	b.WriteString(s.GetGameDir())
+	b.WriteShort(uint16(s.GetClientNumber()))
+	b.WriteString(s.GetMapName())
+	return b
+}
+
+func MarshalConfigstring(cs *pb.CString) Buffer {
+	b := Buffer{}
+	b.WriteByte(SVCConfigString)
+	b.WriteShort(uint16(cs.GetIndex()))
+	b.WriteString(cs.GetString_())
+	return b
+}
+
+func MarshalStuffText(st *pb.StuffText) Buffer {
+	b := Buffer{}
+	b.WriteString(st.GetString_())
+	return b
+}
+
+func MarshalPrint(p *pb.Print) Buffer {
+	b := Buffer{}
+	b.WriteByte(byte(p.GetLevel()))
+	b.WriteString(p.GetString_())
+	return b
+}
+
+func MarshalFlash(mf *pb.MuzzleFlash) Buffer {
+	b := Buffer{}
+	b.WriteShort(uint16(mf.GetEntity()))
+	b.WriteByte(byte(mf.GetWeapon()))
+	return b
+}
+
+func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
+	b := Buffer{}
+	b.WriteByte(byte(te.GetType()))
+	switch te.GetType() {
+	case TentBlood:
+		fallthrough
+	case TentGunshot:
+		fallthrough
+	case TentSparks:
+		fallthrough
+	case TentBulletSparks:
+		fallthrough
+	case TentScreenSparks:
+		fallthrough
+	case TentShieldSparks:
+		fallthrough
+	case TentShotgun:
+		fallthrough
+	case TentBlaster:
+		fallthrough
+	case TentGreenBlood:
+		fallthrough
+	case TentBlaster2:
+		fallthrough
+	case TentFlechette:
+		fallthrough
+	case TentHeatBeamSparks:
+		fallthrough
+	case TentHeatBeamSteam:
+		fallthrough
+	case TentMoreBlood:
+		fallthrough
+	case TentElectricSparks:
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteByte(byte(te.GetDirection()))
+	case TentSplash:
+		fallthrough
+	case TentLaserSparks:
+		fallthrough
+	case TentWeldingSparks:
+		fallthrough
+	case TentTunnelSparks:
+		b.WriteByte(byte(te.GetCount()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteByte(byte(te.GetDirection()))
+		b.WriteByte(byte(te.GetColor()))
+	case TentBlueHyperBlaster:
+		fallthrough
+	case TentRailTrail:
+		fallthrough
+	case TentBubbleTrail:
+		fallthrough
+	case TentDebugTrail:
+		fallthrough
+	case TentBubbleTrail2:
+		fallthrough
+	case TentBFGLaser:
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(uint16(te.GetPosition2X()))
+		b.WriteCoord(uint16(te.GetPosition2Y()))
+		b.WriteCoord(uint16(te.GetPosition2Z()))
+	case TentGrenadeExplosion:
+		fallthrough
+	case TentGrenadeExplosionWater:
+		fallthrough
+	case TentExplosion2:
+		fallthrough
+	case TentPlasmaExplosion:
+		fallthrough
+	case TentRocketExplosion:
+		fallthrough
+	case TentRocketExplosionWater:
+		fallthrough
+	case TentExplosion1:
+		fallthrough
+	case TentExplosion1NP:
+		fallthrough
+	case TentExplosion1Big:
+		fallthrough
+	case TentBFGExplosion:
+		fallthrough
+	case TentBFGBigExplosion:
+		fallthrough
+	case TentBossTeleport:
+		fallthrough
+	case TentPlainExplosion:
+		fallthrough
+	case TentChainFistSmoke:
+		fallthrough
+	case TentTrackerExplosion:
+		fallthrough
+	case TentTeleportEffect:
+		fallthrough
+	case TentDBallGoal:
+		fallthrough
+	case TentWidowSplash:
+		fallthrough
+	case TentNukeBlast:
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+	case TentParasiteAttack:
+		fallthrough
+	case TentMedicCableAttack:
+		fallthrough
+	case TentHeatBeam:
+		fallthrough
+	case TentMonsterHeatBeam:
+		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(uint16(te.GetPosition2X()))
+		b.WriteCoord(uint16(te.GetPosition2Y()))
+		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteCoord(uint16(te.GetOffsetX()))
+		b.WriteCoord(uint16(te.GetOffsetY()))
+		b.WriteCoord(uint16(te.GetOffsetZ()))
+	case TentGrappleCable:
+		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(uint16(te.GetPosition2X()))
+		b.WriteCoord(uint16(te.GetPosition2Y()))
+		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteCoord(uint16(te.GetOffsetX()))
+		b.WriteCoord(uint16(te.GetOffsetY()))
+		b.WriteCoord(uint16(te.GetOffsetZ()))
+	case TentLightning:
+		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteShort(uint16(te.GetEntity2()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(uint16(te.GetPosition2X()))
+		b.WriteCoord(uint16(te.GetPosition2Y()))
+		b.WriteCoord(uint16(te.GetPosition2Z()))
+	case TentFlashlight:
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteShort(uint16(te.GetEntity1()))
+	case TentForceWall:
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(uint16(te.GetPosition2X()))
+		b.WriteCoord(uint16(te.GetPosition2Y()))
+		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteByte(byte(te.GetColor()))
+	case TentSteam:
+		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteByte(byte(te.GetCount()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteByte(byte(te.GetDirection()))
+		b.WriteByte(byte(te.GetColor()))
+		b.WriteShort(uint16(te.GetEntity2()))
+		if int32(te.Entity1) != -1 {
+			b.WriteLong(int32(te.GetTime()))
+		}
+	case TentWidowBeamOut:
+		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteCoord(uint16(te.GetPosition1X()))
+		b.WriteCoord(uint16(te.GetPosition1Y()))
+		b.WriteCoord(uint16(te.GetPosition1Z()))
+	}
+	return b
+}
+
+func MarshalLayout(lo *pb.Layout) Buffer {
+	b := Buffer{}
+	b.WriteString(lo.GetString_())
+	return b
+}
+
+func MarshalSound(s *pb.PackedSound) Buffer {
+	b := Buffer{}
+	b.WriteByte(byte(s.GetFlags()))
+	b.WriteByte(byte(s.GetIndex()))
+	if (s.GetFlags() & SoundVolume) > 0 {
+		b.WriteByte(byte(s.GetVolume()))
+	}
+	if (s.GetFlags() & SoundAttenuation) > 0 {
+		b.WriteByte(byte(s.GetAttenuation()))
+	}
+	if (s.GetFlags() & SoundOffset) > 0 {
+		b.WriteByte(byte(s.GetTimeOffset()))
+	}
+	if (s.GetFlags() & SoundEntity) > 0 {
+		b.WriteShort(uint16(s.GetEntity()<<3 + s.GetChannel()))
+	}
+	if (s.GetFlags() & SoundPosition) > 0 {
+		b.WriteCoord(uint16(s.GetPositionX()))
+		b.WriteCoord(uint16(s.GetPositionY()))
+		b.WriteCoord(uint16(s.GetPositionZ()))
+	}
+	return b
+}
+
+func MarshalCenterPrint(cp *pb.CenterPrint) Buffer {
+	b := Buffer{}
+	b.WriteString(cp.GetString_())
+	return b
 }

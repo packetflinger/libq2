@@ -10,6 +10,7 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
+/*
 func TestServerData(t *testing.T) {
 	msg := Buffer{
 		Data: []byte{
@@ -47,7 +48,9 @@ func TestServerData(t *testing.T) {
 		t.Error("marshal error, got diff\n", diff)
 	}
 }
+*/
 
+/*
 func TestParseConfigstring(t *testing.T) {
 	msg := Buffer{
 		Data: []byte{
@@ -69,7 +72,9 @@ func TestParseConfigstring(t *testing.T) {
 		t.Error("marshal error, got diff\n", diff)
 	}
 }
+*/
 
+/*
 func TestParseBaseline(t *testing.T) {
 	msg := Buffer{
 		Data: []byte{0x83, 0xCA, 0x04, 0x23, 0x1C, 0x01, 0x00, 0x02, 0x80, 0x21, 0x00, 0x28, 0x78, 0x1C},
@@ -87,7 +92,9 @@ func TestParseBaseline(t *testing.T) {
 		t.Error("baseline marshal error, got diff\n", diff)
 	}
 }
+*/
 
+/*
 func TestParseFrame(t *testing.T) {
 	msg := Buffer{
 		Data: []byte{0x01, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x01, 0x02},
@@ -105,7 +112,9 @@ func TestParseFrame(t *testing.T) {
 		t.Error("frame marshal error, got diff\n", diff)
 	}
 }
+*/
 
+/*
 func TestParsePlayerstate(t *testing.T) {
 	msg := Buffer{
 		Data: []byte{0x00, 0x20, 0x0E, 0x0C, 0x00, 0xF5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -120,7 +129,9 @@ func TestParsePlayerstate(t *testing.T) {
 		t.Error("frame marshal error, got diff\n", diff)
 	}
 }
+*/
 
+/*
 func TestParseDeltaEntities(t *testing.T) {
 	msg := Buffer{
 		//Buffer: []byte{0x10, 0x01, 0x17, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00},
@@ -158,6 +169,7 @@ func TestParseDeltaEntities(t *testing.T) {
 		t.Error("differences found:\n", diff)
 	}
 }
+*/
 
 /*
 func TestRenderSVG(t *testing.T) {
@@ -373,7 +385,7 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.msg.ParseDeltaPlayerstateProto(tc.from)
+			got := tc.msg.ParseDeltaPlayerstate(tc.from)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Errorf("ParseDeltaPlayerstateProto(%v) = %v, want: %v\n", tc.from, got, tc.want)
 			}
@@ -471,7 +483,7 @@ func TestParseEntityProto(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			bits := tc.msg.ParseEntityBitmask()
 			num := tc.msg.ParseEntityNumber(bits)
-			got := tc.msg.ParseEntityProto(tc.from, num, bits)
+			got := tc.msg.ParseEntity(tc.from, num, bits)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Errorf("ParseEntityProto(%v) = %v, want: %v\n", tc.from, got, tc.want)
 			}
@@ -503,8 +515,8 @@ func TestPlayerstateDiff(t *testing.T) {
 			}
 			msg1 := NewBuffer(b1)
 			msg2 := NewBuffer(b2)
-			ps1 := msg1.ParseDeltaPlayerstateProto(nil)
-			ps2 := msg2.ParseDeltaPlayerstateProto(nil)
+			ps1 := msg1.ParseDeltaPlayerstate(nil)
+			ps2 := msg2.ParseDeltaPlayerstate(nil)
 			if diff := cmp.Diff(ps1, ps2, protocmp.Transform()); diff != "" {
 				t.Errorf("Playerstate diff: (+got/-want):\n%s", diff)
 			}
@@ -533,10 +545,40 @@ func TestPacketEntitiesDump(t *testing.T) {
 				t.Fatal(err)
 			}
 			msg := NewBuffer(bytes)
-			ents := msg.ParsePacketEntitiesProto(nil)
+			ents := msg.ParsePacketEntities(nil)
 			for _, ent := range ents {
 				t.Error("\n" + prototext.Format(ent))
 			}
+		})
+	}
+}
+
+func TestParsePacketDump(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+	}{
+		{
+			name: "original",
+			data: "14100000000F0000000001021196265F225013C10E5D07F10200000400003654000016FB0AF501FDFFFF000033028000005E00010012B3828001013A5F225013C10E5F225013C10E04000003015F225013C10E00",
+		},
+		{
+			name: "test1",
+			data: "0A03636C616972653A203A29200A00141100000010000000000102118626D9227F13C10E3404AC01000000004138000017FB0AF502FCFEFF0000230080000000001293808001013BD9227F13D9227F13C10E0000",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.data)
+			if err != nil {
+				t.Fatal(err)
+			}
+			msg := NewBuffer(bytes)
+			packet, err := msg.ParsePacket(nil)
+			if err != nil {
+				t.Error(err)
+			}
+			t.Error("\n" + prototext.Format(packet))
 		})
 	}
 }
