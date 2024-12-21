@@ -4,7 +4,7 @@ syntax="proto3";
 option go_package = "github.com/packetflinger/libq2/proto";
 package proto;
 
-import "dm2_demo.proto";
+import "server_message.proto";
 
 // Represents all the gamestate messages from a single server packet
 message Packet {
