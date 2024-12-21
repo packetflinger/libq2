@@ -96,10 +96,10 @@ message PackedPlayer {
     int32 gun_offset_z = 16;
     uint32 gun_index = 17;          // 8 bits
     uint32 gun_frame = 18;          // 8 bits
-    uint32 blend_w = 19;
-    uint32 blend_x = 20;
-    uint32 blend_y = 21;
-    uint32 blend_z = 22;
+    int32 blend_w = 19;
+    int32 blend_x = 20;
+    int32 blend_y = 21;
+    int32 blend_z = 22;
     uint32 fov = 23;
     uint32 rd_flags = 24;
     repeated PlayerStat stats = 25; // 16 bits
