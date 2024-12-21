@@ -2079,3 +2079,458 @@ func MarshalCenterPrint(cp *pb.CenterPrint) Buffer {
 	b.WriteString(cp.GetString_())
 	return b
 }
+
+func MarshalFrame(fr *pb.Frame) Buffer {
+	msg := Buffer{}
+	msg.WriteByte(SVCFrame)
+	msg.WriteLong(fr.Number)
+	msg.WriteLong(fr.Delta)
+	msg.WriteByte(byte(fr.Suppressed))
+	msg.WriteByte(byte(fr.AreaBytes))
+	for _, ab := range fr.AreaBits {
+		msg.WriteByte(byte(ab))
+	}
+
+	// from state is empty
+	DeltaPlayer(&pb.PackedPlayer{}, fr.PlayerState, &msg)
+
+	msg.WriteByte(SVCPacketEntities)
+	for _, ent := range fr.GetEntities() {
+		DeltaEntity(&pb.PackedEntity{}, ent, &msg)
+	}
+	msg.WriteShort(0) // EoE
+
+	// player-based muzzle flashes
+	for _, flash := range fr.GetFlashes1() {
+		tmp := MarshalFlash(flash)
+		msg.WriteByte(SVCMuzzleFlash)
+		msg.Append(tmp)
+	}
+	// monster-basd muzzle flashes
+	for _, flash := range fr.GetFlashes2() {
+		tmp := MarshalFlash(flash)
+		msg.WriteByte(SVCMuzzleFlash2)
+		msg.Append(tmp)
+	}
+	for _, ent := range fr.GetTemporaryEntities() {
+		tmp := MarshalTempEntity(ent)
+		msg.WriteByte(SVCTempEntity)
+		msg.Append(tmp)
+	}
+	for _, layout := range fr.GetLayouts() {
+		tmp := MarshalLayout(layout)
+		msg.WriteByte(SVCLayout)
+		msg.Append(tmp)
+	}
+	for _, sound := range fr.GetSounds() {
+		tmp := MarshalSound(sound)
+		msg.WriteByte(SVCSound)
+		msg.Append(tmp)
+	}
+	for _, print := range fr.GetPrints() {
+		tmp := MarshalPrint(print)
+		msg.WriteByte(SVCPrint)
+		msg.Append(tmp)
+	}
+	for _, stuff := range fr.GetStufftexts() {
+		tmp := MarshalStuffText(stuff)
+		msg.WriteByte(SVCStuffText)
+		msg.Append(tmp)
+	}
+	for _, cs := range fr.GetConfigstrings() {
+		tmp := MarshalConfigstring(cs)
+		msg.Append(tmp)
+	}
+	for _, cp := range fr.GetCenterprints() {
+		tmp := MarshalCenterPrint(cp)
+		msg.WriteByte(SVCCenterPrint)
+		msg.Append(tmp)
+	}
+	return msg
+}
+
+func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
+	bits := DeltaPlayerBitmask(from, to)
+	msg.WriteByte(SVCPlayerInfo)
+	msg.WriteShort(bits)
+
+	if bits&PlayerType > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetType()))
+	}
+
+	if bits&PlayerOrigin > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
+	}
+
+	if bits&PlayerVelocity > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
+	}
+
+	if bits&PlayerTime > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetTime()))
+	}
+
+	if bits&PlayerFlags > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetFlags()))
+	}
+
+	if bits&PlayerGravity > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetGravity()))
+	}
+
+	if bits&PlayerDeltaAngles > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
+	}
+
+	if bits&PlayerViewOffset > 0 {
+		msg.WriteChar(uint8(to.GetViewOffsetX()))
+		msg.WriteChar(uint8(to.GetViewOffsetY()))
+		msg.WriteChar(uint8(to.GetViewOffsetZ()))
+	}
+
+	if bits&PlayerViewAngles > 0 {
+		msg.WriteShort(uint16(to.GetViewAnglesX()))
+		msg.WriteShort(uint16(to.GetViewAnglesY()))
+		msg.WriteShort(uint16(to.GetViewAnglesZ()))
+	}
+
+	if bits&PlayerKickAngles > 0 {
+		msg.WriteChar(uint8(to.GetKickAnglesX()))
+		msg.WriteChar(uint8(to.GetKickAnglesY()))
+		msg.WriteChar(uint8(to.GetKickAnglesZ()))
+	}
+
+	if bits&PlayerWeaponIndex > 0 {
+		msg.WriteByte(byte(to.GetGunIndex()))
+	}
+
+	if bits&PlayerWeaponFrame > 0 {
+		msg.WriteByte(byte(to.GetGunFrame()))
+		msg.WriteChar(uint8(to.GetGunOffsetX()))
+		msg.WriteChar(uint8(to.GetGunOffsetY()))
+		msg.WriteChar(uint8(to.GetGunOffsetZ()))
+		msg.WriteChar(uint8(to.GetGunAnglesX()))
+		msg.WriteChar(uint8(to.GetGunAnglesY()))
+		msg.WriteChar(uint8(to.GetGunAnglesZ()))
+	}
+
+	if bits&PlayerBlend > 0 {
+		msg.WriteByte(byte(to.GetBlendW()))
+		msg.WriteByte(byte(to.GetBlendX()))
+		msg.WriteByte(byte(to.GetBlendY()))
+		msg.WriteByte(byte(to.GetBlendZ()))
+	}
+
+	if bits&PlayerFOV > 0 {
+		msg.WriteByte(byte(to.GetFov()))
+	}
+
+	if bits&PlayerRDFlags > 0 {
+		msg.WriteByte(byte(to.GetRdFlags()))
+	}
+
+	statbits := uint32(0)
+	var i uint32
+	for i = 0; i < MaxStats; i++ {
+		if to.GetStats()[i] != from.GetStats()[i] {
+			statbits |= 1 << i
+		}
+	}
+	msg.WriteLong(int32(statbits))
+	for i = 0; i < MaxStats; i++ {
+		if (bits & (1 << i)) > 0 {
+			msg.WriteShort(uint16(to.GetStats()[i]))
+		}
+	}
+}
+
+func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
+	bits := uint16(0)
+	mf := from.GetMovestate()
+	mt := to.GetMovestate()
+
+	if mf.GetType() != mt.GetType() {
+		bits |= PlayerType
+	}
+
+	if mf.GetOriginX() != mt.GetOriginX() || mf.GetOriginY() != mt.GetOriginY() || mf.GetOriginZ() != mt.GetOriginZ() {
+		bits |= PlayerOrigin
+	}
+	if mf.GetVelocityX() != mt.GetVelocityX() || mf.GetVelocityY() != mt.GetVelocityY() || mf.GetVelocityZ() != mt.GetVelocityZ() {
+		bits |= PlayerVelocity
+	}
+	if mf.GetTime() != mt.GetTime() {
+		bits |= PlayerTime
+	}
+	if mf.GetFlags() != mt.GetFlags() {
+		bits |= PlayerFlags
+	}
+	if mf.GetGravity() != mt.GetGravity() {
+		bits |= PlayerGravity
+	}
+	if mf.GetDeltaAngleX() != mt.GetDeltaAngleX() || mf.GetDeltaAngleY() != mt.GetDeltaAngleY() || mf.GetDeltaAngleZ() != mt.GetDeltaAngleZ() {
+		bits |= PlayerDeltaAngles
+	}
+	if from.GetViewOffsetX() != to.GetViewOffsetX() || from.GetViewOffsetY() != to.GetViewOffsetY() || from.GetViewOffsetZ() != to.GetViewOffsetZ() {
+		bits |= PlayerViewOffset
+	}
+	if from.GetViewAnglesX() != to.GetViewAnglesX() || from.GetViewAnglesY() != to.GetViewAnglesY() || from.GetViewAnglesZ() != to.GetViewAnglesZ() {
+		bits |= PlayerViewAngles
+	}
+	if from.GetKickAnglesX() != to.GetKickAnglesX() || from.GetKickAnglesY() != to.GetKickAnglesY() || from.GetKickAnglesZ() != to.GetKickAnglesZ() {
+		bits |= PlayerKickAngles
+	}
+	if from.GetBlendW() != to.GetBlendW() || from.GetBlendX() != to.GetBlendX() || from.GetBlendY() != to.GetBlendY() || from.GetBlendZ() != to.GetBlendZ() {
+		bits |= PlayerBlend
+	}
+	if from.GetFov() != to.GetFov() {
+		bits |= PlayerFOV
+	}
+	if from.GetRdFlags() != to.GetRdFlags() {
+		bits |= PlayerRDFlags
+	}
+	if from.GetGunFrame() != to.GetGunFrame() || from.GetGunOffsetX() != to.GetGunOffsetX() || from.GetGunOffsetY() != to.GetGunOffsetY() || from.GetGunOffsetZ() != to.GetGunOffsetZ() || from.GetGunAnglesX() != to.GetGunAnglesX() || from.GetGunAnglesY() != to.GetGunAnglesY() || from.GetGunAnglesZ() != to.GetGunAnglesZ() {
+		bits |= PlayerWeaponFrame
+	}
+	if from.GetGunIndex() != to.GetGunIndex() {
+		bits |= PlayerWeaponIndex
+	}
+	return bits
+}
+
+func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *Buffer) {
+	bits := DeltaEntityBitmask(to, from)
+
+	// write the bitmask first
+	m.WriteByte(byte(bits & 255))
+	if bits&0xff000000 > 0 {
+		m.WriteByte(byte((bits >> 8) & 255))
+		m.WriteByte(byte((bits >> 16) & 255))
+		m.WriteByte(byte((bits >> 24) & 255))
+	} else if bits&0x00ff0000 > 0 {
+		m.WriteByte(byte((bits >> 8) & 255))
+		m.WriteByte(byte((bits >> 16) & 255))
+	} else if bits&0x0000ff00 > 0 {
+		m.WriteByte(byte((bits >> 8) & 255))
+	}
+
+	// write the edict number
+	if bits&EntityNumber16 > 0 {
+		m.WriteShort(uint16(to.GetNumber()))
+	} else {
+		m.WriteByte(byte(to.GetNumber()))
+	}
+
+	if bits&EntityModel > 0 {
+		m.WriteByte(byte(to.GetModelIndex()))
+	}
+
+	if bits&EntityModel2 > 0 {
+		m.WriteByte(byte(to.GetModelIndex2()))
+	}
+
+	if bits&EntityModel3 > 0 {
+		m.WriteByte(byte(to.GetModelIndex3()))
+	}
+
+	if bits&EntityModel4 > 0 {
+		m.WriteByte(byte(to.GetModelIndex4()))
+	}
+
+	if bits&EntityFrame8 > 0 {
+		m.WriteByte(byte(to.GetFrame()))
+	} else if bits&EntityFrame16 > 0 {
+		m.WriteShort(uint16(to.GetFrame()))
+	}
+
+	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
+		m.WriteLong(int32(to.GetSkin()))
+	} else if bits&EntitySkin8 > 0 {
+		m.WriteByte(byte(to.GetSkin()))
+	} else if bits&EntitySkin16 > 0 {
+		m.WriteShort(uint16(to.GetSkin()))
+	}
+
+	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
+		m.WriteLong(int32(to.GetEffects()))
+	} else if bits&EntityEffects8 > 0 {
+		m.WriteByte(byte(to.GetEffects()))
+	} else if bits&EntityEffects16 > 0 {
+		m.WriteShort(uint16(to.GetEffects()))
+	}
+
+	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
+		m.WriteLong(int32(to.GetRenderFx()))
+	} else if bits&EntityRenderFX8 > 0 {
+		m.WriteByte(byte(to.GetRenderFx()))
+	} else if bits&EntityRenderFX16 > 0 {
+		m.WriteShort(uint16(to.GetRenderFx()))
+	}
+
+	if bits&EntityOrigin1 > 0 {
+		m.WriteShort(uint16(to.GetOriginX()))
+	}
+
+	if bits&EntityOrigin2 > 0 {
+		m.WriteShort(uint16(to.GetOriginY()))
+	}
+
+	if bits&EntityOrigin3 > 0 {
+		m.WriteShort(uint16(to.GetOriginZ()))
+	}
+
+	if bits&EntityAngle1 > 0 {
+		m.WriteByte(byte(to.GetAngleX()))
+	}
+
+	if bits&EntityAngle2 > 0 {
+		m.WriteByte(byte(to.GetAngleY()))
+	}
+
+	if bits&EntityAngle3 > 0 {
+		m.WriteByte(byte(to.GetAngleZ()))
+	}
+
+	if bits&EntityOldOrigin > 0 {
+		m.WriteShort(uint16(to.GetOldOriginX()))
+		m.WriteShort(uint16(to.GetOldOriginY()))
+		m.WriteShort(uint16(to.GetOldOriginZ()))
+	}
+
+	if bits&EntitySound > 0 {
+		m.WriteByte(byte(to.GetSound()))
+	}
+
+	if bits&EntityEvent > 0 {
+		m.WriteByte(byte(to.GetEvent()))
+	}
+
+	if bits&EntitySolid > 0 {
+		m.WriteShort(uint16(to.GetSolid()))
+	}
+}
+
+func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
+	bits := uint32(0)
+	mask := uint32(0xffff8000)
+
+	if to.GetRemove() {
+		bits |= EntityRemove
+	}
+
+	if to.GetOriginX() != from.GetOriginX() {
+		bits |= EntityOrigin1
+	}
+
+	if to.GetOriginY() != from.GetOriginY() {
+		bits |= EntityOrigin2
+	}
+
+	if to.GetOriginZ() != from.GetOriginZ() {
+		bits |= EntityOrigin3
+	}
+
+	if to.GetAngleX() != from.GetAngleX() {
+		bits |= EntityAngle1
+	}
+
+	if to.GetAngleY() != from.GetAngleY() {
+		bits |= EntityAngle2
+	}
+
+	if to.GetAngleZ() != from.GetAngleZ() {
+		bits |= EntityAngle3
+	}
+
+	if to.GetSkin() != from.GetSkin() {
+		if to.GetSkin()&mask > 0 {
+			bits |= EntitySkin8 | EntitySkin16
+		} else if to.GetSkin()&uint32(0x0000ff00) > 0 {
+			bits |= EntitySkin16
+		} else {
+			bits |= EntitySkin8
+		}
+	}
+
+	if to.GetFrame() != from.GetFrame() {
+		if uint16(to.GetFrame())&uint16(0xff00) > 0 {
+			bits |= EntityFrame16
+		} else {
+			bits |= EntityFrame8
+		}
+	}
+
+	if to.Effects != from.Effects {
+		if to.Effects&mask > 0 {
+			bits |= EntityEffects8 | EntityEffects16
+		} else if to.Effects&0x0000ff00 > 0 {
+			bits |= EntityEffects16
+		} else {
+			bits |= EntityEffects8
+		}
+	}
+
+	if to.GetRenderFx() != from.GetRenderFx() {
+		if to.GetRenderFx()&mask > 0 {
+			bits |= EntityRenderFX8 | EntityRenderFX16
+		} else if to.GetRenderFx()&0x0000ff00 > 0 {
+			bits |= EntityRenderFX16
+		} else {
+			bits |= EntityRenderFX8
+		}
+	}
+
+	if to.GetSolid() != from.GetSolid() {
+		bits |= EntitySolid
+	}
+
+	if to.GetEvent() != from.GetEvent() {
+		bits |= EntityEvent
+	}
+
+	if to.GetModelIndex() != from.GetModelIndex() {
+		bits |= EntityModel
+	}
+
+	if to.GetModelIndex2() != from.GetModelIndex2() {
+		bits |= EntityModel2
+	}
+
+	if to.GetModelIndex3() != from.GetModelIndex3() {
+		bits |= EntityModel3
+	}
+
+	if to.GetModelIndex4() != from.GetModelIndex4() {
+		bits |= EntityModel4
+	}
+
+	if to.GetSound() != from.GetSound() {
+		bits |= EntitySound
+	}
+
+	if to.GetRenderFx()&RFFrameLerp > 0 {
+		bits |= EntityOldOrigin
+	} else if to.GetRenderFx()&RFBeam > 0 {
+		bits |= EntityOldOrigin
+	}
+
+	if to.GetNumber()&0xff00 > 0 {
+		bits |= EntityNumber16
+	}
+
+	if bits&0xff000000 > 0 {
+		bits |= EntityMoreBits3 | EntityMoreBits2 | EntityMoreBits1
+	} else if bits&0x00ff0000 > 0 {
+		bits |= EntityMoreBits2 | EntityMoreBits1
+	} else if bits&0x0000ff00 > 0 {
+		bits |= EntityMoreBits1
+	}
+
+	return bits
+}
