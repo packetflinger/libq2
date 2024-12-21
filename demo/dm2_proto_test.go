@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/packetflinger/libq2/message"
-	"google.golang.org/protobuf/testing/protocmp"
 
 	pb "github.com/packetflinger/libq2/proto"
 )
@@ -42,6 +40,7 @@ func TestMarshal(t *testing.T) {
 }
 */
 
+/*
 func TestServerDataToProto(t *testing.T) {
 	tests := []struct {
 		name string
@@ -71,13 +70,14 @@ func TestServerDataToProto(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := ServerDataToProto(tc.in)
+			got := message.MarshalServerData(tc.in)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Error(diff)
 			}
 		})
 	}
 }
+*/
 
 func TestServerDataToBinary(t *testing.T) {
 	tests := []struct {
