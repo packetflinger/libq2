@@ -1,5 +1,5 @@
 // compile with:
-// protoc --go_out=. --go_opt=paths=source_relative dm2_demo.proto
+// protoc --go_out=. --go_opt=paths=source_relative server_message.proto
 syntax="proto3";
 option go_package = "github.com/packetflinger/libq2/proto";
 package proto;
