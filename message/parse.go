@@ -1588,10 +1588,9 @@ func (m *Buffer) ParseLayout() *pb.Layout {
 
 // 2 bytes for every item
 func (m *Buffer) ParseInventory() {
-	// we don't actually care about this, just parsing it
-	for i := 0; i < MaxItems; i++ {
-		_ = m.ReadShort()
-	}
+	// we don't actually care about this, advance the buffer's pointer so we
+	// can accurately find any messages after this one.
+	m.Index += 2 * MaxItems
 }
 
 // A string that should appear temporarily in the center of the screen
