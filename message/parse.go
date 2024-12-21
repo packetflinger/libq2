@@ -770,10 +770,10 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	}
 
 	if bits&PlayerBlend != 0 {
-		ps.BlendW = uint32(m.ReadChar())
-		ps.BlendX = uint32(m.ReadChar())
-		ps.BlendY = uint32(m.ReadChar())
-		ps.BlendZ = uint32(m.ReadChar())
+		ps.BlendW = int32(m.ReadChar())
+		ps.BlendX = int32(m.ReadChar())
+		ps.BlendY = int32(m.ReadChar())
+		ps.BlendZ = int32(m.ReadChar())
 	}
 
 	if bits&PlayerFOV != 0 {
