@@ -689,16 +689,16 @@ func (m *Buffer) ParseDeltaPlayerstate(ps PackedPlayer) PackedPlayer {
 // ParseDeltaPlayerstateProto will merge a previous playerstate with one parsed
 // from the receiver. Only the changed values are copied.
 func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
-	ps := &pb.PackedPlayer{}
+	to := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
-	stats := []*pb.PlayerStat{}
+	stats := make(map[uint32]int32)
 
 	if from != nil {
-		ps = proto.Clone(from).(*pb.PackedPlayer)
+		to = proto.Clone(from).(*pb.PackedPlayer)
 		// proto.Clone() isn't deep, sub-protos need to be copied manually
 		pm = proto.Clone(from.Movestate).(*pb.PlayerMove)
-		if len(from.GetStats()) > 0 {
-			stats = from.GetStats()
+		for k, v := range from.GetStats() {
+			to.Stats[k] = v
 		}
 	}
 	bits := m.ReadWord()
@@ -738,62 +738,62 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	}
 
 	if bits&PlayerViewOffset != 0 {
-		ps.ViewOffsetX = int32(m.ReadChar())
-		ps.ViewOffsetY = int32(m.ReadChar())
-		ps.ViewOffsetZ = int32(m.ReadChar())
+		to.ViewOffsetX = int32(m.ReadChar())
+		to.ViewOffsetY = int32(m.ReadChar())
+		to.ViewOffsetZ = int32(m.ReadChar())
 	}
 
 	if bits&PlayerViewAngles != 0 {
-		ps.ViewAnglesX = int32(m.ReadShort())
-		ps.ViewAnglesY = int32(m.ReadShort())
-		ps.ViewAnglesZ = int32(m.ReadShort())
+		to.ViewAnglesX = int32(m.ReadShort())
+		to.ViewAnglesY = int32(m.ReadShort())
+		to.ViewAnglesZ = int32(m.ReadShort())
 	}
 
 	if bits&PlayerKickAngles != 0 {
-		ps.KickAnglesX = int32(m.ReadChar())
-		ps.KickAnglesY = int32(m.ReadChar())
-		ps.KickAnglesZ = int32(m.ReadChar())
+		to.KickAnglesX = int32(m.ReadChar())
+		to.KickAnglesY = int32(m.ReadChar())
+		to.KickAnglesZ = int32(m.ReadChar())
 	}
 
 	if bits&PlayerWeaponIndex != 0 {
-		ps.GunIndex = uint32(m.ReadByte())
+		to.GunIndex = uint32(m.ReadByte())
 	}
 
 	if bits&PlayerWeaponFrame != 0 {
-		ps.GunFrame = uint32(m.ReadByte())
-		ps.GunOffsetX = int32(m.ReadChar())
-		ps.GunOffsetY = int32(m.ReadChar())
-		ps.GunOffsetZ = int32(m.ReadChar())
-		ps.GunAnglesX = int32(m.ReadChar())
-		ps.GunAnglesY = int32(m.ReadChar())
-		ps.GunAnglesZ = int32(m.ReadChar())
+		to.GunFrame = uint32(m.ReadByte())
+		to.GunOffsetX = int32(m.ReadChar())
+		to.GunOffsetY = int32(m.ReadChar())
+		to.GunOffsetZ = int32(m.ReadChar())
+		to.GunAnglesX = int32(m.ReadChar())
+		to.GunAnglesY = int32(m.ReadChar())
+		to.GunAnglesZ = int32(m.ReadChar())
 	}
 
 	if bits&PlayerBlend != 0 {
-		ps.BlendW = int32(m.ReadChar())
-		ps.BlendX = int32(m.ReadChar())
-		ps.BlendY = int32(m.ReadChar())
-		ps.BlendZ = int32(m.ReadChar())
+		to.BlendW = int32(m.ReadChar())
+		to.BlendX = int32(m.ReadChar())
+		to.BlendY = int32(m.ReadChar())
+		to.BlendZ = int32(m.ReadChar())
 	}
 
 	if bits&PlayerFOV != 0 {
-		ps.Fov = uint32(m.ReadByte())
+		to.Fov = uint32(m.ReadByte())
 	}
 
 	if bits&PlayerRDFlags != 0 {
-		ps.RdFlags = uint32(m.ReadByte())
+		to.RdFlags = uint32(m.ReadByte())
 	}
 
 	statbits := int32(m.ReadLong())
-	for i := 0; i < 32; i++ {
+	var i uint32
+	for i = 0; i < 32; i++ {
 		if statbits&(1<<i) != 0 {
-			stats = append(stats, &pb.PlayerStat{Index: uint32(i), Value: int32(m.ReadShort())})
+			stats[i] = int32(m.ReadShort())
 		}
 	}
-	ps.Stats = stats
-
-	ps.Movestate = pm
-	return ps
+	to.Stats = stats
+	to.Movestate = pm
+	return to
 }
 
 /*

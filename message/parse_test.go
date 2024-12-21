@@ -333,10 +333,10 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 				ViewAnglesY: 5,
 				ViewAnglesZ: 5,
 				Fov:         90,
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 100},
-					{Index: 5, Value: 50},
-					{Index: 10, Value: 25},
+				Stats: map[uint32]int32{
+					1:  100,
+					5:  50,
+					10: 25,
 				},
 			},
 			want: &pb.PackedPlayer{
@@ -349,10 +349,10 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 				ViewAnglesY: 5,
 				ViewAnglesZ: 5,
 				Fov:         105,
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 100},
-					{Index: 5, Value: 50},
-					{Index: 10, Value: 25},
+				Stats: map[uint32]int32{
+					1:  100,
+					5:  50,
+					10: 25,
 				},
 			},
 		},
@@ -376,9 +376,9 @@ func TestParseDeltaPlayerstateProto(t *testing.T) {
 				ViewAnglesY: 5,
 				ViewAnglesZ: 5,
 				Fov:         105,
-				Stats: []*pb.PlayerStat{
-					{Index: 5, Value: 9},
-					{Index: 6, Value: 0},
+				Stats: map[uint32]int32{
+					5: 9,
+					6: 0,
 				},
 			},
 		},

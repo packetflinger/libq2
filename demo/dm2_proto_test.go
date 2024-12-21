@@ -246,11 +246,8 @@ func TestDeltaPlayerstateBitmask(t *testing.T) {
 			},
 			from: &pb.PackedPlayer{
 				Fov: 102,
-				Stats: []*pb.PlayerStat{
-					{
-						Index: 2,
-						Value: 100,
-					},
+				Stats: map[uint32]int32{
+					2: 100,
 				},
 			},
 			want: message.PlayerGravity | message.PlayerFOV,
@@ -311,39 +308,12 @@ func TestPlayerstateToProto(t *testing.T) {
 				GunAnglesY:  0,
 				GunAnglesZ:  0,
 				Fov:         105,
-				Stats: []*pb.PlayerStat{
-					{Index: 0, Value: 2},
-					{Index: 1, Value: 100},
-					{Index: 2},
-					{Index: 3},
-					{Index: 4},
-					{Index: 5},
-					{Index: 6, Value: 5},
-					{Index: 7},
-					{Index: 8},
-					{Index: 9},
-					{Index: 10},
-					{Index: 11, Value: 5},
-					{Index: 12, Value: 7},
-					{Index: 13},
-					{Index: 14},
-					{Index: 15},
-					{Index: 16},
-					{Index: 17},
-					{Index: 18},
-					{Index: 19},
-					{Index: 20},
-					{Index: 21},
-					{Index: 22},
-					{Index: 23},
-					{Index: 24},
-					{Index: 25},
-					{Index: 26},
-					{Index: 27},
-					{Index: 28},
-					{Index: 29},
-					{Index: 30},
-					{Index: 31},
+				Stats: map[uint32]int32{
+					0:  2,
+					1:  100,
+					6:  5,
+					11: 5,
+					12: 7,
 				},
 			},
 		},
@@ -406,9 +376,9 @@ func TestPlayerstateToBinary(t *testing.T) {
 				Movestate: &pb.PlayerMove{
 					Gravity: 800,
 				},
-				Stats: []*pb.PlayerStat{
-					{Index: 2, Value: 89},
-					{Index: 3, Value: 5},
+				Stats: map[uint32]int32{
+					2: 89,
+					3: 5,
 				},
 			},
 		},
@@ -454,56 +424,3 @@ func TestSound(t *testing.T) {
 	}
 }
 */
-
-func TestReconcilePlayerstateStats(t *testing.T) {
-	tests := []struct {
-		name string
-		ps1  *pb.PackedPlayer
-		ps2  *pb.PackedPlayer
-		want []byte
-	}{
-		{
-			name: "Test 1",
-			ps1: &pb.PackedPlayer{
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 100},
-					{Index: 2, Value: 90},
-				},
-			},
-			ps2: &pb.PackedPlayer{
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 101},
-					{Index: 2, Value: 90},
-				},
-			},
-			want: []byte{2, 0, 0, 0, 101, 0},
-		},
-		{
-			name: "Test 2",
-			ps1: &pb.PackedPlayer{
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 100},
-					{Index: 5, Value: 90},
-					{Index: 9, Value: 2},
-				},
-			},
-			ps2: &pb.PackedPlayer{
-				Stats: []*pb.PlayerStat{
-					{Index: 1, Value: 101},
-					{Index: 5, Value: 90},
-					{Index: 9, Value: 1},
-				},
-			},
-			want: []byte{2, 2, 0, 0, 101, 0, 1, 0},
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			got := message.Buffer{}
-			ReconcilePlayerstateStats(tc.ps2, tc.ps1, &got)
-			if !bytes.Equal(got.Data, tc.want) {
-				t.Error("\ngot:\n", got.Data, "\nwant\n", tc.want)
-			}
-		})
-	}
-}

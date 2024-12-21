@@ -265,32 +265,17 @@ func DeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *message.Buffer
 		msg.WriteByte(byte(to.GetRdFlags()))
 	}
 
-	ReconcilePlayerstateStats(to, from, msg)
-}
-
-func ReconcilePlayerstateStats(to *pb.PackedPlayer, from *pb.PackedPlayer, msg *message.Buffer) {
-	bits := uint32(0)
-	toStats := [32]int16{}
-	for _, s := range to.GetStats() {
-		toStats[s.GetIndex()] = int16(s.GetValue())
-	}
-
-	fromStats := [32]int16{}
-	for _, s := range from.GetStats() {
-		fromStats[s.GetIndex()] = int16(s.GetValue())
-	}
-
-	for i := 0; i < message.MaxStats; i++ {
-		if toStats[i] != fromStats[i] {
-			bits |= 1 << i
+	statbits := uint32(0)
+	var i uint32
+	for i = 0; i < message.MaxStats; i++ {
+		if to.GetStats()[i] != from.GetStats()[i] {
+			statbits |= 1 << i
 		}
 	}
-
-	msg.WriteLong(int32(bits))
-
-	for i := 0; i < MaxStats; i++ {
+	msg.WriteLong(int32(statbits))
+	for i = 0; i < MaxStats; i++ {
 		if (bits & (1 << i)) > 0 {
-			msg.WriteShort(uint16(toStats[i]))
+			msg.WriteShort(uint16(to.GetStats()[i]))
 		}
 	}
 }

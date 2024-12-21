@@ -72,11 +72,6 @@ message PlayerMove {
     int32 delta_angle_z = 13;
 }
 
-message PlayerStat {
-    uint32 index = 1;
-    int32 value = 2;
-}
-
 message PackedPlayer {
     PlayerMove movestate = 1;
     int32 view_angles_x = 2;        // 16 bits
@@ -102,7 +97,7 @@ message PackedPlayer {
     int32 blend_z = 22;
     uint32 fov = 23;
     uint32 rd_flags = 24;
-    repeated PlayerStat stats = 25; // 16 bits
+    map<uint32, int32> stats = 26;  // 16 bits each
 }
 
 message Frame {
