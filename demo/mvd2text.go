@@ -90,10 +90,11 @@ func ParseMVD2TextDemo(demofile string) (DemoFile, error) {
 			//inBlock = true
 			continue
 		}
-		if t[0] == "serverdata" {
+		/*
+			if t[0] == "serverdata" {
 
-		}
-
+			}
+		*/
 	}
 	return demo, nil
 }
