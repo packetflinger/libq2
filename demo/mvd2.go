@@ -98,7 +98,7 @@ type MVDGameState struct {
 	ServerCount   uint32
 	ClientNumber  uint16
 	GameDir       string
-	ConfigStrings []message.ConfigString
+	ConfigStrings []*pb.ConfigString
 	// configstring linked list?
 	// baseframe linked list?
 }
@@ -140,6 +140,7 @@ func (d *MVD2File) Close() {
 	}
 }
 
+/*
 func (d *MVD2File) Parse(extcb message.Callback) error {
 	//intcb := d.InternalCallbacks()
 	for {
@@ -158,7 +159,9 @@ func (d *MVD2File) Parse(extcb message.Callback) error {
 	}
 	return nil
 }
+*/
 
+/*
 // Setup the callbacks for demo parsing. Stores data in the appropriate
 // spots as it's parsed for later use.
 //
@@ -167,6 +170,7 @@ func (d *MVD2File) Parse(extcb message.Callback) error {
 func (d *MVD2File) InternalCallbacks() message.Callback {
 	return message.Callback{}
 }
+*/
 
 func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 	_, err := f.Seek(pos, 0)

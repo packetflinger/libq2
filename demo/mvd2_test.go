@@ -2,8 +2,6 @@ package demo
 
 import (
 	"testing"
-
-	"github.com/packetflinger/libq2/message"
 )
 
 func TestOpenMVD2File(t *testing.T) {
@@ -19,6 +17,7 @@ func TestOpenMVD2File(t *testing.T) {
 	demo.Close()
 }
 
+/*
 func TestParseMVD2(t *testing.T) {
 	demo, _ := OpenMVD2File("../testdata/test.mvd2")
 	cb := message.Callback{}
@@ -30,3 +29,4 @@ func TestParseMVD2(t *testing.T) {
 
 	demo.Close()
 }
+*/
