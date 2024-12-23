@@ -263,13 +263,13 @@ func (msg *Buffer) ReadString() string {
 
 	// find the next null (terminates the string)
 	for i := 0; msg.Data[msg.Index] != 0; i++ {
+		buffer.WriteString(string(msg.Data[msg.Index]))
+		msg.Index++
+
 		// we hit the end without finding a null
 		if msg.Index == len(msg.Data) {
 			break
 		}
-
-		buffer.WriteString(string(msg.Data[msg.Index]))
-		msg.Index++
 	}
 
 	msg.Index++
