@@ -222,19 +222,6 @@ func (m *Buffer) ParseServerData() *pb.ServerInfo {
 	}
 }
 
-/*
-func (sd ServerData) Marshal() *Buffer {
-	msg := Buffer{}
-	msg.WriteLong(sd.Protocol)
-	msg.WriteLong(sd.ServerCount)
-	msg.WriteByte(byte(sd.Demo))
-	msg.WriteString(sd.GameDir)
-	msg.WriteShort(uint16(sd.ClientNumber))
-	msg.WriteString(sd.MapName)
-	return &msg
-}
-*/
-
 // Configstrings are strings sent to each client and associated
 // with an index. They're referenced by index in various playces
 // such as layouts, etc.
