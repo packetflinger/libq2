@@ -897,7 +897,7 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 
 	msg.WriteByte(SVCPacketEntities)
 	for _, ent := range fr.GetEntities() {
-		DeltaEntity(&pb.PackedEntity{}, ent, &msg)
+		WriteDeltaEntity(&pb.PackedEntity{}, ent, &msg)
 	}
 	msg.WriteShort(0) // EoE
 

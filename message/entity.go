@@ -177,7 +177,7 @@ func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]
 	return out
 }
 
-func DeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *Buffer) {
+func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *Buffer) {
 	bits := DeltaEntityBitmask(to, from)
 
 	// write the bitmask first
