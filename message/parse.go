@@ -468,32 +468,6 @@ func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 	return fr
 }
 
-/*
-// A server-to-client message containing all entities the client should know
-// about for a particular frame
-func (m *Buffer) ParsePacketEntities(from *ServerFrame) []PackedEntity {
-	froments := map[int]PackedEntity{}
-	ents := []PackedEntity{}
-	for {
-		bits := m.ParseEntityBitmask()
-		num := m.ParseEntityNumber(bits)
-
-		if num <= 0 {
-			break
-		}
-
-		if from != nil {
-			froments = from.Entities
-		}
-
-		entity := m.ParseEntity(froments[int(num)], num, bits)
-		ents = append(ents, entity)
-	}
-
-	return ents
-}
-*/
-
 // ParsePacketEntities will parse an `SVC_PACKETENTITIES` msg. This is the
 // last of the 3-tuple of msgs sent from the server for each frame. There is no
 // delimiter between entities, once the entity is fully parsed it immediately
