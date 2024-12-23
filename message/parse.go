@@ -232,15 +232,6 @@ func (m *Buffer) ParseConfigString() *pb.CString {
 	}
 }
 
-/*
-func (cs ConfigString) Marshal() *Buffer {
-	msg := Buffer{}
-	msg.WriteShort(cs.Index)
-	msg.WriteString(cs.String)
-	return &msg
-}
-*/
-
 // A baseline is just a normal entity in its default state, from
 // a client's perspective
 func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
