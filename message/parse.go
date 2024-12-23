@@ -2,14 +2,12 @@ package message
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/proto"
 
 	pb "github.com/packetflinger/libq2/proto"
-	util "github.com/packetflinger/libq2/util"
 )
 
 const (
@@ -31,6 +29,7 @@ type Parser interface {
 	ApplyPacket(packet *pb.Packet)
 }
 
+/*
 // function pointers for each message type
 type Callback struct {
 	// message specific callbacks
@@ -58,7 +57,9 @@ type Callback struct {
 	// packetentities
 	FrameMap map[int]ServerFrame
 }
+*/
 
+/*
 type ServerFrame struct {
 	Server         ServerData
 	Frame          FrameMsg
@@ -76,7 +77,9 @@ type ServerFrame struct {
 	Flash1         []MuzzleFlash
 	Flash2         []MuzzleFlash
 }
+*/
 
+/*
 // This "header" is present for both demos and live connections.
 // Before being spawned in, the server will send a serverdata message,
 // then all the current configstrings, and known entities and their
@@ -88,7 +91,9 @@ type GamestateHeader struct {
 	Configstrings []ConfigString
 	Baselines     []PackedEntity
 }
+*/
 
+/*
 // always the first message received from server
 type ServerData struct {
 	Protocol     int32
@@ -201,6 +206,7 @@ type Layout struct {
 type CenterPrint struct {
 	Data string
 }
+*/
 
 type ChallengeResponse struct {
 	Number    int
@@ -396,6 +402,7 @@ func (m *Buffer) ParseServerData() *pb.ServerInfo {
 	}
 }
 
+/*
 func (sd ServerData) Marshal() *Buffer {
 	msg := Buffer{}
 	msg.WriteLong(sd.Protocol)
@@ -406,6 +413,7 @@ func (sd ServerData) Marshal() *Buffer {
 	msg.WriteString(sd.MapName)
 	return &msg
 }
+*/
 
 // Configstrings are strings sent to each client and associated
 // with an index. They're referenced by index in various playces
@@ -417,12 +425,14 @@ func (m *Buffer) ParseConfigString() *pb.CString {
 	}
 }
 
+/*
 func (cs ConfigString) Marshal() *Buffer {
 	msg := Buffer{}
 	msg.WriteShort(cs.Index)
 	msg.WriteString(cs.String)
 	return &msg
 }
+*/
 
 // A baseline is just a normal entity in its default state, from
 // a client's perspective
@@ -1003,6 +1013,7 @@ func (m *Buffer) ParseSound() *pb.PackedSound {
 	return s
 }
 
+/*
 // Figure out the difference between two playerstates
 func (to *PackedPlayer) DeltaPlayerstateBitmask(from *PackedPlayer) uint16 {
 	bits := uint16(0)
@@ -1071,7 +1082,9 @@ func (to *PackedPlayer) DeltaPlayerstateBitmask(from *PackedPlayer) uint16 {
 
 	return bits
 }
+*/
 
+/*
 // Build a playerstate message, but only the differences between to and from.
 func (msg *Buffer) WriteDeltaPlayerstate(to *PackedPlayer, from *PackedPlayer) {
 	bits := to.DeltaPlayerstateBitmask(from)
@@ -1167,7 +1180,9 @@ func (msg *Buffer) WriteDeltaPlayerstate(to *PackedPlayer, from *PackedPlayer) {
 		}
 	}
 }
+*/
 
+/*
 // Find the differences between these two Entities
 func (to *PackedEntity) DeltaEntityBitmask(from *PackedEntity) int {
 	bits := 0
@@ -1283,7 +1298,9 @@ func (to *PackedEntity) DeltaEntityBitmask(from *PackedEntity) int {
 
 	return bits
 }
+*/
 
+/*
 // Compare from and to and only write what's different.
 // This is "delta compression"
 func (m *Buffer) WriteDeltaEntity(from PackedEntity, to PackedEntity) {
@@ -1397,7 +1414,9 @@ func (m *Buffer) WriteDeltaEntity(from PackedEntity, to PackedEntity) {
 		m.WriteShort(uint16(to.Solid))
 	}
 }
+*/
 
+/*
 func (m *Buffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
 	m.WriteByte(SVCFrame)
 	m.WriteLong(to.Frame.Number)
@@ -1406,6 +1425,7 @@ func (m *Buffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
 	m.WriteByte(byte(to.Frame.AreaBytes))
 	m.WriteData(to.Frame.AreaBits)
 }
+*/
 
 func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
 	te := &pb.TemporaryEntity{}
@@ -1687,6 +1707,7 @@ func (msg *MessageBuffer) WriteDeltaMove(from *client.ClientMove, to *client.Cli
 }
 */
 
+/*
 // generate an SVG image from a layout message
 func (lo Layout) RenderSVG() {
 	fmt.Println("")
@@ -1786,6 +1807,7 @@ func (sf ServerFrame) MergeCopy() ServerFrame {
 	}
 	return nsf
 }
+*/
 
 // ParsePacket will parse all the messages in a particular server packet.
 func (p *Buffer) ParsePacket(oldFrames map[int32]*pb.Frame) (*pb.Packet, error) {
