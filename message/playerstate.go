@@ -57,3 +57,104 @@ func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
 	}
 	return bits
 }
+
+func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
+	bits := DeltaPlayerBitmask(from, to)
+	msg.WriteByte(SVCPlayerInfo)
+	msg.WriteShort(bits)
+
+	if bits&PlayerType > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetType()))
+	}
+
+	if bits&PlayerOrigin > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
+	}
+
+	if bits&PlayerVelocity > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
+	}
+
+	if bits&PlayerTime > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetTime()))
+	}
+
+	if bits&PlayerFlags > 0 {
+		msg.WriteByte(byte(to.GetMovestate().GetFlags()))
+	}
+
+	if bits&PlayerGravity > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetGravity()))
+	}
+
+	if bits&PlayerDeltaAngles > 0 {
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
+		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
+	}
+
+	if bits&PlayerViewOffset > 0 {
+		msg.WriteChar(uint8(to.GetViewOffsetX()))
+		msg.WriteChar(uint8(to.GetViewOffsetY()))
+		msg.WriteChar(uint8(to.GetViewOffsetZ()))
+	}
+
+	if bits&PlayerViewAngles > 0 {
+		msg.WriteShort(uint16(to.GetViewAnglesX()))
+		msg.WriteShort(uint16(to.GetViewAnglesY()))
+		msg.WriteShort(uint16(to.GetViewAnglesZ()))
+	}
+
+	if bits&PlayerKickAngles > 0 {
+		msg.WriteChar(uint8(to.GetKickAnglesX()))
+		msg.WriteChar(uint8(to.GetKickAnglesY()))
+		msg.WriteChar(uint8(to.GetKickAnglesZ()))
+	}
+
+	if bits&PlayerWeaponIndex > 0 {
+		msg.WriteByte(byte(to.GetGunIndex()))
+	}
+
+	if bits&PlayerWeaponFrame > 0 {
+		msg.WriteByte(byte(to.GetGunFrame()))
+		msg.WriteChar(uint8(to.GetGunOffsetX()))
+		msg.WriteChar(uint8(to.GetGunOffsetY()))
+		msg.WriteChar(uint8(to.GetGunOffsetZ()))
+		msg.WriteChar(uint8(to.GetGunAnglesX()))
+		msg.WriteChar(uint8(to.GetGunAnglesY()))
+		msg.WriteChar(uint8(to.GetGunAnglesZ()))
+	}
+
+	if bits&PlayerBlend > 0 {
+		msg.WriteByte(byte(to.GetBlendW()))
+		msg.WriteByte(byte(to.GetBlendX()))
+		msg.WriteByte(byte(to.GetBlendY()))
+		msg.WriteByte(byte(to.GetBlendZ()))
+	}
+
+	if bits&PlayerFOV > 0 {
+		msg.WriteByte(byte(to.GetFov()))
+	}
+
+	if bits&PlayerRDFlags > 0 {
+		msg.WriteByte(byte(to.GetRdFlags()))
+	}
+
+	statbits := uint32(0)
+	var i uint32
+	for i = 0; i < MaxStats; i++ {
+		if to.GetStats()[i] != from.GetStats()[i] {
+			statbits |= 1 << i
+		}
+	}
+	msg.WriteLong(int32(statbits))
+	for i = 0; i < MaxStats; i++ {
+		if (bits & (1 << i)) > 0 {
+			msg.WriteShort(uint16(to.GetStats()[i]))
+		}
+	}
+}
