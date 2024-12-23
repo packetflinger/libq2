@@ -27,11 +27,6 @@ type Parser interface {
 	ApplyPacket(packet *pb.Packet)
 }
 
-type ChallengeResponse struct {
-	Number    int
-	Protocols []int // protocols support by server (34=orig, 35=r1q2, 36=q2pro)
-}
-
 func (m *Buffer) ParseServerData() *pb.ServerInfo {
 	return &pb.ServerInfo{
 		Protocol:     m.ReadULong(),
@@ -322,30 +317,38 @@ func (m *Buffer) ParseCenterPrint() *pb.CenterPrint {
 	}
 }
 
-func (m *Buffer) ParseChallenge() (ChallengeResponse, error) {
+// This the first server-to-client message after client issues "getchallenge"
+// when initiating a connection.
+//
+// Example response: ÿÿÿÿchallenge 910908644 p=34,35,36
+func (m *Buffer) ParseChallenge() (*pb.Challenge, error) {
 	cl := m.ReadLong()
 	if cl != -1 {
-		return ChallengeResponse{}, errors.New("not connectionless message, invalid challenge response")
+		return nil, errors.New("not connectionless message, invalid challenge response")
 	}
-
-	tokens := strings.Fields(string(m.ReadString()))
-	num, err := strconv.Atoi(tokens[1])
-	if err != nil {
-		return ChallengeResponse{}, errors.New("invalid challenge response")
-	}
-
-	pr := []int{}
-	protocols := strings.Split(tokens[2][2:], ",")
-	for _, p := range protocols {
-		pint, err := strconv.Atoi(p)
+	line := m.ReadString()
+	tokens := strings.Fields(line)
+	chal := int32(0)
+	if len(tokens) > 1 {
+		num, err := strconv.Atoi(tokens[1])
 		if err != nil {
-			continue
+			return nil, errors.New("invalid challenge response")
 		}
-		pr = append(pr, pint)
+		chal = int32(num)
 	}
-
-	return ChallengeResponse{
-		Number:    num,
+	pr := []int32{}
+	if len(tokens) > 2 {
+		protocols := strings.Split(tokens[2][2:], ",")
+		for _, p := range protocols {
+			pint, err := strconv.Atoi(p)
+			if err != nil {
+				continue
+			}
+			pr = append(pr, int32(pint))
+		}
+	}
+	return &pb.Challenge{
+		Number:    chal,
 		Protocols: pr,
 	}, nil
 }
