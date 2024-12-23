@@ -20,3 +20,14 @@ func (m *Buffer) ParseEntityBitmask() uint32 {
 
 	return uint32(bits)
 }
+
+func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
+	num := uint16(0)
+	if flags&EntityNumber16 != 0 {
+		num = uint16(m.ReadShort())
+	} else {
+		num = uint16(m.ReadByte())
+	}
+
+	return num
+}

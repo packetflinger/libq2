@@ -442,17 +442,6 @@ func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
 	return m.ParseEntity(&pb.PackedEntity{}, number, bitmask)
 }
 
-func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
-	num := uint16(0)
-	if flags&EntityNumber16 != 0 {
-		num = uint16(m.ReadShort())
-	} else {
-		num = uint16(m.ReadByte())
-	}
-
-	return num
-}
-
 /*
 func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
 	to := proto.Clone(from).(*pb.PackedEntity)
