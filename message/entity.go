@@ -147,3 +147,32 @@ func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb
 	}
 	return to
 }
+
+// ParsePacketEntities will parse an `SVC_PACKETENTITIES` msg. This is the
+// last of the 3-tuple of msgs sent from the server for each frame. There is no
+// delimiter between entities, once the entity is fully parsed it immediately
+// moves on to the next. If the entity number is 0, the end of the clod of ents
+// has been reached.
+//
+// This has to decompress entities as they're parsed or else there is no way to
+// tell new values from existing. This makes it impossible to decompress all
+// entities after the fact.
+func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
+	out := make(map[int32]*pb.PackedEntity)
+	for k := range from {
+		out[k] = proto.Clone(from[k]).(*pb.PackedEntity)
+	}
+	for {
+		bits := m.ParseEntityBitmask()
+		num := m.ParseEntityNumber(bits)
+		if num <= 0 {
+			break
+		}
+		orig, ok := out[int32(num)]
+		if !ok {
+			orig = &pb.PackedEntity{}
+		}
+		out[int32(num)] = m.ParseEntity(orig, num, bits)
+	}
+	return out
+}
