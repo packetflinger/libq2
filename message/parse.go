@@ -308,17 +308,6 @@ func (m *Buffer) ParseSound() *pb.PackedSound {
 	return s
 }
 
-/*
-func (m *Buffer) WriteDeltaFrame(from *ServerFrame, to *ServerFrame) {
-	m.WriteByte(SVCFrame)
-	m.WriteLong(to.Frame.Number)
-	m.WriteLong(from.Frame.Number)
-	m.WriteByte(byte(to.Frame.Suppressed))
-	m.WriteByte(byte(to.Frame.AreaBytes))
-	m.WriteData(to.Frame.AreaBits)
-}
-*/
-
 func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
 	te := &pb.TemporaryEntity{}
 	te.Type = uint32(m.ReadByte())
