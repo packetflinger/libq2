@@ -182,90 +182,91 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 
 // WriteDeltaPlayer will convert the changes between the `from` and `to`
 // playerstates from a textproto to binary that q2 clients understand.
-func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
+func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
+	b := Buffer{}
 	bits := DeltaPlayerBitmask(from, to)
-	msg.WriteByte(SVCPlayerInfo)
-	msg.WriteShort(bits)
+	b.WriteByte(SVCPlayerInfo)
+	b.WriteShort(bits)
 
 	if bits&PlayerType > 0 {
-		msg.WriteByte(byte(to.GetMovestate().GetType()))
+		b.WriteByte(byte(to.GetMovestate().GetType()))
 	}
 
 	if bits&PlayerOrigin > 0 {
-		msg.WriteShort(uint16(to.GetMovestate().GetOriginX()))
-		msg.WriteShort(uint16(to.GetMovestate().GetOriginY()))
-		msg.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
+		b.WriteShort(uint16(to.GetMovestate().GetOriginX()))
+		b.WriteShort(uint16(to.GetMovestate().GetOriginY()))
+		b.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
 	}
 
 	if bits&PlayerVelocity > 0 {
-		msg.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
-		msg.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
-		msg.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
+		b.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
+		b.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
+		b.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
 	}
 
 	if bits&PlayerTime > 0 {
-		msg.WriteByte(byte(to.GetMovestate().GetTime()))
+		b.WriteByte(byte(to.GetMovestate().GetTime()))
 	}
 
 	if bits&PlayerFlags > 0 {
-		msg.WriteByte(byte(to.GetMovestate().GetFlags()))
+		b.WriteByte(byte(to.GetMovestate().GetFlags()))
 	}
 
 	if bits&PlayerGravity > 0 {
-		msg.WriteShort(uint16(to.GetMovestate().GetGravity()))
+		b.WriteShort(uint16(to.GetMovestate().GetGravity()))
 	}
 
 	if bits&PlayerDeltaAngles > 0 {
-		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
-		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
-		msg.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
+		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
+		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
+		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
 	}
 
 	if bits&PlayerViewOffset > 0 {
-		msg.WriteChar(uint8(to.GetViewOffsetX()))
-		msg.WriteChar(uint8(to.GetViewOffsetY()))
-		msg.WriteChar(uint8(to.GetViewOffsetZ()))
+		b.WriteChar(uint8(to.GetViewOffsetX()))
+		b.WriteChar(uint8(to.GetViewOffsetY()))
+		b.WriteChar(uint8(to.GetViewOffsetZ()))
 	}
 
 	if bits&PlayerViewAngles > 0 {
-		msg.WriteShort(uint16(to.GetViewAnglesX()))
-		msg.WriteShort(uint16(to.GetViewAnglesY()))
-		msg.WriteShort(uint16(to.GetViewAnglesZ()))
+		b.WriteShort(uint16(to.GetViewAnglesX()))
+		b.WriteShort(uint16(to.GetViewAnglesY()))
+		b.WriteShort(uint16(to.GetViewAnglesZ()))
 	}
 
 	if bits&PlayerKickAngles > 0 {
-		msg.WriteChar(uint8(to.GetKickAnglesX()))
-		msg.WriteChar(uint8(to.GetKickAnglesY()))
-		msg.WriteChar(uint8(to.GetKickAnglesZ()))
+		b.WriteChar(uint8(to.GetKickAnglesX()))
+		b.WriteChar(uint8(to.GetKickAnglesY()))
+		b.WriteChar(uint8(to.GetKickAnglesZ()))
 	}
 
 	if bits&PlayerWeaponIndex > 0 {
-		msg.WriteByte(byte(to.GetGunIndex()))
+		b.WriteByte(byte(to.GetGunIndex()))
 	}
 
 	if bits&PlayerWeaponFrame > 0 {
-		msg.WriteByte(byte(to.GetGunFrame()))
-		msg.WriteChar(uint8(to.GetGunOffsetX()))
-		msg.WriteChar(uint8(to.GetGunOffsetY()))
-		msg.WriteChar(uint8(to.GetGunOffsetZ()))
-		msg.WriteChar(uint8(to.GetGunAnglesX()))
-		msg.WriteChar(uint8(to.GetGunAnglesY()))
-		msg.WriteChar(uint8(to.GetGunAnglesZ()))
+		b.WriteByte(byte(to.GetGunFrame()))
+		b.WriteChar(uint8(to.GetGunOffsetX()))
+		b.WriteChar(uint8(to.GetGunOffsetY()))
+		b.WriteChar(uint8(to.GetGunOffsetZ()))
+		b.WriteChar(uint8(to.GetGunAnglesX()))
+		b.WriteChar(uint8(to.GetGunAnglesY()))
+		b.WriteChar(uint8(to.GetGunAnglesZ()))
 	}
 
 	if bits&PlayerBlend > 0 {
-		msg.WriteByte(byte(to.GetBlendW()))
-		msg.WriteByte(byte(to.GetBlendX()))
-		msg.WriteByte(byte(to.GetBlendY()))
-		msg.WriteByte(byte(to.GetBlendZ()))
+		b.WriteByte(byte(to.GetBlendW()))
+		b.WriteByte(byte(to.GetBlendX()))
+		b.WriteByte(byte(to.GetBlendY()))
+		b.WriteByte(byte(to.GetBlendZ()))
 	}
 
 	if bits&PlayerFOV > 0 {
-		msg.WriteByte(byte(to.GetFov()))
+		b.WriteByte(byte(to.GetFov()))
 	}
 
 	if bits&PlayerRDFlags > 0 {
-		msg.WriteByte(byte(to.GetRdFlags()))
+		b.WriteByte(byte(to.GetRdFlags()))
 	}
 
 	statbits := uint32(0)
@@ -278,10 +279,11 @@ func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
 		}
 	}
 
-	msg.WriteLong(int32(statbits))
+	b.WriteLong(int32(statbits))
 	for i = 0; i < MaxStats; i++ {
 		if (statbits & (1 << i)) != 0 {
-			msg.WriteShort(uint16(toStats[i]))
+			b.WriteShort(uint16(toStats[i]))
 		}
 	}
+	return b
 }

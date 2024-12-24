@@ -717,7 +717,7 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 	}
 
 	// from state is empty
-	WriteDeltaPlayer(&pb.PackedPlayer{}, fr.PlayerState, &msg)
+	msg.Append(WriteDeltaPlayer(nil, fr.PlayerState))
 
 	msg.WriteByte(SVCPacketEntities)
 	for _, ent := range fr.GetEntities() {
