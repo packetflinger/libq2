@@ -66,8 +66,12 @@ func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
 	return bits
 }
 
-// ParseDeltaPlayerstateProto will merge a previous playerstate with one parsed
+// ParseDeltaPlayerstate will merge a previous playerstate with one parsed
 // from the receiver. Only the changed values are copied.
+//
+// The merge (decompression) has to happen at parse-time because values can
+// change TO zero, and after parsing is complete there is no way to tell if
+// a zero is a new value or a missing value.
 func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	to := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
