@@ -5,6 +5,13 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// DeltaPlayerBitmask will return a bitmask representing the difference between
+// two playerstates. This way only differences are transmitted from server to
+// client to save bandwidth/processing since playerstates are emitted on every
+// frame (every 100ms by default, and down to every 20ms for q2pro on protocol
+// 36).
+//
+// The bitmask is an unsigned short
 func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
 	bits := uint16(0)
 	mf := from.GetMovestate()
