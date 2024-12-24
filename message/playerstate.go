@@ -9,7 +9,7 @@ import (
 // two playerstates. This way only differences are transmitted from server to
 // client to save bandwidth/processing since playerstates are emitted on every
 // frame (every 100ms by default, and down to every 20ms for q2pro on protocol
-// 36).
+// 36). This is used for both parsing and writing playerstates.
 //
 // The bitmask is an unsigned short
 func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
@@ -180,9 +180,9 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	return to
 }
 
-// WriteDeltaPlayer will convert the changes between the `from` and `to`
+// WriteDeltaPlayerstate will convert the changes between the `from` and `to`
 // playerstates from a textproto to binary that q2 clients understand.
-func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
+func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	b := Buffer{}
 	bits := DeltaPlayerBitmask(from, to)
 	b.WriteByte(SVCPlayerInfo)
