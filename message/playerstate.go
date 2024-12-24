@@ -180,6 +180,8 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	return to
 }
 
+// WriteDeltaPlayer will convert the changes between the `from` and `to`
+// playerstates from a textproto to binary that q2 clients understand.
 func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
 	bits := DeltaPlayerBitmask(from, to)
 	msg.WriteByte(SVCPlayerInfo)
