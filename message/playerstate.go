@@ -159,7 +159,7 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 
 	statbits := int32(m.ReadLong())
 	var i uint32
-	for i = 0; i < 32; i++ {
+	for i = 0; i < MaxStats; i++ {
 		if statbits&(1<<i) != 0 {
 			stats[i] = int32(m.ReadShort())
 		}
@@ -256,16 +256,19 @@ func WriteDeltaPlayer(from *pb.PackedPlayer, to *pb.PackedPlayer, msg *Buffer) {
 	}
 
 	statbits := uint32(0)
+	toStats := to.GetStats()
+	fromStats := from.GetStats()
 	var i uint32
 	for i = 0; i < MaxStats; i++ {
-		if to.GetStats()[i] != from.GetStats()[i] {
+		if toStats[i] != fromStats[i] {
 			statbits |= 1 << i
 		}
 	}
+
 	msg.WriteLong(int32(statbits))
 	for i = 0; i < MaxStats; i++ {
-		if (bits & (1 << i)) > 0 {
-			msg.WriteShort(uint16(to.GetStats()[i]))
+		if (statbits & (1 << i)) != 0 {
+			msg.WriteShort(uint16(toStats[i]))
 		}
 	}
 }
