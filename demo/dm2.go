@@ -194,13 +194,13 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 
 	textpb := demo.GetTextProto()
 
-	packet.Append(ServerDataToBinary(textpb.Serverinfo))
+	packet.Append(message.MarshalServerData(textpb.Serverinfo))
 	for i := 0; i < MaxConfigStrings; i++ {
 		cs, ok := textpb.Configstrings[int32(i)]
 		if !ok {
 			continue
 		}
-		tmp := ConfigstringToBinary(cs)
+		tmp := message.MarshalConfigstring(cs)
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	for i := 0; i < MaxEdicts; i++ {
@@ -209,11 +209,11 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 			continue
 		}
 		tmp := message.Buffer{Data: []byte{SvcSpawnBaseline}}
-		tmp.Append(EntityToBinary(bl))
+		message.WriteDeltaEntity(nil, bl, &tmp)
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	tmp := message.Buffer{Data: []byte{SvcStuffText}}
-	tmp.Append(StuffTextToBinary(&pb.StuffText{String_: "precache\n"}))
+	tmp.Append(message.MarshalStuffText(&pb.StuffText{String_: "precache\n"}))
 	buildDemoPacket(&out, &packet, tmp, false)
 
 	frameNum := int32(0)
@@ -224,7 +224,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 		if !ok {
 			continue
 		}
-		tmp := FrameToBinary(fr)
+		tmp := message.MarshalFrame(fr)
 		buildDemoPacket(&out, &packet, tmp, true)
 		total++
 	}

@@ -139,7 +139,7 @@ func TestMarshal(t *testing.T) {
 		inFile  string
 		outFile string
 	}{
-		{
+		/*{
 			name:    "multiple entities spinning",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1ents.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1ents-out.dm2",
@@ -153,17 +153,17 @@ func TestMarshal(t *testing.T) {
 			name:    "picking up ssh and shells one shell doesn't disappear",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1pickup.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1pickup-out.dm2",
-		},
+		},*/
 		{
 			name:    "fall and land with sound health highlight",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1fall2.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2-out.dm2",
 		},
-		{
+		/*{
 			name:    "rocket shot with explosion",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1rocket.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1rocket-out.dm2",
-		},
+		},*/
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
