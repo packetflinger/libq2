@@ -313,7 +313,7 @@ func (m *Buffer) ParseInventory() {
 // A string that should appear temporarily in the center of the screen
 func (m *Buffer) ParseCenterPrint() *pb.CenterPrint {
 	return &pb.CenterPrint{
-		String_: m.ReadString(),
+		Data: m.ReadString(),
 	}
 }
 
@@ -701,7 +701,7 @@ func MarshalSound(s *pb.PackedSound) Buffer {
 
 func MarshalCenterPrint(cp *pb.CenterPrint) Buffer {
 	b := Buffer{}
-	b.WriteString(cp.GetString_())
+	b.WriteString(cp.GetData())
 	return b
 }
 

@@ -167,5 +167,5 @@ message Layout {
 }
 
 message CenterPrint {
-    string string = 1;
+    string data = 1;
 }
