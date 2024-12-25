@@ -163,7 +163,7 @@ message MuzzleFlash {
 }
 
 message Layout {
-    string string = 1;
+    string data = 1;
 }
 
 message CenterPrint {

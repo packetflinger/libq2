@@ -299,7 +299,7 @@ func (m *Buffer) ParseMuzzleFlash() *pb.MuzzleFlash {
 // stats, etc is an example
 func (m *Buffer) ParseLayout() *pb.Layout {
 	return &pb.Layout{
-		String_: m.ReadString(),
+		Data: m.ReadString(),
 	}
 }
 
@@ -671,7 +671,7 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 
 func MarshalLayout(lo *pb.Layout) Buffer {
 	b := Buffer{}
-	b.WriteString(lo.GetString_())
+	b.WriteString(lo.GetData())
 	return b
 }
 
