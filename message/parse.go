@@ -689,7 +689,7 @@ func MarshalSound(s *pb.PackedSound) Buffer {
 		b.WriteByte(byte(s.GetTimeOffset()))
 	}
 	if (s.GetFlags() & SoundEntity) > 0 {
-		b.WriteShort(uint16(s.GetEntity()<<3 + s.GetChannel()))
+		b.WriteShort(uint16((s.GetEntity() << 3) + s.GetChannel()))
 	}
 	if (s.GetFlags() & SoundPosition) > 0 {
 		b.WriteCoord(uint16(s.GetPositionX()))
