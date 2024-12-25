@@ -57,7 +57,7 @@ func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
 }
 
 func (m *Buffer) ParseStuffText() *pb.StuffText {
-	return &pb.StuffText{String_: m.ReadString()}
+	return &pb.StuffText{Data: m.ReadString()}
 }
 
 func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
@@ -473,7 +473,7 @@ func MarshalConfigstring(cs *pb.ConfigString) Buffer {
 
 func MarshalStuffText(st *pb.StuffText) Buffer {
 	b := Buffer{}
-	b.WriteString(st.GetString_())
+	b.WriteString(st.GetData())
 	return b
 }
 

@@ -27,7 +27,7 @@ message ConfigString {
 }
 
 message StuffText {
-    string string = 1;
+    string data = 1;
 }
 
 // an edict_t packed up and ready for xfer
