@@ -27,14 +27,15 @@ func (m *Buffer) ParseEntityBitmask() uint32 {
 	return uint32(bits)
 }
 
+// ParseEntityNumber will read the edict number of an entity. This number will
+// be between 1 and MaxEntities. Entity 0 is the world.
 func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
 	num := uint16(0)
-	if flags&EntityNumber16 != 0 {
+	if (flags & EntityNumber16) != 0 {
 		num = uint16(m.ReadShort())
 	} else {
 		num = uint16(m.ReadByte())
 	}
-
 	return num
 }
 
