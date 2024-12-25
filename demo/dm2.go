@@ -209,7 +209,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 			continue
 		}
 		tmp := message.Buffer{Data: []byte{SvcSpawnBaseline}}
-		message.WriteDeltaEntity(nil, bl, &tmp)
+		tmp.Append(message.WriteDeltaEntity(nil, bl))
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	tmp := message.Buffer{Data: []byte{SvcStuffText}}

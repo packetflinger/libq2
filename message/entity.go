@@ -180,116 +180,118 @@ func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]
 
 // WriteDeltaEntity will emit the differences between `from` and `to` as binary
 // that q2 clients can understand.
-func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *Buffer) {
+func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
+	b := Buffer{}
 	bits := DeltaEntityBitmask(to, from)
 
 	// write the bitmask first
-	m.WriteByte(byte(bits & 255))
-	if bits&0xff000000 > 0 {
-		m.WriteByte(byte((bits >> 8) & 255))
-		m.WriteByte(byte((bits >> 16) & 255))
-		m.WriteByte(byte((bits >> 24) & 255))
-	} else if bits&0x00ff0000 > 0 {
-		m.WriteByte(byte((bits >> 8) & 255))
-		m.WriteByte(byte((bits >> 16) & 255))
-	} else if bits&0x0000ff00 > 0 {
-		m.WriteByte(byte((bits >> 8) & 255))
+	b.WriteByte(byte(bits & 255))
+	if (bits & 0xff000000) > 0 {
+		b.WriteByte(byte((bits >> 8) & 255))
+		b.WriteByte(byte((bits >> 16) & 255))
+		b.WriteByte(byte((bits >> 24) & 255))
+	} else if (bits & 0x00ff0000) > 0 {
+		b.WriteByte(byte((bits >> 8) & 255))
+		b.WriteByte(byte((bits >> 16) & 255))
+	} else if (bits & 0x0000ff00) > 0 {
+		b.WriteByte(byte((bits >> 8) & 255))
 	}
 
 	// write the edict number
-	if bits&EntityNumber16 > 0 {
-		m.WriteShort(uint16(to.GetNumber()))
+	if (bits & EntityNumber16) > 0 {
+		b.WriteShort(uint16(to.GetNumber()))
 	} else {
-		m.WriteByte(byte(to.GetNumber()))
+		b.WriteByte(byte(to.GetNumber()))
 	}
 
-	if bits&EntityModel > 0 {
-		m.WriteByte(byte(to.GetModelIndex()))
+	if (bits & EntityModel) > 0 {
+		b.WriteByte(byte(to.GetModelIndex()))
 	}
 
-	if bits&EntityModel2 > 0 {
-		m.WriteByte(byte(to.GetModelIndex2()))
+	if (bits & EntityModel2) > 0 {
+		b.WriteByte(byte(to.GetModelIndex2()))
 	}
 
-	if bits&EntityModel3 > 0 {
-		m.WriteByte(byte(to.GetModelIndex3()))
+	if (bits & EntityModel3) > 0 {
+		b.WriteByte(byte(to.GetModelIndex3()))
 	}
 
-	if bits&EntityModel4 > 0 {
-		m.WriteByte(byte(to.GetModelIndex4()))
+	if (bits & EntityModel4) > 0 {
+		b.WriteByte(byte(to.GetModelIndex4()))
 	}
 
-	if bits&EntityFrame8 > 0 {
-		m.WriteByte(byte(to.GetFrame()))
-	} else if bits&EntityFrame16 > 0 {
-		m.WriteShort(uint16(to.GetFrame()))
+	if (bits & EntityFrame8) > 0 {
+		b.WriteByte(byte(to.GetFrame()))
+	} else if (bits & EntityFrame16) > 0 {
+		b.WriteShort(uint16(to.GetFrame()))
 	}
 
 	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
-		m.WriteLong(int32(to.GetSkin()))
-	} else if bits&EntitySkin8 > 0 {
-		m.WriteByte(byte(to.GetSkin()))
-	} else if bits&EntitySkin16 > 0 {
-		m.WriteShort(uint16(to.GetSkin()))
+		b.WriteLong(int32(to.GetSkin()))
+	} else if (bits & EntitySkin8) > 0 {
+		b.WriteByte(byte(to.GetSkin()))
+	} else if (bits & EntitySkin16) > 0 {
+		b.WriteShort(uint16(to.GetSkin()))
 	}
 
 	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
-		m.WriteLong(int32(to.GetEffects()))
-	} else if bits&EntityEffects8 > 0 {
-		m.WriteByte(byte(to.GetEffects()))
-	} else if bits&EntityEffects16 > 0 {
-		m.WriteShort(uint16(to.GetEffects()))
+		b.WriteLong(int32(to.GetEffects()))
+	} else if (bits & EntityEffects8) > 0 {
+		b.WriteByte(byte(to.GetEffects()))
+	} else if (bits & EntityEffects16) > 0 {
+		b.WriteShort(uint16(to.GetEffects()))
 	}
 
 	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
-		m.WriteLong(int32(to.GetRenderFx()))
-	} else if bits&EntityRenderFX8 > 0 {
-		m.WriteByte(byte(to.GetRenderFx()))
-	} else if bits&EntityRenderFX16 > 0 {
-		m.WriteShort(uint16(to.GetRenderFx()))
+		b.WriteLong(int32(to.GetRenderFx()))
+	} else if (bits & EntityRenderFX8) > 0 {
+		b.WriteByte(byte(to.GetRenderFx()))
+	} else if (bits & EntityRenderFX16) > 0 {
+		b.WriteShort(uint16(to.GetRenderFx()))
 	}
 
-	if bits&EntityOrigin1 > 0 {
-		m.WriteShort(uint16(to.GetOriginX()))
+	if (bits & EntityOrigin1) > 0 {
+		b.WriteShort(uint16(to.GetOriginX()))
 	}
 
-	if bits&EntityOrigin2 > 0 {
-		m.WriteShort(uint16(to.GetOriginY()))
+	if (bits & EntityOrigin2) > 0 {
+		b.WriteShort(uint16(to.GetOriginY()))
 	}
 
-	if bits&EntityOrigin3 > 0 {
-		m.WriteShort(uint16(to.GetOriginZ()))
+	if (bits & EntityOrigin3) > 0 {
+		b.WriteShort(uint16(to.GetOriginZ()))
 	}
 
-	if bits&EntityAngle1 > 0 {
-		m.WriteByte(byte(to.GetAngleX()))
+	if (bits & EntityAngle1) > 0 {
+		b.WriteByte(byte(to.GetAngleX()))
 	}
 
-	if bits&EntityAngle2 > 0 {
-		m.WriteByte(byte(to.GetAngleY()))
+	if (bits & EntityAngle2) > 0 {
+		b.WriteByte(byte(to.GetAngleY()))
 	}
 
-	if bits&EntityAngle3 > 0 {
-		m.WriteByte(byte(to.GetAngleZ()))
+	if (bits & EntityAngle3) > 0 {
+		b.WriteByte(byte(to.GetAngleZ()))
 	}
 
-	if bits&EntityOldOrigin > 0 {
-		m.WriteShort(uint16(to.GetOldOriginX()))
-		m.WriteShort(uint16(to.GetOldOriginY()))
-		m.WriteShort(uint16(to.GetOldOriginZ()))
+	if (bits & EntityOldOrigin) > 0 {
+		b.WriteShort(uint16(to.GetOldOriginX()))
+		b.WriteShort(uint16(to.GetOldOriginY()))
+		b.WriteShort(uint16(to.GetOldOriginZ()))
 	}
 
-	if bits&EntitySound > 0 {
-		m.WriteByte(byte(to.GetSound()))
+	if (bits & EntitySound) > 0 {
+		b.WriteByte(byte(to.GetSound()))
 	}
 
-	if bits&EntityEvent > 0 {
-		m.WriteByte(byte(to.GetEvent()))
+	if (bits & EntityEvent) > 0 {
+		b.WriteByte(byte(to.GetEvent()))
 	}
 
-	if bits&EntitySolid > 0 {
-		m.WriteShort(uint16(to.GetSolid()))
+	if (bits & EntitySolid) > 0 {
+		b.WriteShort(uint16(to.GetSolid()))
 	}
+	return b
 }
 
 func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
