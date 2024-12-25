@@ -178,6 +178,8 @@ func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]
 	return out
 }
 
+// WriteDeltaEntity will emit the differences between `from` and `to` as binary
+// that q2 clients can understand.
 func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity, m *Buffer) {
 	bits := DeltaEntityBitmask(to, from)
 
