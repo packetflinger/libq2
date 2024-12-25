@@ -41,10 +41,10 @@ func (m *Buffer) ParseServerData() *pb.ServerInfo {
 // Configstrings are strings sent to each client and associated
 // with an index. They're referenced by index in various playces
 // such as layouts, etc.
-func (m *Buffer) ParseConfigString() *pb.CString {
-	return &pb.CString{
-		Index:   uint32(m.ReadShort()),
-		String_: m.ReadString(),
+func (m *Buffer) ParseConfigString() *pb.ConfigString {
+	return &pb.ConfigString{
+		Index: uint32(m.ReadShort()),
+		Data:  m.ReadString(),
 	}
 }
 
@@ -463,11 +463,11 @@ func MarshalServerData(s *pb.ServerInfo) Buffer {
 	return b
 }
 
-func MarshalConfigstring(cs *pb.CString) Buffer {
+func MarshalConfigstring(cs *pb.ConfigString) Buffer {
 	b := Buffer{}
 	b.WriteByte(SVCConfigString)
 	b.WriteShort(uint16(cs.GetIndex()))
-	b.WriteString(cs.GetString_())
+	b.WriteString(cs.GetData())
 	return b
 }
 

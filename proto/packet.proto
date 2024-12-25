@@ -9,7 +9,7 @@ import "server_message.proto";
 // Represents all the gamestate messages from a single server packet
 message Packet {
     repeated Frame frames = 1; // includes playerstate and packetentities
-    repeated CString config_strings = 2;
+    repeated ConfigString config_strings = 2;
     repeated Print prints = 3;
     repeated PackedSound sounds = 4;
     repeated TemporaryEntity temp_ents = 5;
