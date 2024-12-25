@@ -39,7 +39,7 @@ func NewDM2Demo(filename string) (*DM2Parser, error) {
 	demo := &DM2Parser{binaryData: data}
 	demo.textProto = &pb.DM2Demo{}
 	demo.textProto.Baselines = make(map[int32]*pb.PackedEntity)
-	demo.textProto.Configstrings = make(map[int32]*pb.CString)
+	demo.textProto.Configstrings = make(map[int32]*pb.ConfigString)
 	demo.textProto.Frames = make(map[int32]*pb.Frame)
 	return demo, nil
 }
@@ -75,7 +75,7 @@ func (d *DM2Parser) ApplyPacket(packet *pb.Packet) error {
 	if len(cstrings) > 0 {
 		if d.currentFrame > 0 {
 			if d.textProto.GetFrames()[d.currentFrame].Configstrings == nil {
-				d.textProto.GetFrames()[d.currentFrame].Configstrings = make(map[int32]*pb.CString)
+				d.textProto.GetFrames()[d.currentFrame].Configstrings = make(map[int32]*pb.ConfigString)
 			}
 			for _, cs := range cstrings {
 				d.textProto.GetFrames()[d.currentFrame].Configstrings[int32(cs.GetIndex())] = cs
@@ -213,7 +213,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
 	tmp := message.Buffer{Data: []byte{SvcStuffText}}
-	tmp.Append(message.MarshalStuffText(&pb.StuffText{String_: "precache\n"}))
+	tmp.Append(message.MarshalStuffText(&pb.StuffText{Data: "precache\n"}))
 	buildDemoPacket(&out, &packet, tmp, false)
 
 	frameNum := int32(0)
