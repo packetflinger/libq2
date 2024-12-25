@@ -731,7 +731,7 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 		msg.WriteByte(SVCMuzzleFlash)
 		msg.Append(tmp)
 	}
-	// monster-basd muzzle flashes
+	// monster-based muzzle flashes
 	for _, flash := range fr.GetFlashes2() {
 		tmp := MarshalFlash(flash)
 		msg.WriteByte(SVCMuzzleFlash2)
