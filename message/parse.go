@@ -84,8 +84,8 @@ func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 
 func (m *Buffer) ParsePrint() *pb.Print {
 	return &pb.Print{
-		Level:   uint32(m.ReadByte()),
-		String_: m.ReadString(),
+		Level: uint32(m.ReadByte()),
+		Data:  m.ReadString(),
 	}
 }
 
@@ -480,7 +480,7 @@ func MarshalStuffText(st *pb.StuffText) Buffer {
 func MarshalPrint(p *pb.Print) Buffer {
 	b := Buffer{}
 	b.WriteByte(byte(p.GetLevel()))
-	b.WriteString(p.GetString_())
+	b.WriteString(p.GetData())
 	return b
 }
 

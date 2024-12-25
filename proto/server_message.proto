@@ -121,7 +121,7 @@ message Frame {
 
 message Print {
     uint32 level = 1;       // 8 bits
-    string string = 2;
+    string data = 2;
 }
 
 // Start a sound playing
