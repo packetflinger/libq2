@@ -307,6 +307,12 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	bits := uint32(0)
 	mask := uint32(0xffff8000)
+	if to == nil {
+		to = &pb.PackedEntity{}
+	}
+	if from == nil {
+		from = &pb.PackedEntity{}
+	}
 
 	if to.GetRemove() {
 		bits |= EntityRemove
