@@ -10,21 +10,17 @@ import (
 // previous ones. This value tells you what data is in the rest
 // of the entity message.
 func (m *Buffer) ParseEntityBitmask() uint32 {
-	bits := uint32(m.ReadByte())
-
-	if bits&EntityMoreBits1 != 0 {
-		bits |= (uint32(m.ReadByte()) << 8)
+	mask := uint32(m.ReadByte())
+	if (mask & EntityMoreBits1) != 0 {
+		mask |= (uint32(m.ReadByte()) << 8)
 	}
-
-	if bits&EntityMoreBits2 != 0 {
-		bits |= (uint32(m.ReadByte()) << 16)
+	if (mask & EntityMoreBits2) != 0 {
+		mask |= (uint32(m.ReadByte()) << 16)
 	}
-
-	if bits&EntityMoreBits3 != 0 {
-		bits |= (uint32(m.ReadByte()) << 24)
+	if (mask & EntityMoreBits3) != 0 {
+		mask |= (uint32(m.ReadByte()) << 24)
 	}
-
-	return uint32(bits)
+	return mask
 }
 
 // ParseEntityNumber will read the edict number of an entity. This number will
