@@ -91,65 +91,65 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 			to.Stats[k] = v
 		}
 	}
-	bits := m.ReadWord()
+	mask := m.ReadWord()
 
-	if bits&PlayerType != 0 {
+	if (mask & PlayerType) != 0 {
 		pm.Type = uint32(m.ReadByte())
 	}
 
-	if bits&PlayerOrigin != 0 {
+	if (mask & PlayerOrigin) != 0 {
 		pm.OriginX = int32(m.ReadShort())
 		pm.OriginY = int32(m.ReadShort())
 		pm.OriginZ = int32(m.ReadShort())
 	}
 
-	if bits&PlayerVelocity != 0 {
+	if (mask & PlayerVelocity) != 0 {
 		pm.VelocityX = uint32(m.ReadShort())
 		pm.VelocityY = uint32(m.ReadShort())
 		pm.VelocityZ = uint32(m.ReadShort())
 	}
 
-	if bits&PlayerTime != 0 {
+	if (mask & PlayerTime) != 0 {
 		pm.Time = uint32(m.ReadByte())
 	}
 
-	if bits&PlayerFlags != 0 {
+	if (mask & PlayerFlags) != 0 {
 		pm.Flags = uint32(m.ReadByte())
 	}
 
-	if bits&PlayerGravity != 0 {
+	if (mask & PlayerGravity) != 0 {
 		pm.Gravity = int32(m.ReadShort())
 	}
 
-	if bits&PlayerDeltaAngles != 0 {
+	if (mask & PlayerDeltaAngles) != 0 {
 		pm.DeltaAngleX = int32(m.ReadShort())
 		pm.DeltaAngleY = int32(m.ReadShort())
 		pm.DeltaAngleZ = int32(m.ReadShort())
 	}
 
-	if bits&PlayerViewOffset != 0 {
+	if (mask & PlayerViewOffset) != 0 {
 		to.ViewOffsetX = int32(m.ReadChar())
 		to.ViewOffsetY = int32(m.ReadChar())
 		to.ViewOffsetZ = int32(m.ReadChar())
 	}
 
-	if bits&PlayerViewAngles != 0 {
+	if (mask & PlayerViewAngles) != 0 {
 		to.ViewAnglesX = int32(m.ReadShort())
 		to.ViewAnglesY = int32(m.ReadShort())
 		to.ViewAnglesZ = int32(m.ReadShort())
 	}
 
-	if bits&PlayerKickAngles != 0 {
+	if (mask & PlayerKickAngles) != 0 {
 		to.KickAnglesX = int32(m.ReadChar())
 		to.KickAnglesY = int32(m.ReadChar())
 		to.KickAnglesZ = int32(m.ReadChar())
 	}
 
-	if bits&PlayerWeaponIndex != 0 {
+	if (mask & PlayerWeaponIndex) != 0 {
 		to.GunIndex = uint32(m.ReadByte())
 	}
 
-	if bits&PlayerWeaponFrame != 0 {
+	if (mask & PlayerWeaponFrame) != 0 {
 		to.GunFrame = uint32(m.ReadByte())
 		to.GunOffsetX = int32(m.ReadChar())
 		to.GunOffsetY = int32(m.ReadChar())
@@ -159,25 +159,25 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 		to.GunAnglesZ = int32(m.ReadChar())
 	}
 
-	if bits&PlayerBlend != 0 {
+	if (mask & PlayerBlend) != 0 {
 		to.BlendW = int32(m.ReadChar())
 		to.BlendX = int32(m.ReadChar())
 		to.BlendY = int32(m.ReadChar())
 		to.BlendZ = int32(m.ReadChar())
 	}
 
-	if bits&PlayerFOV != 0 {
+	if (mask & PlayerFOV) != 0 {
 		to.Fov = uint32(m.ReadByte())
 	}
 
-	if bits&PlayerRDFlags != 0 {
+	if (mask & PlayerRDFlags) != 0 {
 		to.RdFlags = uint32(m.ReadByte())
 	}
 
-	statbits := int32(m.ReadLong())
+	statsMask := int32(m.ReadLong())
 	var i uint32
 	for i = 0; i < MaxStats; i++ {
-		if statbits&(1<<i) != 0 {
+		if (statsMask & (1 << i)) != 0 {
 			stats[i] = int32(m.ReadShort())
 		}
 	}
