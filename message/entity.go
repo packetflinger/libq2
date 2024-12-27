@@ -49,97 +49,97 @@ func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb
 		return to
 	}
 
-	if bits&EntityModel != 0 {
+	if (bits & EntityModel) != 0 {
 		to.ModelIndex = uint32(m.ReadByte())
 	}
 
-	if bits&EntityModel2 != 0 {
+	if (bits & EntityModel2) != 0 {
 		to.ModelIndex2 = uint32(m.ReadByte())
 	}
 
-	if bits&EntityModel3 != 0 {
+	if (bits & EntityModel3) != 0 {
 		to.ModelIndex3 = uint32(m.ReadByte())
 	}
 
-	if bits&EntityModel4 != 0 {
+	if (bits & EntityModel4) != 0 {
 		to.ModelIndex4 = uint32(m.ReadByte())
 	}
 
-	if bits&EntityFrame8 != 0 {
+	if (bits & EntityFrame8) != 0 {
 		to.Frame = uint32(m.ReadByte())
 	}
 
-	if bits&EntityFrame16 != 0 {
+	if (bits & EntityFrame16) != 0 {
 		to.Frame = uint32(m.ReadShort())
 	}
 
 	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
 		to.Skin = uint32(m.ReadLong())
-	} else if bits&EntitySkin8 != 0 {
+	} else if (bits & EntitySkin8) != 0 {
 		to.Skin = uint32(m.ReadByte())
-	} else if bits&EntitySkin16 != 0 {
+	} else if (bits & EntitySkin16) != 0 {
 		to.Skin = uint32(m.ReadWord())
 	}
 
 	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
 		to.Effects = uint32(m.ReadLong())
-	} else if bits&EntityEffects8 != 0 {
+	} else if (bits & EntityEffects8) != 0 {
 		to.Effects = uint32(m.ReadByte())
-	} else if bits&EntityEffects16 != 0 {
+	} else if (bits & EntityEffects16) != 0 {
 		to.Effects = uint32(m.ReadWord())
 	}
 
 	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
 		to.RenderFx = uint32(m.ReadLong())
-	} else if bits&EntityRenderFX8 != 0 {
+	} else if (bits & EntityRenderFX8) != 0 {
 		to.RenderFx = uint32(m.ReadByte())
-	} else if bits&EntityRenderFX16 != 0 {
+	} else if (bits & EntityRenderFX16) != 0 {
 		to.RenderFx = uint32(m.ReadWord())
 	}
 
-	if bits&EntityOrigin1 != 0 {
+	if (bits & EntityOrigin1) != 0 {
 		to.OriginX = int32(m.ReadShort())
 	}
 
-	if bits&EntityOrigin2 != 0 {
+	if (bits & EntityOrigin2) != 0 {
 		to.OriginY = int32(m.ReadShort())
 	}
 
-	if bits&EntityOrigin3 != 0 {
+	if (bits & EntityOrigin3) != 0 {
 		to.OriginZ = int32(m.ReadShort())
 	}
 
-	if bits&EntityAngle1 != 0 {
+	if (bits & EntityAngle1) != 0 {
 		to.AngleX = int32(m.ReadByte())
 	}
 
-	if bits&EntityAngle2 != 0 {
+	if (bits & EntityAngle2) != 0 {
 		to.AngleY = int32(m.ReadByte())
 	}
 
-	if bits&EntityAngle3 != 0 {
+	if (bits & EntityAngle3) != 0 {
 		to.AngleZ = int32(m.ReadByte())
 	}
 
-	if bits&EntityOldOrigin != 0 {
+	if (bits & EntityOldOrigin) != 0 {
 		to.OldOriginX = int32(m.ReadShort())
 		to.OldOriginY = int32(m.ReadShort())
 		to.OldOriginZ = int32(m.ReadShort())
 	}
 
-	if bits&EntitySound != 0 {
+	if (bits & EntitySound) != 0 {
 		to.Sound = uint32(m.ReadByte())
 	}
 
-	if bits&EntityEvent != 0 {
+	if (bits & EntityEvent) != 0 {
 		to.Event = uint32(m.ReadByte())
 	}
 
-	if bits&EntitySolid != 0 {
+	if (bits & EntitySolid) != 0 {
 		to.Solid = uint32(m.ReadWord())
 	}
 
-	if bits&EntityRemove != 0 {
+	if (bits & EntityRemove) != 0 {
 		to.Remove = true
 	}
 	return to
