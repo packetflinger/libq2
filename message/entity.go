@@ -290,6 +290,8 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	return b
 }
 
+// DeltaEntityBitmask will return the bitmask representing the differences
+// between the `to` and `from` entities.
 func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	bits := uint32(0)
 	mask := uint32(0xffff8000)
@@ -323,9 +325,9 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetSkin() != from.GetSkin() {
-		if to.GetSkin()&mask > 0 {
+		if (to.GetSkin() & mask) > 0 {
 			bits |= EntitySkin8 | EntitySkin16
-		} else if to.GetSkin()&uint32(0x0000ff00) > 0 {
+		} else if (to.GetSkin() & uint32(0x0000ff00)) > 0 {
 			bits |= EntitySkin16
 		} else {
 			bits |= EntitySkin8
@@ -333,7 +335,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetFrame() != from.GetFrame() {
-		if uint16(to.GetFrame())&uint16(0xff00) > 0 {
+		if (uint16(to.GetFrame()) & uint16(0xff00)) > 0 {
 			bits |= EntityFrame16
 		} else {
 			bits |= EntityFrame8
@@ -341,9 +343,9 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.Effects != from.Effects {
-		if to.Effects&mask > 0 {
+		if (to.Effects & mask) > 0 {
 			bits |= EntityEffects8 | EntityEffects16
-		} else if to.Effects&0x0000ff00 > 0 {
+		} else if (to.Effects & 0x0000ff00) > 0 {
 			bits |= EntityEffects16
 		} else {
 			bits |= EntityEffects8
@@ -351,9 +353,9 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetRenderFx() != from.GetRenderFx() {
-		if to.GetRenderFx()&mask > 0 {
+		if (to.GetRenderFx() & mask) > 0 {
 			bits |= EntityRenderFX8 | EntityRenderFX16
-		} else if to.GetRenderFx()&0x0000ff00 > 0 {
+		} else if (to.GetRenderFx() & 0x0000ff00) > 0 {
 			bits |= EntityRenderFX16
 		} else {
 			bits |= EntityRenderFX8
@@ -388,21 +390,21 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 		bits |= EntitySound
 	}
 
-	if to.GetRenderFx()&RFFrameLerp > 0 {
+	if (to.GetRenderFx() & RFFrameLerp) > 0 {
 		bits |= EntityOldOrigin
-	} else if to.GetRenderFx()&RFBeam > 0 {
+	} else if (to.GetRenderFx() & RFBeam) > 0 {
 		bits |= EntityOldOrigin
 	}
 
-	if to.GetNumber()&0xff00 > 0 {
+	if (to.GetNumber() & 0xff00) > 0 {
 		bits |= EntityNumber16
 	}
 
-	if bits&0xff000000 > 0 {
+	if (bits & 0xff000000) > 0 {
 		bits |= EntityMoreBits3 | EntityMoreBits2 | EntityMoreBits1
-	} else if bits&0x00ff0000 > 0 {
+	} else if (bits & 0x00ff0000) > 0 {
 		bits |= EntityMoreBits2 | EntityMoreBits1
-	} else if bits&0x0000ff00 > 0 {
+	} else if (bits & 0x0000ff00) > 0 {
 		bits |= EntityMoreBits1
 	}
 
