@@ -45,6 +45,9 @@ func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
 // PackedEntity proto. It uses the `from` param to decompress, this acts as a
 // baseline, applies the changes and returns a clone of that full PackedEntity.
 func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb.PackedEntity {
+	if m.Index == m.Length {
+		return nil
+	}
 	to := &pb.PackedEntity{}
 	if from != nil {
 		to = proto.Clone(from).(*pb.PackedEntity)
