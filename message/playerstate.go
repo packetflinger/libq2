@@ -76,11 +76,17 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	to := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
 	stats := make(map[uint32]int32)
-
+	if m.Index == m.Length { // end of buffer (or empty buffer)
+		return nil
+	}
 	if from != nil {
 		to = proto.Clone(from).(*pb.PackedPlayer)
 		// proto.Clone() isn't deep, sub-protos need to be copied manually
 		pm = proto.Clone(from.Movestate).(*pb.PlayerMove)
+		if pm == nil {
+			// from might not have playermove defined
+			pm = &pb.PlayerMove{}
+		}
 		for k, v := range from.GetStats() {
 			to.Stats[k] = v
 		}
