@@ -190,67 +190,67 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 // playerstates from a textproto to binary that q2 clients understand.
 func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	b := Buffer{}
-	bits := DeltaPlayerBitmask(from, to)
+	mask := DeltaPlayerBitmask(from, to)
 	b.WriteByte(SVCPlayerInfo)
-	b.WriteShort(bits)
+	b.WriteShort(mask)
 
-	if bits&PlayerType > 0 {
+	if (mask & PlayerType) > 0 {
 		b.WriteByte(byte(to.GetMovestate().GetType()))
 	}
 
-	if bits&PlayerOrigin > 0 {
+	if (mask & PlayerOrigin) > 0 {
 		b.WriteShort(uint16(to.GetMovestate().GetOriginX()))
 		b.WriteShort(uint16(to.GetMovestate().GetOriginY()))
 		b.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
 	}
 
-	if bits&PlayerVelocity > 0 {
+	if (mask & PlayerVelocity) > 0 {
 		b.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
 		b.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
 		b.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
 	}
 
-	if bits&PlayerTime > 0 {
+	if (mask & PlayerTime) > 0 {
 		b.WriteByte(byte(to.GetMovestate().GetTime()))
 	}
 
-	if bits&PlayerFlags > 0 {
+	if (mask & PlayerFlags) > 0 {
 		b.WriteByte(byte(to.GetMovestate().GetFlags()))
 	}
 
-	if bits&PlayerGravity > 0 {
+	if (mask & PlayerGravity) > 0 {
 		b.WriteShort(uint16(to.GetMovestate().GetGravity()))
 	}
 
-	if bits&PlayerDeltaAngles > 0 {
+	if (mask & PlayerDeltaAngles) > 0 {
 		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
 		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
 		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
 	}
 
-	if bits&PlayerViewOffset > 0 {
+	if (mask & PlayerViewOffset) > 0 {
 		b.WriteChar(uint8(to.GetViewOffsetX()))
 		b.WriteChar(uint8(to.GetViewOffsetY()))
 		b.WriteChar(uint8(to.GetViewOffsetZ()))
 	}
 
-	if bits&PlayerViewAngles > 0 {
+	if (mask & PlayerViewAngles) > 0 {
 		b.WriteShort(uint16(to.GetViewAnglesX()))
 		b.WriteShort(uint16(to.GetViewAnglesY()))
 		b.WriteShort(uint16(to.GetViewAnglesZ()))
 	}
 
-	if bits&PlayerKickAngles > 0 {
+	if (mask & PlayerKickAngles) > 0 {
 		b.WriteChar(uint8(to.GetKickAnglesX()))
 		b.WriteChar(uint8(to.GetKickAnglesY()))
 		b.WriteChar(uint8(to.GetKickAnglesZ()))
 	}
 
-	if bits&PlayerWeaponIndex > 0 {
+	if (mask & PlayerWeaponIndex) > 0 {
 		b.WriteByte(byte(to.GetGunIndex()))
 	}
 
-	if bits&PlayerWeaponFrame > 0 {
+	if (mask & PlayerWeaponFrame) > 0 {
 		b.WriteByte(byte(to.GetGunFrame()))
 		b.WriteChar(uint8(to.GetGunOffsetX()))
 		b.WriteChar(uint8(to.GetGunOffsetY()))
@@ -260,34 +260,34 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 		b.WriteChar(uint8(to.GetGunAnglesZ()))
 	}
 
-	if bits&PlayerBlend > 0 {
+	if (mask & PlayerBlend) > 0 {
 		b.WriteByte(byte(to.GetBlendW()))
 		b.WriteByte(byte(to.GetBlendX()))
 		b.WriteByte(byte(to.GetBlendY()))
 		b.WriteByte(byte(to.GetBlendZ()))
 	}
 
-	if bits&PlayerFOV > 0 {
+	if (mask & PlayerFOV) > 0 {
 		b.WriteByte(byte(to.GetFov()))
 	}
 
-	if bits&PlayerRDFlags > 0 {
+	if (mask & PlayerRDFlags) > 0 {
 		b.WriteByte(byte(to.GetRdFlags()))
 	}
 
-	statbits := uint32(0)
+	statsMask := uint32(0)
 	toStats := to.GetStats()
 	fromStats := from.GetStats()
 	var i uint32
 	for i = 0; i < MaxStats; i++ {
 		if toStats[i] != fromStats[i] {
-			statbits |= 1 << i
+			statsMask |= 1 << i
 		}
 	}
 
-	b.WriteLong(int32(statbits))
+	b.WriteLong(int32(statsMask))
 	for i = 0; i < MaxStats; i++ {
-		if (statbits & (1 << i)) != 0 {
+		if (statsMask & (1 << i)) != 0 {
 			b.WriteShort(uint16(toStats[i]))
 		}
 	}
