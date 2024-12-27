@@ -164,6 +164,9 @@ func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb
 // tell new values from existing. This makes it impossible to decompress all
 // entities after the fact.
 func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]*pb.PackedEntity {
+	if m.Index == m.Length {
+		return nil
+	}
 	out := make(map[int32]*pb.PackedEntity)
 	for k := range from {
 		out[k] = proto.Clone(from[k]).(*pb.PackedEntity)
