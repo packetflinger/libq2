@@ -24,19 +24,8 @@ func main() {
 	}
 
 	for _, frame := range dm2.GetTextProto().GetFrames() {
-		fmt.Println("frame!")
 		for _, print := range frame.GetPrints() {
-			fmt.Println(print.GetString_())
+			fmt.Println(print.GetData())
 		}
 	}
-	// set a callback for parsing prints
-	/*callback := message.MessageCallbacks{
-		Print: func(p *message.Print) {
-			fmt.Println(util.ConvertHighChars(p.String[:len(p.String)-1]))
-		},
-	}*/
-
-	// parse all demo messages running our callback function
-	// every time a print message is found
-	//demo.ParseDM2(callback)
 }
