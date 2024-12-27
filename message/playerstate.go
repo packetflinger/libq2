@@ -281,7 +281,7 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	var i uint32
 	for i = 0; i < MaxStats; i++ {
 		if toStats[i] != fromStats[i] {
-			statsMask |= 1 << i
+			statsMask |= (1 << i)
 		}
 	}
 
