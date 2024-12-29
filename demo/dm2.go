@@ -14,18 +14,12 @@ import (
 )
 
 type DM2Parser struct {
-	textProto      *pb.DM2Demo    // uncompressed
-	binaryData     []byte         // .dm2 file contents
-	binaryPosition int            // where in those contents we are
-	currentFrame   int32          // index of frames map
-	callbacks      map[int]func() // index is svc_msg type
+	textProto      *pb.DM2Demo       // uncompressed
+	binaryData     []byte            // .dm2 file contents
+	binaryPosition int               // where in those contents we are
+	currentFrame   int32             // index of frames map
+	callbacks      map[int]func(any) // index is svc_msg type
 }
-
-/*
-type DM2Writer struct {
-	textProto *pb.DM2Demo
-}
-*/
 
 // Read the entire binary demo file into memory
 func NewDM2Demo(filename string) (*DM2Parser, error) {
@@ -247,7 +241,7 @@ func buildDemoPacket(final, packet *message.Buffer, msg message.Buffer, force bo
 	packet.Append(msg)
 }
 
-func (p *DM2Parser) RegisterCallback(msgtype int, dofunc func()) {
+func (p *DM2Parser) RegisterCallback(msgtype int, dofunc func(any)) {
 	p.callbacks[msgtype] = dofunc
 }
 
