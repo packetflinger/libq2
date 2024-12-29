@@ -23,6 +23,14 @@ const (
 	PrintLevelChat   = 3
 )
 
+const (
+	CallbackOnConnect = iota + SVCNumTypes
+	CallbackOnBegin
+	CallbackOnMention // a print containing our name
+	CallbackOnDamage  // someone shot us
+	CallbackOnDie     // we're dead
+)
+
 type Parser interface {
 	ApplyPacket(packet *pb.Packet)
 }
