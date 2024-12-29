@@ -241,10 +241,23 @@ func buildDemoPacket(final, packet *message.Buffer, msg message.Buffer, force bo
 	packet.Append(msg)
 }
 
-func (p *DM2Parser) RegisterCallback(msgtype int, dofunc func(any)) {
-	p.callbacks[msgtype] = dofunc
+// RegisterCallback allows for a custom function to be called at specific
+// points while a demo is being parsed.
+//
+// `event` is an index corresponding to what you want your callback to be
+// associated with. These match up with the SVC* server messages.
+//
+// `dofunc` is the function definition to be called at that event. The argument
+// is set to `any` to accept any type, but this arg should be the parsed server
+// message proto. Inside the dofunc, the arg will need to be casted to the
+// appropriate type. Something like:
+//
+// printMsg := argname.(*pb.Print)
+func (p *DM2Parser) RegisterCallback(event int, dofunc func(any)) {
+	p.callbacks[event] = dofunc
 }
 
+// Dynamically remove a particular callback
 func (p *DM2Parser) UnregisterCallback(msgtype int) {
 	delete(p.callbacks, msgtype)
 }
