@@ -765,49 +765,40 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 
 	// player-based muzzle flashes
 	for _, flash := range fr.GetFlashes1() {
-		tmp := MarshalFlash(flash)
 		msg.WriteByte(SVCMuzzleFlash)
-		msg.Append(tmp)
+		msg.Append(MarshalFlash(flash))
 	}
 	// monster-based muzzle flashes
 	for _, flash := range fr.GetFlashes2() {
-		tmp := MarshalFlash(flash)
 		msg.WriteByte(SVCMuzzleFlash2)
-		msg.Append(tmp)
+		msg.Append(MarshalFlash(flash))
 	}
 	for _, ent := range fr.GetTemporaryEntities() {
-		tmp := MarshalTempEntity(ent)
 		msg.WriteByte(SVCTempEntity)
-		msg.Append(tmp)
+		msg.Append(MarshalTempEntity(ent))
 	}
 	for _, layout := range fr.GetLayouts() {
-		tmp := MarshalLayout(layout)
 		msg.WriteByte(SVCLayout)
-		msg.Append(tmp)
+		msg.Append(MarshalLayout(layout))
 	}
 	for _, sound := range fr.GetSounds() {
-		tmp := MarshalSound(sound)
 		msg.WriteByte(SVCSound)
-		msg.Append(tmp)
+		msg.Append(MarshalSound(sound))
 	}
 	for _, print := range fr.GetPrints() {
-		tmp := MarshalPrint(print)
 		msg.WriteByte(SVCPrint)
-		msg.Append(tmp)
+		msg.Append(MarshalPrint(print))
 	}
 	for _, stuff := range fr.GetStufftexts() {
-		tmp := MarshalStuffText(stuff)
 		msg.WriteByte(SVCStuffText)
-		msg.Append(tmp)
+		msg.Append(MarshalStuffText(stuff))
 	}
 	for _, cs := range fr.GetConfigstrings() {
-		tmp := MarshalConfigstring(cs)
-		msg.Append(tmp)
+		msg.Append(MarshalConfigstring(cs))
 	}
 	for _, cp := range fr.GetCenterprints() {
-		tmp := MarshalCenterPrint(cp)
 		msg.WriteByte(SVCCenterPrint)
-		msg.Append(tmp)
+		msg.Append(MarshalCenterPrint(cp))
 	}
 	return msg
 }
