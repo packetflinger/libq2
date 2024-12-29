@@ -36,41 +36,6 @@ const (
 	SVCNumTypes  // r1q2/q2pro
 )
 
-// entity state flags
-const (
-	EntityOrigin1   = 1 << 0
-	EntityOrigin2   = 1 << 1
-	EntityAngle2    = 1 << 2
-	EntityAngle3    = 1 << 3
-	EntityFrame8    = 1 << 4
-	EntityEvent     = 1 << 5
-	EntityRemove    = 1 << 6
-	EntityMoreBits1 = 1 << 7
-
-	EntityNumber16  = 1 << 8
-	EntityOrigin3   = 1 << 9
-	EntityAngle1    = 1 << 10
-	EntityModel     = 1 << 11
-	EntityRenderFX8 = 1 << 12
-	EntityAngle16   = 1 << 13
-	EntityEffects8  = 1 << 14
-	EntityMoreBits2 = 1 << 15
-
-	EntitySkin8      = 1 << 16
-	EntityFrame16    = 1 << 17
-	EntityRenderFX16 = 1 << 18
-	EntityEffects16  = 1 << 19
-	EntityModel2     = 1 << 20
-	EntityModel3     = 1 << 21
-	EntityModel4     = 1 << 22
-	EntityMoreBits3  = 1 << 23
-
-	EntityOldOrigin = 1 << 24
-	EntitySkin16    = 1 << 25
-	EntitySound     = 1 << 26
-	EntitySolid     = 1 << 27
-)
-
 // playerstate flags
 const (
 	PlayerType        = 1 << 0
