@@ -35,6 +35,9 @@ type Parser interface {
 	ApplyPacket(packet *pb.Packet)
 }
 
+// The ServerData message is the first one sent from the server to the client
+// after the client connects. It contains info about the protocol used, the
+// current map name (not the map filename), etc.
 func (m *Buffer) ParseServerData() *pb.ServerInfo {
 	return &pb.ServerInfo{
 		Protocol:     m.ReadULong(),
@@ -64,10 +67,20 @@ func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
 	return m.ParseEntity(&pb.PackedEntity{}, number, bitmask)
 }
 
+// Stuffs are a way for the server to force a client to execute a command. If
+// a client is connected to a server, it will do anything the server tells it
+// to via a StuffText message. Anything a player can type into their console
+// can be stuff'd to them, including harmful things like `disconnect` or
+// `set rate "10"`.
 func (m *Buffer) ParseStuffText() *pb.StuffText {
 	return &pb.StuffText{Data: m.ReadString()}
 }
 
+// Frame message are sent from the server to each client every 0.1 seconds (100
+// milliseconds), this is the server's default framerate. Each fram will
+// contain info about that frame (the number, the number of the frame it was
+// compressed against, areabits, etc), and also the current playerstate and
+// copy of all entities that changed since the delta frame.
 func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 	fr := &pb.Frame{}
 	fr.Number = int32(m.ReadLong())
@@ -90,6 +103,10 @@ func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 	return fr
 }
 
+// Print messages are sent from the server to all clients when there is
+// something that should be printed in the console of all clients. This
+// includes player chat, obituaries, inventory (out of ammo, cant switch to
+// the railgun).
 func (m *Buffer) ParsePrint() *pb.Print {
 	return &pb.Print{
 		Level: uint32(m.ReadByte()),
@@ -132,6 +149,8 @@ func (m *Buffer) ParseSound() *pb.PackedSound {
 	return s
 }
 
+// Temporary entities include things like explosions, sparks, and things like
+// projectiles (rockets).
 func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
 	te := &pb.TemporaryEntity{}
 	te.Type = uint32(m.ReadByte())
@@ -293,7 +312,8 @@ func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
 	return te
 }
 
-// A gun fired, nearby clients should see the flash
+// A gun fired, nearby clients should see the flash. Monsters also produce
+// muzzle flashes when they shoot, but only in single-player mode.
 func (m *Buffer) ParseMuzzleFlash() *pb.MuzzleFlash {
 	return &pb.MuzzleFlash{
 		Entity: uint32(m.ReadShort()),
@@ -455,6 +475,7 @@ func (p *Buffer) ParsePacket(oldFrames map[int32]*pb.Frame) (*pb.Packet, error) 
 	return out, nil
 }
 
+// Write a ServerData proto back to binary
 func MarshalServerData(s *pb.ServerInfo) Buffer {
 	b := Buffer{}
 	b.WriteByte(SVCServerData)
@@ -471,6 +492,7 @@ func MarshalServerData(s *pb.ServerInfo) Buffer {
 	return b
 }
 
+// Write a Configstring proto back to binary
 func MarshalConfigstring(cs *pb.ConfigString) Buffer {
 	b := Buffer{}
 	b.WriteByte(SVCConfigString)
@@ -479,12 +501,14 @@ func MarshalConfigstring(cs *pb.ConfigString) Buffer {
 	return b
 }
 
+// Write a StuffText proto back to binary
 func MarshalStuffText(st *pb.StuffText) Buffer {
 	b := Buffer{}
 	b.WriteString(st.GetData())
 	return b
 }
 
+// Write a Print proto back to binary
 func MarshalPrint(p *pb.Print) Buffer {
 	b := Buffer{}
 	b.WriteByte(byte(p.GetLevel()))
@@ -492,6 +516,7 @@ func MarshalPrint(p *pb.Print) Buffer {
 	return b
 }
 
+// Write a Muzzleflash proto back to binary
 func MarshalFlash(mf *pb.MuzzleFlash) Buffer {
 	b := Buffer{}
 	b.WriteShort(uint16(mf.GetEntity()))
@@ -499,6 +524,7 @@ func MarshalFlash(mf *pb.MuzzleFlash) Buffer {
 	return b
 }
 
+// Write a TempEntity proto back to binary
 func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	b := Buffer{}
 	b.WriteByte(byte(te.GetType()))
@@ -677,12 +703,14 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	return b
 }
 
+// Write a Layout proto back to binary
 func MarshalLayout(lo *pb.Layout) Buffer {
 	b := Buffer{}
 	b.WriteString(lo.GetData())
 	return b
 }
 
+// Write a PackedSound proto back to binary
 func MarshalSound(s *pb.PackedSound) Buffer {
 	b := Buffer{}
 	b.WriteByte(byte(s.GetFlags()))
@@ -707,12 +735,14 @@ func MarshalSound(s *pb.PackedSound) Buffer {
 	return b
 }
 
+// Write a Centerprint proto back to binary
 func MarshalCenterPrint(cp *pb.CenterPrint) Buffer {
 	b := Buffer{}
 	b.WriteString(cp.GetData())
 	return b
 }
 
+// Write a Frame proto (including playerstate and entities) back to binary
 func MarshalFrame(fr *pb.Frame) Buffer {
 	msg := Buffer{}
 	msg.WriteByte(SVCFrame)
