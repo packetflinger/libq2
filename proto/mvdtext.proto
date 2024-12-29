@@ -1,5 +1,5 @@
 // compile with:
-// protoc --go_out=. --go_opt=paths=source_relative *.proto
+// protoc --go_out=. --go_opt=paths=source_relative mvdtext.proto
 syntax="proto3";
 
 option go_package = "github.com/packetflinger/libq2/proto";
@@ -15,10 +15,10 @@ message ServerData {
 }
 
 message BaseStrings {
-    repeated ConfigString configstring = 1;
+    repeated ConfigString2 configstring = 1;
 }
 
-message ConfigString {
+message ConfigString2 {
     uint64 index = 1;
     string str = 2;
 }

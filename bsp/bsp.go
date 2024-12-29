@@ -39,7 +39,7 @@ type BSPFile struct {
 	Name       string // just the filename minus extension (ex: "q2dm1")
 	Filename   string // including any path prefix and .bsp extension
 	Handle     *os.File
-	Header     m.MessageBuffer
+	Header     m.Buffer
 	LumpMeta   [19]BSPLumpMeta
 	LumpData   [19]BSPLumpData
 	Ents       []BSPEntity
@@ -55,7 +55,7 @@ type BSPLumpMeta struct {
 }
 
 type BSPLumpData struct {
-	Data m.MessageBuffer
+	Data m.Buffer
 }
 
 func OpenBSPFile(f string) (*BSPFile, error) {
@@ -80,7 +80,7 @@ func OpenBSPFile(f string) (*BSPFile, error) {
 		Name:     ftokens[0],
 		Filename: f,
 		Handle:   fp,
-		Header:   m.NewMessageBuffer(header),
+		Header:   m.NewBuffer(header),
 	}
 
 	bsp.ParseLumpMetadata()
@@ -137,8 +137,8 @@ func (bsp *BSPFile) ParseLumpData() error {
 		}
 
 		bsp.LumpData[i] = BSPLumpData{
-			Data: m.MessageBuffer{
-				Buffer: data,
+			Data: m.Buffer{
+				Data: data,
 			},
 		}
 	}

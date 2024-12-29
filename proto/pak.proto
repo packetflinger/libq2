@@ -1,0 +1,23 @@
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative pak.proto
+syntax="proto3";
+option go_package = "github.com/packetflinger/libq2/proto";
+package proto;
+
+// Represents a .pak file that contains other files
+message PAKArchive {
+    // The name of the particular pak file (including extension) ex: pak0.pak
+    string name = 1;
+    // Just a description of what this archive is for
+    repeated string description = 2;
+    // All the files in the archive
+    repeated PAKFile files = 3;
+}
+
+// An individual file contained within a PAK archive
+message PAKFile {
+    // the name of the file in the archive. Ex: fart2.wav
+    string name = 1;
+    // the actual binary data
+    bytes data = 2;
+}

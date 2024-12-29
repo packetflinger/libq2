@@ -45,7 +45,7 @@ func (bsp *BSPFile) FetchEntities() []BSPEntity {
 }
 
 func (bsp *BSPFile) FetchEntityString() string {
-	return string(bsp.LumpData[EntityLump].Data.Buffer)
+	return string(bsp.LumpData[EntityLump].Data.Data)
 }
 
 func (bsp *BSPFile) BuildEntityString() string {

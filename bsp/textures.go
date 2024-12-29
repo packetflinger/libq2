@@ -8,7 +8,7 @@ type BSPTexture struct {
 // TODO: parse the location and orientation data too
 func (bsp *BSPFile) FetchTextures() []BSPTexture {
 	lump := bsp.LumpData[TextureLump].Data
-	qty := len(lump.Buffer) / TextureLen
+	qty := len(lump.Data) / TextureLen
 	var textures []BSPTexture
 	lump.Index = 0
 	for i := 0; i < qty; i++ {

@@ -87,7 +87,7 @@ type MVD2File struct {
 	Filename string
 	Handle   *os.File
 	Position int // needed?
-	Msg      *message.MessageBuffer
+	Msg      *message.Buffer
 }
 
 type MVDGameState struct {
@@ -98,7 +98,7 @@ type MVDGameState struct {
 	ServerCount   uint32
 	ClientNumber  uint16
 	GameDir       string
-	ConfigStrings []message.ConfigString
+	ConfigStrings []*pb.ConfigString
 	// configstring linked list?
 	// baseframe linked list?
 }
@@ -120,7 +120,7 @@ func OpenMVD2File(f string) (*MVD2File, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg := message.NewMessageBuffer(buffer)
+	msg := message.NewBuffer(buffer)
 	if msg.ReadLong() != MVDMagic {
 		return nil, errors.New("not a valid multi-view demo file")
 	}
@@ -140,7 +140,8 @@ func (d *MVD2File) Close() {
 	}
 }
 
-func (d *MVD2File) Parse(extcb message.MessageCallbacks) error {
+/*
+func (d *MVD2File) Parse(extcb message.Callback) error {
 	//intcb := d.InternalCallbacks()
 	for {
 		lump, size, err := d.nextLump(d.Handle, int64(d.Position))
@@ -151,22 +152,25 @@ func (d *MVD2File) Parse(extcb message.MessageCallbacks) error {
 			break
 		}
 		d.Position += size
-		buffer := message.NewMessageBuffer(lump)
+		buffer := message.NewBuffer(lump)
 		d.Msg = &buffer
 
 		d.ParseLump(buffer)
 	}
 	return nil
 }
+*/
 
+/*
 // Setup the callbacks for demo parsing. Stores data in the appropriate
 // spots as it's parsed for later use.
 //
 // You can't just parse each frame independently, the current frame depends
 // on a previous frame for delta compression (usually the last one).
-func (d *MVD2File) InternalCallbacks() message.MessageCallbacks {
-	return message.MessageCallbacks{}
+func (d *MVD2File) InternalCallbacks() message.Callback {
+	return message.Callback{}
 }
+*/
 
 func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 	_, err := f.Seek(pos, 0)
@@ -180,7 +184,7 @@ func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 		return []byte{}, 0, err
 	}
 
-	lenbuf := message.MessageBuffer{Buffer: lumplen, Index: 0}
+	lenbuf := message.Buffer{Data: lumplen, Index: 0}
 	length := lenbuf.ReadShort()
 
 	// EOF
@@ -202,8 +206,8 @@ func (d *MVD2File) nextLump(f *os.File, pos int64) ([]byte, int, error) {
 	return lump, read + 2, nil
 }
 
-func (d *MVD2File) ParseLump(buf message.MessageBuffer) {
-	for buf.Index < len(buf.Buffer) {
+func (d *MVD2File) ParseLump(buf message.Buffer) {
+	for buf.Index < len(buf.Data) {
 		cmd := buf.ReadByte()
 		bits := cmd >> MVD2CMDBits
 		cmd &= MVD2CMDMask

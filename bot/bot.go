@@ -10,6 +10,8 @@ import (
 
 	"github.com/packetflinger/libq2/message"
 	pl "github.com/packetflinger/libq2/player"
+
+	pb "github.com/packetflinger/libq2/proto"
 )
 
 const (
@@ -17,24 +19,26 @@ const (
 )
 
 type Bot struct {
-	Net     Connection
-	User    pl.Userinfo
-	Version string
-	Netchan NetChan
-	Spawned bool
-	Debug   bool
+	Net       Connection
+	User      pl.Userinfo
+	Version   string
+	Netchan   NetChan
+	Spawned   bool
+	Debug     bool
+	callbacks map[int]func(any, *message.Buffer)
+	oldframes map[int32]*pb.Frame
 }
 
 type Connection struct {
 	Address   string
 	Port      int
 	Conn      net.Conn
-	Challenge message.ChallengeResponse
+	Challenge *pb.Challenge
 }
 
 type NetChan struct {
-	msgIn      message.MessageBuffer
-	msgOut     message.MessageBuffer
+	in         message.Buffer
+	out        message.Buffer
 	QPort      uint16
 	Sequence1  int32
 	Sequence2  int32
@@ -42,9 +46,23 @@ type NetChan struct {
 	ReliableS2 bool
 }
 
+func (b *Bot) RegisterCallback(index int, dofunc func(any, *message.Buffer)) {
+	if b.callbacks == nil {
+		b.callbacks = make(map[int]func(any, *message.Buffer))
+	}
+	b.callbacks[index] = dofunc
+}
+
+func (b *Bot) UnregisterCallback(index int) {
+	if b.callbacks == nil {
+		b.callbacks = make(map[int]func(any, *message.Buffer))
+	}
+	delete(b.callbacks, index)
+}
+
 // is there anything that needs to be sent?
 func (bot *Bot) OutPending() bool {
-	return len(bot.Netchan.msgOut.Buffer) > 0
+	return len(bot.Netchan.out.Data) > 0
 }
 
 // was a recently received msg reliable and needs an ack?
@@ -62,7 +80,7 @@ func (bot *Bot) SendAck() error {
 }
 
 func (bot *Bot) ClientCommand(str string, reliable bool) error {
-	msg := message.MessageBuffer{}
+	msg := message.Buffer{}
 	msg.WriteString(str)
 	p := message.ClientPacket{
 		Sequence1:   bot.Netchan.Sequence1,
@@ -71,7 +89,7 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 		Reliable1:   reliable,
 		Reliable2:   bot.Netchan.ReliableS2,
 		MessageType: message.CLCStringCommand,
-		Data:        msg.Buffer,
+		Data:        msg.Data,
 	}
 	packet := p.Marshal()
 	if bot.Debug {
@@ -84,11 +102,12 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 	return nil
 }
 
-func (bot *Bot) Run(cb message.MessageCallbacks) error {
+func (bot *Bot) Run() error {
 	if bot.Netchan.QPort == 0 {
 		bot.Netchan.QPort = uint16(rand.Intn(256))
 	}
-	c, e := net.Dial("udp4", fmt.Sprintf("%s:%d", bot.Net.Address, bot.Net.Port))
+	addr := fmt.Sprintf("%s:%d", bot.Net.Address, bot.Net.Port)
+	c, e := net.Dial("udp4", addr)
 	if e != nil {
 		return e
 	}
@@ -98,7 +117,7 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 	bot.Netchan.ReliableS1 = true
 
 	defer c.Close()
-	log.Println("requesting challenge...")
+	log.Println("requesting challenge from", addr)
 
 	getchal := message.ConnectionlessPacket{Data: "getchallenge"}.Marshal()
 	_, e = c.Write(getchal)
@@ -112,7 +131,7 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 		return e
 	}
 
-	cmsg := message.MessageBuffer{Buffer: chal}
+	cmsg := message.Buffer{Data: chal}
 	ch, err := cmsg.ParseChallenge()
 	if err != nil {
 		return err
@@ -141,10 +160,6 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 
 	bot.ClientCommand("new", true)
 
-	if cb.OnConnect != nil {
-		cb.OnConnect()
-	}
-
 	for {
 		bytes, err := bot.Receive()
 		if err != nil {
@@ -154,30 +169,49 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 			break
 		}
 
-		serverframe, err := message.ParseMessageLump(bot.Netchan.msgIn, message.MessageCallbacks{}, cb)
+		packet, err := bot.Netchan.in.ParsePacket(bot.oldframes)
 		if err != nil {
 			return err
 		}
+		for _, pr := range packet.GetPrints() {
+			log.Printf("%s", pr.GetData()) // newline is included in the string
+			cb, ok := bot.callbacks[message.SVCPrint]
+			if ok {
+				cb(pr, &bot.Netchan.out)
+			}
+		}
 
-		for _, st := range serverframe.Stuffs {
+		for _, st := range packet.GetStuffs() {
 			// entering the game
-			if t := strings.Fields(st.String); len(t) > 1 && t[0] == "precache" {
+			if t := strings.Fields(st.GetData()); len(t) > 1 && t[0] == "precache" {
 				bot.Spawned = true
 				log.Println("entering game")
-				bot.Netchan.msgOut.WriteByte(message.CLCStringCommand)
-				bot.Netchan.msgOut.WriteString("begin " + t[1] + "\n")
+				bot.Netchan.out.WriteByte(message.CLCStringCommand)
+				bot.Netchan.out.WriteString("begin " + t[1] + "\n")
 				bot.Netchan.ReliableS1 = true
-
-				if cb.OnEnter != nil {
-					cb.OnEnter()
+				cb, ok := bot.callbacks[message.CallbackOnBegin]
+				if ok {
+					cb(nil, &bot.Netchan.out)
 				}
+				continue
 			}
 
 			// handle version probe
-			if t := strings.Fields(st.String); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
-				bot.Netchan.msgOut.WriteByte(message.CLCStringCommand)
-				bot.Netchan.msgOut.WriteString("\177c version " + bot.Version + "\n")
+			if t := strings.Fields(st.GetData()); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
+				bot.Netchan.out.WriteByte(message.CLCStringCommand)
+				bot.Netchan.out.WriteString("\177c version " + bot.Version + "\n")
 				bot.Netchan.ReliableS1 = true
+			}
+			cb, ok := bot.callbacks[message.SVCStuffText]
+			if ok {
+				cb(st, &bot.Netchan.out)
+			}
+		}
+
+		for _, frame := range packet.GetFrames() {
+			cb, ok := bot.callbacks[message.SVCFrame]
+			if ok {
+				cb(frame, &bot.Netchan.out)
 			}
 		}
 
@@ -197,12 +231,7 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 				continue
 			}
 		}
-
-		if err != nil {
-			log.Println(err)
-		}
-
-		if bot.Netchan.Sequence2&3 == 0 && bot.Spawned {
+		if ((bot.Netchan.Sequence2 & 3) == 0) && bot.Spawned {
 			err = bot.SendAck()
 			if err != nil {
 				log.Println(err)
@@ -213,30 +242,30 @@ func (bot *Bot) Run(cb message.MessageCallbacks) error {
 }
 
 func (bot *Bot) Send() error {
-	msg2 := &bot.Netchan.msgOut
-	msg := message.MessageBuffer{}
+	msg2 := &bot.Netchan.out
+	msg := message.Buffer{}
 	msg.WriteLong(bot.Netchan.Sequence1)
 	if bot.Netchan.ReliableS1 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteLong(bot.Netchan.Sequence2)
 	if bot.Netchan.ReliableS2 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteShort(uint16(bot.Netchan.QPort))
 
-	if len(msg2.Buffer) > 0 {
-		msg.Buffer = append(msg.Buffer, msg2.Buffer...)
+	if len(msg2.Data) > 0 {
+		msg.Data = append(msg.Data, msg2.Data...)
 		msg.Index += msg2.Index
 	}
 
-	_, e := bot.Net.Conn.Write(msg.Buffer)
+	_, e := bot.Net.Conn.Write(msg.Data)
 	if e != nil {
 		return e
 	}
 
 	if bot.Debug {
-		fmt.Printf("sent:\n%s\n", hex.Dump(msg.Buffer))
+		fmt.Printf("sent:\n%s\n", hex.Dump(msg.Data))
 	}
 
 	bot.Netchan.Sequence1++
@@ -252,12 +281,12 @@ func (bot *Bot) Receive() (int, error) {
 		return bytes, error
 	}
 
-	msg := &bot.Netchan.msgIn
+	msg := &bot.Netchan.in
 	msg.Reset()
-	msg.Buffer = in[:bytes]
+	msg.Data = in[:bytes]
 
 	if bot.Debug {
-		fmt.Printf("received\n%s\n", hex.Dump(msg.Buffer))
+		fmt.Printf("received\n%s\n", hex.Dump(msg.Data))
 	}
 
 	// normally this would be a ReadLong(), but we need it to stay in byte slice format
@@ -265,7 +294,7 @@ func (bot *Bot) Receive() (int, error) {
 	sequence := msg.ReadData(4)
 
 	// is the last bit (sign bit) 1?
-	if sequence[3]&0x80 > 0 {
+	if (sequence[3] & 0x80) > 0 {
 		bot.Netchan.ReliableS2 = true
 
 		// flip it back to 0
@@ -273,7 +302,7 @@ func (bot *Bot) Receive() (int, error) {
 	} else {
 		bot.Netchan.ReliableS2 = false
 	}
-	tmpmsg := message.MessageBuffer{Buffer: sequence}
+	tmpmsg := message.Buffer{Data: sequence}
 	bot.Netchan.Sequence2 = tmpmsg.ReadLong()
 
 	// we don't care about the ack sequence

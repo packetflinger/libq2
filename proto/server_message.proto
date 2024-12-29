@@ -1,15 +1,15 @@
 // compile with:
-// protoc --go_out=. --go_opt=paths=source_relative dm2_demo.proto
+// protoc --go_out=. --go_opt=paths=source_relative server_message.proto
 syntax="proto3";
 option go_package = "github.com/packetflinger/libq2/proto";
 package proto;
 
-message TestDemo {
+message DM2Demo {
     ServerInfo serverinfo = 1;
-    repeated PackedEntity baselines = 2;
-    repeated CString configstrings = 3;
-    repeated StuffText stuffs = 4;
-    repeated Frame frames = 5;
+    map<int32, PackedEntity> baselines = 2;
+    map<int32, ConfigString> configstrings = 3;
+    map<int32, Frame> frames = 5;
+    int32 current_frame = 6;    // index to the frames map
 }
 
 message ServerInfo {
@@ -21,21 +21,21 @@ message ServerInfo {
     string map_name = 6;
 }
 
-message CString {
+message ConfigString {
     uint32 index = 1;           // 16 bits
-    string string = 2;
+    string data = 2;
 }
 
 message StuffText {
-    string string = 1;
+    string data = 1;
 }
 
 // an edict_t packed up and ready for xfer
 message PackedEntity {
     uint32 number = 1;          // 32 bits
-    int32 origin_x = 2;        // 16 bits
-    int32 origin_y = 3;        // 16 bits
-    int32 origin_z = 4;        // 16 bits
+    int32 origin_x = 2;         // 16 bits
+    int32 origin_y = 3;         // 16 bits
+    int32 origin_z = 4;         // 16 bits
     int32 angle_x = 5;
     int32 angle_y = 6;
     int32 angle_z = 7;
@@ -53,11 +53,12 @@ message PackedEntity {
     uint32 frame = 19;          // 16 bits
     uint32 sound = 20;          // 8 bits
     uint32 event = 21;          // 8 bits
+    bool remove = 22;           // this ent should be removed after frame
 }
 
 message PlayerMove {
     uint32 type = 1;            // 8 bits
-    int32 origin_x = 2;        // 16 bits
+    int32 origin_x = 2;         // 16 bits
     int32 origin_y = 3;
     int32 origin_z = 4;
     uint32 velocity_x = 5;
@@ -65,23 +66,18 @@ message PlayerMove {
     uint32 velocity_z = 7;
     uint32 flags = 8;           // byte
     uint32 time = 9;            // byte
-    int32 gravity = 10;        // 16 bits
-    int32 delta_angle_x = 11;  // 16 bits
+    int32 gravity = 10;         // 16 bits
+    int32 delta_angle_x = 11;   // 16 bits
     int32 delta_angle_y = 12;
     int32 delta_angle_z = 13;
 }
 
-message PlayerStat {
-    uint32 index = 1;
-    int32 value = 2;
-}
-
 message PackedPlayer {
     PlayerMove movestate = 1;
-    int32 view_angles_x = 2;   // 16 bits
-    int32 view_angles_y = 3;   // 16 bits
-    int32 view_angles_z = 4;   // 16 bits
-    int32 view_offset_x = 5;   // 8 bits
+    int32 view_angles_x = 2;        // 16 bits
+    int32 view_angles_y = 3;        // 16 bits
+    int32 view_angles_z = 4;        // 16 bits
+    int32 view_offset_x = 5;        // 8 bits
     int32 view_offset_y = 6;
     int32 view_offset_z = 7;
     int32 kick_angles_x = 8;
@@ -93,15 +89,15 @@ message PackedPlayer {
     int32 gun_offset_x = 14;
     int32 gun_offset_y = 15;
     int32 gun_offset_z = 16;
-    uint32 gun_index = 17;      // 8 bits
-    uint32 gun_frame = 18;      // 8 bits
-    uint32 blend_w = 19;
-    uint32 blend_x = 20;
-    uint32 blend_y = 21;
-    uint32 blend_z = 22;
+    uint32 gun_index = 17;          // 8 bits
+    uint32 gun_frame = 18;          // 8 bits
+    int32 blend_w = 19;
+    int32 blend_x = 20;
+    int32 blend_y = 21;
+    int32 blend_z = 22;
     uint32 fov = 23;
     uint32 rd_flags = 24;
-    repeated PlayerStat stats = 25; // 16 bits
+    map<uint32, int32> stats = 26;  // 16 bits each
 }
 
 message Frame {
@@ -111,8 +107,8 @@ message Frame {
     uint32 area_bytes = 4;          // 8 bits
     repeated uint32 area_bits = 5;  // byte
     PackedPlayer player_state = 6;
-    repeated PackedEntity entities = 7;
-    repeated CString configstrings = 8;
+    map<int32, PackedEntity> entities = 7;
+    map<int32, ConfigString> configstrings = 8;
     repeated CenterPrint centerprints = 9;
     repeated StuffText stufftexts= 10;
     repeated Print prints = 11;
@@ -124,18 +120,19 @@ message Frame {
 }
 
 message Print {
-    uint32 level = 1;   // 8 bits
-    string string = 2;
+    uint32 level = 1;       // 8 bits
+    string data = 2;
 }
 
+// Start a sound playing
 message PackedSound {
     uint32 flags = 1;       // 8 bits
-    uint32 index = 2;       // 8 bits
+    uint32 index = 2;       // 8 bits, CS_SOUNDS + this
     uint32 volume = 3;
     uint32 attenuation = 4;
     uint32 time_offset = 5;
     uint32 channel = 6;     // 16 bits
-    uint32 entity = 7;      // 16 bits
+    uint32 entity = 7;      // 16 bits, relative to this ent
     uint32 position_x = 8;  // 16 bits
     uint32 position_y = 9;
     uint32 position_z = 10;
@@ -155,9 +152,9 @@ message TemporaryEntity {
     uint32 direction = 11;  // 8 bits
     uint32 count = 12;      // 8 bits
     uint32 color = 13;      // 8 bits
-    uint32 entity1 = 14;    // 16 bits
-    uint32 entity2 = 15;    // 16 bits
-    uint32 time = 16;       // 32 bits
+    int32 entity1 = 14;    // 16 bits
+    int32 entity2 = 15;    // 16 bits
+    int32 time = 16;       // 32 bits
 }
 
 message MuzzleFlash {
@@ -166,10 +163,9 @@ message MuzzleFlash {
 }
 
 message Layout {
-    string string = 1;
+    string data = 1;
 }
 
 message CenterPrint {
-    string string = 1;
+    string data = 1;
 }
-

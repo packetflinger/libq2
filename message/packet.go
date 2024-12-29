@@ -22,64 +22,64 @@ type ConnectionlessPacket struct {
 	Data     string
 }
 
-func NewConnectionlessPacket(str string) MessageBuffer {
-	msg := MessageBuffer{}
+func NewConnectionlessPacket(str string) Buffer {
+	msg := Buffer{}
 	msg.WriteLong(-1)
 	msg.WriteString(str)
 	return msg
 }
 
-func NewClientCommand(str string) MessageBuffer {
-	msg := MessageBuffer{}
+func NewClientCommand(str string) Buffer {
+	msg := Buffer{}
 	msg.WriteByte(CLCStringCommand)
 	msg.WriteString(str)
 	return msg
 }
 
 func (p ClientPacket) Marshal() []byte {
-	msg := MessageBuffer{}
+	msg := Buffer{}
 	msg.WriteLong(p.Sequence1)
 	if p.Reliable1 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteLong(p.Sequence2)
 	if p.Reliable2 {
-		msg.Buffer[msg.Index-1] |= 0x80
+		msg.Data[msg.Index-1] |= 0x80
 	}
 	msg.WriteShort(uint16(p.QPort))
 	msg.WriteByte(p.MessageType)
 	msg.WriteData(p.Data)
-	return msg.Buffer
+	return msg.Data
 }
 
 func (cp ConnectionlessPacket) Marshal() []byte {
-	msg := MessageBuffer{}
+	msg := Buffer{}
 	msg.WriteLong(-1)
 	msg.WriteString(cp.Data)
-	return msg.Buffer
+	return msg.Data
 }
 
-func (cp ConnectionlessPacket) Send(srv string, port int) (MessageBuffer, error) {
+func (cp ConnectionlessPacket) Send(srv string, port int) (Buffer, error) {
 	target := fmt.Sprintf("%s:%d", srv, port)
 
 	// only use IPv4
 	conn, err := net.Dial("udp4", target)
 	if err != nil {
-		return MessageBuffer{}, err
+		return Buffer{}, err
 	}
 	defer conn.Close()
 	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 	_, err = conn.Write(cp.Marshal())
 	if err != nil {
-		return MessageBuffer{}, err
+		return Buffer{}, err
 	}
 
 	d := make([]byte, 1500)
 	read, err := conn.Read(d)
 	if err != nil {
 		// swallow read errors
-		return MessageBuffer{}, nil
+		return Buffer{}, nil
 	}
 
-	return MessageBuffer{Buffer: d[:read]}, nil
+	return Buffer{Data: d[:read]}, nil
 }

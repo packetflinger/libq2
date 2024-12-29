@@ -34,10 +34,10 @@ func TestWriteLong(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		msg := MessageBuffer{}
+		msg := Buffer{}
 		msg.WriteLong(int32(test.input))
-		for i := range msg.Buffer {
-			if msg.Buffer[i] != test.want[i] {
+		for i := range msg.Data {
+			if msg.Data[i] != test.want[i] {
 				t.Errorf("%s failed\n", test.desc)
 			}
 		}
@@ -45,8 +45,8 @@ func TestWriteLong(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	msg1 := MessageBuffer{}
-	msg2 := MessageBuffer{}
+	msg1 := Buffer{}
+	msg2 := Buffer{}
 
 	msg1.WriteByte(1)
 	msg2.WriteByte(1)
@@ -82,9 +82,9 @@ func TestWriteByte(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			msg := MessageBuffer{}
+			msg := Buffer{}
 			msg.WriteByte(byte(tc.input))
-			got := msg.Buffer
+			got := msg.Data
 			if diff := cmp.Diff(got, tc.want); diff != "" {
 				t.Error("got diff:", diff)
 			}
@@ -116,9 +116,9 @@ func TestWriteShort(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			msg := MessageBuffer{}
+			msg := Buffer{}
 			msg.WriteShort(tc.input)
-			got := msg.Buffer
+			got := msg.Data
 			if diff := cmp.Diff(got, tc.want); diff != "" {
 				t.Error("got diff:", diff)
 			}
@@ -140,9 +140,9 @@ func TestWriteString(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			msg := MessageBuffer{}
+			msg := Buffer{}
 			msg.WriteString(tc.input)
-			got := msg.Buffer
+			got := msg.Data
 			if diff := cmp.Diff(got, tc.want); diff != "" {
 				t.Error("got diff:", diff)
 			}
@@ -153,22 +153,22 @@ func TestWriteString(t *testing.T) {
 func TestReadULong(t *testing.T) {
 	tests := []struct {
 		desc  string
-		input MessageBuffer
+		input Buffer
 		want  uint32
 	}{
 		{
 			desc:  "test1",
-			input: NewMessageBuffer([]byte{255, 255, 255, 255}),
+			input: NewBuffer([]byte{255, 255, 255, 255}),
 			want:  4294967295,
 		},
 		{
 			desc:  "test2",
-			input: NewMessageBuffer([]byte{128, 0, 0, 0}),
+			input: NewBuffer([]byte{128, 0, 0, 0}),
 			want:  128,
 		},
 		{
 			desc:  "test3",
-			input: NewMessageBuffer([]byte{0, 0, 0, 128}),
+			input: NewBuffer([]byte{0, 0, 0, 128}),
 			want:  2147483648,
 		},
 	}
@@ -186,22 +186,22 @@ func TestReadULong(t *testing.T) {
 func TestReadLong(t *testing.T) {
 	tests := []struct {
 		desc  string
-		input MessageBuffer
+		input Buffer
 		want  int32
 	}{
 		{
 			desc:  "test1",
-			input: NewMessageBuffer([]byte{255, 255, 255, 255}),
+			input: NewBuffer([]byte{255, 255, 255, 255}),
 			want:  -1,
 		},
 		{
 			desc:  "test2",
-			input: NewMessageBuffer([]byte{128, 0, 0, 0}),
+			input: NewBuffer([]byte{128, 0, 0, 0}),
 			want:  128,
 		},
 		{
 			desc:  "test3",
-			input: NewMessageBuffer([]byte{0, 0, 0, 128}),
+			input: NewBuffer([]byte{0, 0, 0, 128}),
 			want:  -2147483648,
 		},
 	}

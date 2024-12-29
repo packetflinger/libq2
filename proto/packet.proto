@@ -1,0 +1,22 @@
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative packet.proto
+syntax="proto3";
+option go_package = "github.com/packetflinger/libq2/proto";
+package proto;
+
+import "server_message.proto";
+
+// Represents all the gamestate messages from a single server packet
+message Packet {
+    repeated Frame frames = 1; // includes playerstate and packetentities
+    repeated ConfigString config_strings = 2;
+    repeated Print prints = 3;
+    repeated PackedSound sounds = 4;
+    repeated TemporaryEntity temp_ents = 5;
+    repeated MuzzleFlash muzzle_flashes = 6;
+    repeated Layout layouts = 7;
+    repeated CenterPrint centerprints = 8;
+    repeated StuffText stuffs = 9;
+    repeated PackedEntity baselines = 11;
+    ServerInfo server_data = 10;
+}

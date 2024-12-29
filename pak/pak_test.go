@@ -1,89 +1,81 @@
 package pak
 
 import (
+	"bytes"
 	"os"
 	"testing"
+
+	pb "github.com/packetflinger/libq2/proto"
 )
 
-func TestOpenPakFile(t *testing.T) {
-	infile := "../testdata/test.pak"
-	pak, e := OpenPakFile(infile)
-	if e != nil {
-		t.Errorf("%v", e)
+func TestUnmarshal(t *testing.T) {
+	data, err := os.ReadFile("../testdata/test.pak")
+	if err != nil {
+		t.Error(err)
 	}
 
-	if pak.Handle == nil {
-		t.Error("Handle - file handle is nil")
+	archive, err := Unmarshal(data)
+	if err != nil {
+		t.Error(err)
 	}
-	if len(pak.Files) != 2 {
-		t.Error("Incorrect file count, have:", len(pak.Files), ", want: 2")
-	}
-	pak.Close()
+	t.Error(archive)
 }
 
-func TestAddFile(t *testing.T) {
-	pak, e := OpenPakFile("../testdata/test.pak")
-	if e != nil {
-		t.Errorf("%v", e)
+func TestMarshal(t *testing.T) {
+	data, err := os.ReadFile("../testdata/test.pak")
+	if err != nil {
+		t.Error(err)
 	}
 
-	e = pak.AddFile("../testdata/testfile.txt")
-	if e != nil {
-		t.Error(e)
+	archive, err := Unmarshal(data)
+	if err != nil {
+		t.Error(err)
 	}
 
-	if len(pak.Files) != 3 {
-		t.Error("Wrong file count")
+	data, err = Marshal(archive)
+	if err != nil {
+		t.Error(err)
 	}
-
-	if string(pak.Files[len(pak.Files)-1].Data) != "test\n" {
-		t.Error("new file contents mismatch")
+	err = os.WriteFile("../testdata/test-out.pak", data, 0777)
+	if err != nil {
+		t.Error(err)
 	}
-	pak.Close()
 }
 
-func TestRemoveFile(t *testing.T) {
-	pak, e := OpenPakFile("../testdata/test.pak")
-	if e != nil {
-		t.Errorf("%v", e)
+func TestExtractFile(t *testing.T) {
+	tests := []struct {
+		name string
+		pak  *pb.PAKArchive
+		file string
+		want []byte
+	}{
+		{
+			name: "Test 1",
+			pak: &pb.PAKArchive{
+				Files: []*pb.PAKFile{
+					{
+						Name: "test.cfg",
+						Data: []byte{1, 2, 3, 4, 5},
+					},
+					{
+						Name: "test2.cfg",
+						Data: []byte{6, 7, 8, 9},
+					},
+				},
+			},
+			file: "test2.cfg",
+			want: []byte{6, 7, 8, 9},
+		},
 	}
-
-	e = pak.RemoveFile("test2.cfg")
-	if e != nil {
-		t.Error(e)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := ExtractFile(tc.pak, tc.file)
+			if err != nil {
+				t.Error()
+			}
+			if !bytes.Equal(got.Data, tc.want) {
+				t.Error("\ngot:\n", got.Data, "\nwant\n", tc.want)
+			}
+		})
 	}
-
-	if len(pak.Files) != 1 {
-		t.Error("Wrong file count")
-	}
-
-	pak.Close()
-}
-
-func TestWrite(t *testing.T) {
-	pak, e := OpenPakFile("../testdata/test.pak")
-	if e != nil {
-		t.Errorf("%v", e)
-	}
-	pak.Close()
-
-	pak.Filename = "/tmp/testpak.pak"
-	pak.Write()
-
-	want, e := os.ReadFile("../testdata/test.pak")
-	if e != nil {
-		t.Error(e)
-	}
-	have, e := os.ReadFile("/tmp/testpak.pak")
-	if e != nil {
-		t.Error(e)
-	}
-
-	for i := range want {
-		if want[i] != have[i] {
-			t.Error("Result pak not byte-for-byte match")
-		}
-	}
-
-	os.Remove("/tmp/testpak.pak")
 }
