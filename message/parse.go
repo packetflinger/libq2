@@ -39,6 +39,9 @@ type Parser interface {
 // after the client connects. It contains info about the protocol used, the
 // current map name (not the map filename), etc.
 func (m *Buffer) ParseServerData() *pb.ServerInfo {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.ServerInfo{
 		Protocol:     m.ReadULong(),
 		ServerCount:  m.ReadULong(),
@@ -53,6 +56,9 @@ func (m *Buffer) ParseServerData() *pb.ServerInfo {
 // with an index. They're referenced by index in various playces
 // such as layouts, etc.
 func (m *Buffer) ParseConfigString() *pb.ConfigString {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.ConfigString{
 		Index: uint32(m.ReadShort()),
 		Data:  m.ReadString(),
@@ -73,6 +79,9 @@ func (m *Buffer) ParseSpawnBaseline() *pb.PackedEntity {
 // can be stuff'd to them, including harmful things like `disconnect` or
 // `set rate "10"`.
 func (m *Buffer) ParseStuffText() *pb.StuffText {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.StuffText{Data: m.ReadString()}
 }
 
@@ -82,6 +91,11 @@ func (m *Buffer) ParseStuffText() *pb.StuffText {
 // compressed against, areabits, etc), and also the current playerstate and
 // copy of all entities that changed since the delta frame.
 func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
+	if m.Index == m.Length {
+		return nil
+	}
+	var fromPS *pb.PackedPlayer
+	var fromEnts map[int32]*pb.PackedEntity
 	fr := &pb.Frame{}
 	fr.Number = int32(m.ReadLong())
 	fr.Delta = int32(m.ReadLong())
@@ -91,14 +105,20 @@ func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 	for _, ab := range areabits {
 		fr.AreaBits = append(fr.AreaBits, uint32(ab))
 	}
-	deltaFrame := oldFrames[fr.Delta]
+	if oldFrames != nil {
+		delta, ok := oldFrames[fr.Delta]
+		if ok {
+			fromPS = delta.GetPlayerState()
+			fromEnts = delta.GetEntities()
+		}
+	}
 	var ps *pb.PackedPlayer
 	if m.ReadByte() == SVCPlayerInfo {
-		ps = m.ParseDeltaPlayerstate(deltaFrame.GetPlayerState())
+		ps = m.ParseDeltaPlayerstate(fromPS)
 	}
 	fr.PlayerState = ps
 	if m.ReadByte() == SVCPacketEntities {
-		fr.Entities = m.ParsePacketEntities(fr.Entities)
+		fr.Entities = m.ParsePacketEntities(fromEnts)
 	}
 	return fr
 }
@@ -108,6 +128,9 @@ func (m *Buffer) ParseFrame(oldFrames map[int32]*pb.Frame) *pb.Frame {
 // includes player chat, obituaries, inventory (out of ammo, cant switch to
 // the railgun).
 func (m *Buffer) ParsePrint() *pb.Print {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.Print{
 		Level: uint32(m.ReadByte()),
 		Data:  m.ReadString(),
@@ -152,6 +175,9 @@ func (m *Buffer) ParseSound() *pb.PackedSound {
 // Temporary entities include things like explosions, sparks, and things like
 // projectiles (rockets).
 func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
+	if m.Index == m.Length {
+		return nil
+	}
 	te := &pb.TemporaryEntity{}
 	te.Type = uint32(m.ReadByte())
 	switch te.Type {
@@ -315,6 +341,9 @@ func (m *Buffer) ParseTempEntity() *pb.TemporaryEntity {
 // A gun fired, nearby clients should see the flash. Monsters also produce
 // muzzle flashes when they shoot, but only in single-player mode.
 func (m *Buffer) ParseMuzzleFlash() *pb.MuzzleFlash {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.MuzzleFlash{
 		Entity: uint32(m.ReadShort()),
 		Weapon: uint32(m.ReadByte()),
@@ -326,6 +355,9 @@ func (m *Buffer) ParseMuzzleFlash() *pb.MuzzleFlash {
 // after a TDM match for example with players, scores, pings,
 // stats, etc is an example
 func (m *Buffer) ParseLayout() *pb.Layout {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.Layout{
 		Data: m.ReadString(),
 	}
@@ -340,6 +372,9 @@ func (m *Buffer) ParseInventory() {
 
 // A string that should appear temporarily in the center of the screen
 func (m *Buffer) ParseCenterPrint() *pb.CenterPrint {
+	if m.Index == m.Length {
+		return nil
+	}
 	return &pb.CenterPrint{
 		Data: m.ReadString(),
 	}
@@ -442,6 +477,9 @@ func (msg *MessageBuffer) WriteDeltaMove(from *client.ClientMove, to *client.Cli
 
 // ParsePacket will parse all the messages in a particular server packet.
 func (p *Buffer) ParsePacket(oldFrames map[int32]*pb.Frame) (*pb.Packet, error) {
+	if p.Index == p.Length {
+		return nil, nil
+	}
 	out := &pb.Packet{}
 	for p.Index < len(p.Data) {
 		cmd := p.ReadByte()
