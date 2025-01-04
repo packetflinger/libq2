@@ -119,8 +119,8 @@ func (m *MasterServer) Run() {
 		go startAPIServer(m)
 	}
 
+	buf := make([]byte, 1024)
 	for {
-		buf := make([]byte, 1024)
 		count, addr, err := listener.ReadFrom(buf)
 		if err != nil {
 			continue
