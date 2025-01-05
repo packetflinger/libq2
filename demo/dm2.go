@@ -35,6 +35,7 @@ func NewDM2Demo(filename string) (*DM2Parser, error) {
 	demo.textProto.Baselines = make(map[int32]*pb.PackedEntity)
 	demo.textProto.Configstrings = make(map[int32]*pb.ConfigString)
 	demo.textProto.Frames = make(map[int32]*pb.Frame)
+	demo.callbacks = make(map[int]func(any))
 	return demo, nil
 }
 
@@ -79,11 +80,21 @@ func (d *DM2Parser) ApplyPacket(packet *pb.Packet) error {
 				d.textProto.GetConfigstrings()[int32(cs.GetIndex())] = cs
 			}
 		}
+		if cbFunc, found := d.callbacks[message.SVCConfigString]; found {
+			for _, cs := range cstrings {
+				cbFunc(cs)
+			}
+		}
 	}
 	baselines := packet.GetBaselines()
 	if len(baselines) > 0 {
 		for _, bl := range baselines {
 			d.textProto.Baselines[int32(bl.GetNumber())] = bl
+		}
+		if cbFunc, found := d.callbacks[message.SVCSpawnBaseline]; found {
+			for _, bl := range baselines {
+				cbFunc(bl)
+			}
 		}
 	}
 	frames := packet.GetFrames()
@@ -98,35 +109,75 @@ func (d *DM2Parser) ApplyPacket(packet *pb.Packet) error {
 			d.textProto.Frames[int32(fr.GetNumber())] = fr
 			d.currentFrame = fr.GetNumber()
 		}
+		if cbFunc, found := d.callbacks[message.SVCFrame]; found {
+			for _, fr := range frames {
+				cbFunc(fr)
+			}
+		}
 	}
 	prints := packet.GetPrints()
 	if len(prints) > 0 {
 		d.textProto.Frames[d.currentFrame].Prints = append(d.textProto.Frames[d.currentFrame].Prints, prints...)
+		if cbFunc, found := d.callbacks[message.SVCPrint]; found {
+			for _, pr := range prints {
+				cbFunc(pr)
+			}
+		}
 	}
 	sounds := packet.GetSounds()
 	if len(sounds) > 0 {
 		d.textProto.Frames[d.currentFrame].Sounds = append(d.textProto.Frames[d.currentFrame].Sounds, sounds...)
+		if cbFunc, found := d.callbacks[message.SVCSound]; found {
+			for _, snd := range sounds {
+				cbFunc(snd)
+			}
+		}
 	}
 	tempents := packet.GetTempEnts()
 	if len(tempents) > 0 {
 		d.textProto.Frames[d.currentFrame].TemporaryEntities = append(d.textProto.Frames[d.currentFrame].TemporaryEntities, tempents...)
+		if cbFunc, found := d.callbacks[message.SVCTempEntity]; found {
+			for _, te := range tempents {
+				cbFunc(te)
+			}
+		}
 	}
 	mf := packet.GetMuzzleFlashes()
 	if len(mf) > 0 {
 		d.textProto.Frames[d.currentFrame].Flashes1 = append(d.textProto.Frames[d.currentFrame].Flashes1, mf...)
+		if cbFunc, found := d.callbacks[message.SVCMuzzleFlash]; found {
+			for _, f := range mf {
+				cbFunc(f)
+			}
+		}
 	}
 	layouts := packet.GetLayouts()
 	if len(layouts) > 0 {
 		d.textProto.Frames[d.currentFrame].Layouts = append(d.textProto.Frames[d.currentFrame].Layouts, layouts...)
+		if cbFunc, found := d.callbacks[message.SVCLayout]; found {
+			for _, lo := range layouts {
+				cbFunc(lo)
+			}
+		}
 	}
 	cp := packet.GetCenterprints()
 	if len(cp) > 0 {
 		d.textProto.Frames[d.currentFrame].Centerprints = append(d.textProto.Frames[d.currentFrame].Centerprints, cp...)
+		if cbFunc, found := d.callbacks[message.SVCCenterPrint]; found {
+			for _, c := range cp {
+				cbFunc(c)
+			}
+		}
 	}
 	st := packet.GetStuffs()
 	if len(st) > 0 {
 		if d.currentFrame > 0 {
 			d.textProto.Frames[d.currentFrame].Stufftexts = append(d.textProto.Frames[d.currentFrame].Stufftexts, st...)
+		}
+		if cbFunc, found := d.callbacks[message.SVCStuffText]; found {
+			for _, s := range st {
+				cbFunc(s)
+			}
 		}
 	}
 	return nil
@@ -153,9 +204,7 @@ func (demo *DM2Parser) NextPacket() (message.Buffer, int, error) {
 		return message.Buffer{}, 0, nil
 	}
 	demo.binaryPosition += 4
-	packet := message.Buffer{
-		Data: demo.binaryData[demo.binaryPosition : demo.binaryPosition+packetLen],
-	}
+	packet := message.NewBuffer(demo.binaryData[demo.binaryPosition : demo.binaryPosition+packetLen])
 	demo.binaryPosition += packetLen
 	return packet, packetLen, nil
 }
