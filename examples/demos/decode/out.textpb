@@ -1,0 +1,13033 @@
+serverinfo: {
+  protocol: 34
+  server_count: 1269125491
+  demo: true
+  map_name: "The Edge"
+}
+baselines: {
+  key: 18
+  value: {
+    number: 18
+    origin_x: 1952
+    origin_y: 63648
+    origin_z: 2656
+    sound: 43
+  }
+}
+baselines: {
+  key: 19
+  value: {
+    number: 19
+    origin_x: 1952
+    origin_y: 288
+    origin_z: 2656
+    sound: 43
+  }
+}
+baselines: {
+  key: 20
+  value: {
+    number: 20
+    origin_x: 7520
+    origin_y: 5024
+    origin_z: 3360
+    sound: 43
+  }
+}
+baselines: {
+  key: 21
+  value: {
+    number: 21
+    origin_x: 7264
+    origin_y: 6560
+    origin_z: 3360
+    sound: 43
+  }
+}
+baselines: {
+  key: 22
+  value: {
+    number: 22
+    origin_x: 1952
+    origin_y: 62368
+    origin_z: 4192
+    sound: 43
+  }
+}
+baselines: {
+  key: 23
+  value: {
+    number: 23
+    origin_x: 10272
+    origin_y: 5024
+    origin_z: 3360
+    sound: 43
+  }
+}
+baselines: {
+  key: 24
+  value: {
+    number: 24
+    origin_x: 12768
+    origin_y: 7840
+    origin_z: 9056
+    sound: 44
+  }
+}
+baselines: {
+  key: 25
+  value: {
+    number: 25
+    origin_x: 3104
+    origin_y: 4640
+    origin_z: 6048
+    sound: 44
+  }
+}
+baselines: {
+  key: 26
+  value: {
+    number: 26
+    origin_x: 9536
+    origin_y: 65344
+    origin_z: 7288
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 27
+  value: {
+    number: 27
+    origin_x: 9856
+    origin_y: 65344
+    origin_z: 7288
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 28
+  value: {
+    number: 28
+    origin_x: 12032
+    origin_y: 832
+    origin_z: 5240
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 29
+  value: {
+    number: 29
+    origin_x: 11584
+    origin_y: 1280
+    origin_z: 5240
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 30
+  value: {
+    number: 30
+    origin_x: 15680
+    origin_y: 320
+    origin_z: 5240
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 31
+  value: {
+    number: 31
+    origin_x: 15680
+    origin_y: 65408
+    origin_z: 5240
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 32
+  value: {
+    number: 32
+    origin_x: 15680
+    origin_y: 1280
+    origin_z: 5240
+    model_index: 25
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 33
+  value: {
+    number: 33
+    origin_x: 13376
+    origin_y: 3904
+    origin_z: 4216
+    model_index: 26
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 34
+  value: {
+    number: 34
+    origin_x: 13760
+    origin_y: 3904
+    origin_z: 4216
+    model_index: 26
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 35
+  value: {
+    number: 35
+    origin_x: 8576
+    origin_y: 10240
+    origin_z: 7288
+    model_index: 28
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 36
+  value: {
+    number: 36
+    origin_x: 5632
+    origin_y: 832
+    origin_z: 7288
+    model_index: 29
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 37
+  value: {
+    number: 37
+    origin_x: 12032
+    origin_y: 7936
+    origin_z: 7288
+    model_index: 34
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 38
+  value: {
+    number: 38
+    origin_x: 11776
+    origin_y: 8832
+    origin_z: 7288
+    model_index: 35
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 39
+  value: {
+    number: 39
+    origin_x: 4352
+    origin_y: 2816
+    origin_z: 3856
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 40
+  value: {
+    number: 40
+    origin_x: 12416
+    origin_y: 4800
+    origin_z: 2816
+    angle_y: 96
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 41
+  value: {
+    number: 41
+    origin_x: 15104
+    origin_y: 5888
+    origin_z: 4288
+    angle_y: 128
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 42
+  value: {
+    number: 42
+    origin_x: 64896
+    origin_y: 6400
+    origin_z: 3776
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 43
+  value: {
+    number: 43
+    origin_x: 11904
+    origin_y: 65152
+    origin_z: 5312
+    angle_y: 96
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 44
+  value: {
+    number: 44
+    origin_x: 15104
+    origin_y: 3712
+    origin_z: 7360
+    angle_y: 192
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 45
+  value: {
+    number: 45
+    origin_x: 16128
+    origin_y: 63744
+    origin_z: 5312
+    angle_y: 64
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 46
+  value: {
+    number: 46
+    origin_x: 12096
+    origin_y: 65344
+    origin_z: 4288
+    angle_y: 64
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 47
+  value: {
+    number: 47
+    origin_x: 13504
+    origin_y: 768
+    origin_z: 4216
+    model_index: 38
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 48
+  value: {
+    number: 48
+    origin_x: 12096
+    origin_y: 1088
+    origin_z: 4216
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 49
+  value: {
+    number: 49
+    origin_x: 12096
+    origin_y: 704
+    origin_z: 4216
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 50
+  value: {
+    number: 50
+    origin_x: 10240
+    origin_y: 4800
+    origin_z: 2744
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 51
+  value: {
+    number: 51
+    origin_x: 9920
+    origin_y: 4800
+    origin_z: 2744
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 52
+  value: {
+    number: 52
+    origin_x: 10240
+    origin_y: 5120
+    origin_z: 2744
+    model_index: 41
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 53
+  value: {
+    number: 53
+    origin_x: 11904
+    origin_y: 4160
+    origin_z: 3704
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 54
+  value: {
+    number: 54
+    origin_x: 11584
+    origin_y: 3840
+    origin_z: 3704
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 55
+  value: {
+    number: 55
+    origin_x: 12224
+    origin_y: 4608
+    origin_z: 3704
+    model_index: 38
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 56
+  value: {
+    number: 56
+    origin_x: 16320
+    origin_y: 6656
+    origin_z: 3192
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 57
+  value: {
+    number: 57
+    origin_x: 16256
+    origin_y: 2304
+    origin_z: 3192
+    model_index: 31
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 58
+  value: {
+    number: 58
+    origin_x: 15616
+    origin_y: 2304
+    origin_z: 3192
+    model_index: 31
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 59
+  value: {
+    number: 59
+    origin_x: 15936
+    origin_y: 2560
+    origin_z: 3192
+    model_index: 29
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 60
+  value: {
+    number: 60
+    origin_x: 14592
+    origin_y: 7424
+    origin_z: 3704
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 61
+  value: {
+    number: 61
+    origin_x: 14272
+    origin_y: 7424
+    origin_z: 3704
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 62
+  value: {
+    number: 62
+    origin_x: 15104
+    origin_y: 7488
+    origin_z: 4216
+    model_index: 41
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 63
+  value: {
+    number: 63
+    origin_x: 9984
+    origin_y: 2880
+    origin_z: 5240
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 64
+  value: {
+    number: 64
+    origin_x: 9984
+    origin_y: 2560
+    origin_z: 5240
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 65
+  value: {
+    number: 65
+    origin_x: 11520
+    origin_y: 7936
+    origin_z: 5240
+    model_index: 28
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 66
+  value: {
+    number: 66
+    origin_x: 14592
+    origin_y: 5184
+    origin_z: 7288
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 67
+  value: {
+    number: 67
+    origin_x: 14592
+    origin_y: 5504
+    origin_z: 7288
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 68
+  value: {
+    number: 68
+    origin_x: 14592
+    origin_y: 5824
+    origin_z: 7288
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 69
+  value: {
+    number: 69
+    origin_x: 14592
+    origin_y: 4864
+    origin_z: 7288
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 70
+  value: {
+    number: 70
+    origin_x: 15104
+    origin_y: 5760
+    origin_z: 8312
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 71
+  value: {
+    number: 71
+    origin_x: 15104
+    origin_y: 5440
+    origin_z: 8312
+    model_index: 24
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 72
+  value: {
+    number: 72
+    origin_x: 12032
+    origin_y: 1280
+    origin_z: 5240
+    model_index: 45
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 73
+  value: {
+    number: 73
+    origin_x: 10432
+    origin_y: 10752
+    origin_z: 7288
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 74
+  value: {
+    number: 74
+    origin_x: 10432
+    origin_y: 10432
+    origin_z: 7288
+    model_index: 23
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 75
+  value: {
+    number: 75
+    origin_x: 10624
+    origin_y: 9664
+    origin_z: 7360
+    angle_y: 32
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 76
+  value: {
+    number: 76
+    origin_x: 3328
+    origin_y: 9856
+    origin_z: 6264
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 77
+  value: {
+    number: 77
+    origin_x: 3328
+    origin_y: 10176
+    origin_z: 6264
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 78
+  value: {
+    number: 78
+    origin_x: 3328
+    origin_y: 10496
+    origin_z: 6264
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 79
+  value: {
+    number: 79
+    origin_x: 3328
+    origin_y: 9536
+    origin_z: 6264
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 80
+  value: {
+    number: 80
+    origin_x: 6400
+    origin_y: 12672
+    origin_z: 6264
+    model_index: 26
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 81
+  value: {
+    number: 81
+    origin_x: 6400
+    origin_y: 12288
+    origin_z: 6264
+    model_index: 26
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 82
+  value: {
+    number: 82
+    origin_x: 12608
+    origin_y: 7488
+    origin_z: 8312
+    model_index: 47
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 83
+  value: {
+    number: 83
+    origin_x: 6656
+    origin_y: 13952
+    origin_z: 6336
+    angle_y: 192
+    model_index: 37
+    solid: 6176
+  }
+}
+baselines: {
+  key: 84
+  value: {
+    number: 84
+    origin_x: 3328
+    origin_y: 11520
+    origin_z: 7288
+    model_index: 31
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 85
+  value: {
+    number: 85
+    origin_x: 3840
+    origin_y: 11008
+    origin_z: 7288
+    model_index: 50
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 86
+  value: {
+    number: 86
+    origin_x: 8960
+    origin_y: 11264
+    origin_z: 6776
+    model_index: 26
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 87
+  value: {
+    number: 87
+    origin_x: 5888
+    origin_y: 9216
+    origin_z: 6776
+    model_index: 51
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 88
+  value: {
+    number: 88
+    origin_x: 10688
+    origin_y: 10240
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 89
+  value: {
+    number: 89
+    origin_x: 10688
+    origin_y: 10816
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 90
+  value: {
+    number: 90
+    origin_x: 10688
+    origin_y: 9664
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 91
+  value: {
+    number: 91
+    origin_x: 11200
+    origin_y: 10240
+    origin_z: 6264
+    model_index: 52
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 92
+  value: {
+    number: 92
+    origin_x: 15104
+    origin_y: 9024
+    origin_z: 8312
+    model_index: 54
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 93
+  value: {
+    number: 93
+    origin_x: 15104
+    origin_y: 9472
+    origin_z: 8312
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 94
+  value: {
+    number: 94
+    origin_x: 14784
+    origin_y: 65184
+    origin_z: 7288
+    model_index: 34
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 95
+  value: {
+    number: 95
+    origin_x: 14528
+    origin_y: 64896
+    origin_z: 7288
+    model_index: 34
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 96
+  value: {
+    number: 96
+    origin_x: 5120
+    origin_y: 2880
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 97
+  value: {
+    number: 97
+    origin_x: 5280
+    origin_y: 2592
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 98
+  value: {
+    number: 98
+    origin_x: 4992
+    origin_y: 3200
+    origin_z: 6264
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 99
+  value: {
+    number: 99
+    origin_x: 64896
+    origin_y: 2688
+    origin_z: 5240
+    model_index: 31
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 100
+  value: {
+    number: 100
+    origin_x: 3840
+    origin_y: 3072
+    origin_z: 3784
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 101
+  value: {
+    number: 101
+    origin_x: 3520
+    origin_y: 3072
+    origin_z: 3784
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 102
+  value: {
+    number: 102
+    origin_x: 1408
+    origin_y: 6208
+    origin_z: 3640
+    model_index: 55
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 103
+  value: {
+    number: 103
+    origin_x: 1408
+    origin_y: 6528
+    origin_z: 3640
+    model_index: 55
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 104
+  value: {
+    number: 104
+    origin_x: 1152
+    origin_y: 6784
+    origin_z: 3640
+    model_index: 55
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 105
+  value: {
+    number: 105
+    origin_x: 1280
+    origin_y: 5888
+    origin_z: 3640
+    model_index: 55
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 106
+  value: {
+    number: 106
+    origin_x: 2944
+    origin_y: 8384
+    origin_z: 3128
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 107
+  value: {
+    number: 107
+    origin_x: 3264
+    origin_y: 8384
+    origin_z: 3128
+    model_index: 40
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 108
+  value: {
+    number: 108
+    origin_x: 65344
+    origin_y: 4416
+    origin_z: 4856
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 109
+  value: {
+    number: 109
+    origin_x: 65152
+    origin_y: 4736
+    origin_z: 4856
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 110
+  value: {
+    number: 110
+    origin_x: 64832
+    origin_y: 4864
+    origin_z: 4856
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 111
+  value: {
+    number: 111
+    origin_x: 64896
+    origin_y: 3456
+    origin_z: 5240
+    model_index: 43
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 112
+  value: {
+    number: 112
+    origin_x: 64896
+    origin_y: 2368
+    origin_z: 5240
+    model_index: 31
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 113
+  value: {
+    number: 113
+    origin_x: 960
+    origin_y: 62400
+    origin_z: 3672
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 114
+  value: {
+    number: 114
+    origin_x: 960
+    origin_y: 62656
+    origin_z: 3672
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 115
+  value: {
+    number: 115
+    origin_x: 960
+    origin_y: 62912
+    origin_z: 3672
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 116
+  value: {
+    number: 116
+    origin_x: 960
+    origin_y: 62144
+    origin_z: 3672
+    model_index: 44
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 117
+  value: {
+    number: 117
+    origin_x: 2816
+    origin_y: 62208
+    origin_z: 3672
+    model_index: 25
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 118
+  value: {
+    number: 118
+    origin_x: 1920
+    origin_y: 62464
+    origin_z: 3672
+    model_index: 56
+    effects: 1
+    render_fx: 512
+  }
+}
+baselines: {
+  key: 119
+  value: {
+    number: 119
+    origin_z: 60848
+    model_index: 2
+    solid: 31
+  }
+}
+baselines: {
+  key: 121
+  value: {
+    number: 121
+    origin_z: 63536
+    model_index: 3
+    solid: 31
+  }
+}
+baselines: {
+  key: 124
+  value: {
+    number: 124
+    origin_y: 1536
+    origin_z: 6112
+    sound: 44
+  }
+}
+baselines: {
+  key: 125
+  value: {
+    number: 125
+    origin_x: 65440
+    origin_y: 4608
+    origin_z: 6112
+    sound: 44
+  }
+}
+baselines: {
+  key: 126
+  value: {
+    number: 126
+    origin_x: 5984
+    origin_y: 672
+    origin_z: 8160
+    sound: 44
+  }
+}
+baselines: {
+  key: 127
+  value: {
+    number: 127
+    origin_x: 12000
+    origin_y: 7840
+    origin_z: 3360
+    sound: 43
+  }
+}
+configstrings: {
+  key: 0
+  value: {
+    data: "The Edge"
+  }
+}
+configstrings: {
+  key: 1
+  value: {
+    index: 1
+    data: "7"
+  }
+}
+configstrings: {
+  key: 2
+  value: {
+    index: 2
+    data: "unit1_"
+  }
+}
+configstrings: {
+  key: 3
+  value: {
+    index: 3
+    data: "0.000000 0.000000 0.000000"
+  }
+}
+configstrings: {
+  key: 4
+  value: {
+    index: 4
+    data: "0.000000"
+  }
+}
+configstrings: {
+  key: 5
+  value: {
+    index: 5
+    data: "yb -24 xv 0 hnum xv 50 pic 0 if 2    xv  100    anum    xv  150 "
+  }
+}
+configstrings: {
+  key: 6
+  value: {
+    index: 6
+    data: "   pic 2 endif if 4    xv  200    rnum    xv  250    pic 4 endif"
+  }
+}
+configstrings: {
+  key: 7
+  value: {
+    index: 7
+    data: " if 6    xv  296    pic 6 endif yb -50 if 7    xv  0    pic 7   "
+  }
+}
+configstrings: {
+  key: 8
+  value: {
+    index: 8
+    data: " xv  26    yb  -42    stat_string 8    yb  -50 endif if 9    xv "
+  }
+}
+configstrings: {
+  key: 9
+  value: {
+    index: 9
+    data: " 246    num 2   10    xv  296    pic 9 endif if 11    xv  148   "
+  }
+}
+configstrings: {
+  key: 10
+  value: {
+    index: 10
+    data: " pic 11 endif xr -50 yt 2 num 3 14 if 17 xv 0 yb -58 string2 \"SP"
+  }
+}
+configstrings: {
+  key: 11
+  value: {
+    index: 11
+    data: "ECTATOR MODE\" endif if 16 xv 0 yb -68 string \"Chasing\" xv 64 sta"
+  }
+}
+configstrings: {
+  key: 12
+  value: {
+    index: 12
+    data: "t_string 16 endif "
+  }
+}
+configstrings: {
+  key: 29
+  value: {
+    index: 29
+    data: "0"
+  }
+}
+configstrings: {
+  key: 30
+  value: {
+    index: 30
+    data: "8"
+  }
+}
+configstrings: {
+  key: 31
+  value: {
+    index: 31
+    data: "80717714"
+  }
+}
+configstrings: {
+  key: 33
+  value: {
+    index: 33
+    data: "maps/q2dm1.bsp"
+  }
+}
+configstrings: {
+  key: 34
+  value: {
+    index: 34
+    data: "*1"
+  }
+}
+configstrings: {
+  key: 35
+  value: {
+    index: 35
+    data: "*2"
+  }
+}
+configstrings: {
+  key: 36
+  value: {
+    index: 36
+    data: "models/weapons/v_blast/tris.md2"
+  }
+}
+configstrings: {
+  key: 37
+  value: {
+    index: 37
+    data: "#w_blaster.md2"
+  }
+}
+configstrings: {
+  key: 38
+  value: {
+    index: 38
+    data: "#w_shotgun.md2"
+  }
+}
+configstrings: {
+  key: 39
+  value: {
+    index: 39
+    data: "#w_sshotgun.md2"
+  }
+}
+configstrings: {
+  key: 40
+  value: {
+    index: 40
+    data: "#w_machinegun.md2"
+  }
+}
+configstrings: {
+  key: 41
+  value: {
+    index: 41
+    data: "#w_chaingun.md2"
+  }
+}
+configstrings: {
+  key: 42
+  value: {
+    index: 42
+    data: "#a_grenades.md2"
+  }
+}
+configstrings: {
+  key: 43
+  value: {
+    index: 43
+    data: "#w_glauncher.md2"
+  }
+}
+configstrings: {
+  key: 44
+  value: {
+    index: 44
+    data: "#w_rlauncher.md2"
+  }
+}
+configstrings: {
+  key: 45
+  value: {
+    index: 45
+    data: "#w_hyperblaster.md2"
+  }
+}
+configstrings: {
+  key: 46
+  value: {
+    index: 46
+    data: "#w_railgun.md2"
+  }
+}
+configstrings: {
+  key: 47
+  value: {
+    index: 47
+    data: "#w_bfg.md2"
+  }
+}
+configstrings: {
+  key: 48
+  value: {
+    index: 48
+    data: "models/objects/gibs/sm_meat/tris.md2"
+  }
+}
+configstrings: {
+  key: 49
+  value: {
+    index: 49
+    data: "models/objects/gibs/arm/tris.md2"
+  }
+}
+configstrings: {
+  key: 50
+  value: {
+    index: 50
+    data: "models/objects/gibs/bone/tris.md2"
+  }
+}
+configstrings: {
+  key: 51
+  value: {
+    index: 51
+    data: "models/objects/gibs/bone2/tris.md2"
+  }
+}
+configstrings: {
+  key: 52
+  value: {
+    index: 52
+    data: "models/objects/gibs/chest/tris.md2"
+  }
+}
+configstrings: {
+  key: 53
+  value: {
+    index: 53
+    data: "models/objects/gibs/skull/tris.md2"
+  }
+}
+configstrings: {
+  key: 54
+  value: {
+    index: 54
+    data: "models/objects/gibs/head2/tris.md2"
+  }
+}
+configstrings: {
+  key: 55
+  value: {
+    index: 55
+    data: "models/items/healing/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 56
+  value: {
+    index: 56
+    data: "models/items/ammo/shells/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 57
+  value: {
+    index: 57
+    data: "models/items/ammo/slugs/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 58
+  value: {
+    index: 58
+    data: "models/items/ammo/grenades/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 59
+  value: {
+    index: 59
+    data: "models/weapons/v_handgr/tris.md2"
+  }
+}
+configstrings: {
+  key: 60
+  value: {
+    index: 60
+    data: "models/items/armor/combat/tris.md2"
+  }
+}
+configstrings: {
+  key: 61
+  value: {
+    index: 61
+    data: "models/weapons/g_rocket/tris.md2"
+  }
+}
+configstrings: {
+  key: 62
+  value: {
+    index: 62
+    data: "models/weapons/v_rocket/tris.md2"
+  }
+}
+configstrings: {
+  key: 63
+  value: {
+    index: 63
+    data: "models/items/ammo/rockets/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 64
+  value: {
+    index: 64
+    data: "models/objects/rocket/tris.md2"
+  }
+}
+configstrings: {
+  key: 65
+  value: {
+    index: 65
+    data: "models/objects/debris2/tris.md2"
+  }
+}
+configstrings: {
+  key: 66
+  value: {
+    index: 66
+    data: "models/items/ammo/cells/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 67
+  value: {
+    index: 67
+    data: "models/weapons/g_hyperb/tris.md2"
+  }
+}
+configstrings: {
+  key: 68
+  value: {
+    index: 68
+    data: "models/weapons/v_hyperb/tris.md2"
+  }
+}
+configstrings: {
+  key: 69
+  value: {
+    index: 69
+    data: "models/objects/dmspot/tris.md2"
+  }
+}
+configstrings: {
+  key: 70
+  value: {
+    index: 70
+    data: "models/weapons/g_shotg/tris.md2"
+  }
+}
+configstrings: {
+  key: 71
+  value: {
+    index: 71
+    data: "models/weapons/v_shotg/tris.md2"
+  }
+}
+configstrings: {
+  key: 72
+  value: {
+    index: 72
+    data: "models/items/ammo/bullets/medium/tris.md2"
+  }
+}
+configstrings: {
+  key: 73
+  value: {
+    index: 73
+    data: "models/weapons/g_machn/tris.md2"
+  }
+}
+configstrings: {
+  key: 74
+  value: {
+    index: 74
+    data: "models/weapons/v_machn/tris.md2"
+  }
+}
+configstrings: {
+  key: 75
+  value: {
+    index: 75
+    data: "models/items/healing/large/tris.md2"
+  }
+}
+configstrings: {
+  key: 76
+  value: {
+    index: 76
+    data: "models/items/armor/shard/tris.md2"
+  }
+}
+configstrings: {
+  key: 77
+  value: {
+    index: 77
+    data: "models/weapons/g_shotg2/tris.md2"
+  }
+}
+configstrings: {
+  key: 78
+  value: {
+    index: 78
+    data: "models/weapons/v_shotg2/tris.md2"
+  }
+}
+configstrings: {
+  key: 79
+  value: {
+    index: 79
+    data: "models/weapons/g_launch/tris.md2"
+  }
+}
+configstrings: {
+  key: 80
+  value: {
+    index: 80
+    data: "models/weapons/v_launch/tris.md2"
+  }
+}
+configstrings: {
+  key: 81
+  value: {
+    index: 81
+    data: "models/objects/grenade/tris.md2"
+  }
+}
+configstrings: {
+  key: 82
+  value: {
+    index: 82
+    data: "models/items/mega_h/tris.md2"
+  }
+}
+configstrings: {
+  key: 83
+  value: {
+    index: 83
+    data: "models/items/pack/tris.md2"
+  }
+}
+configstrings: {
+  key: 84
+  value: {
+    index: 84
+    data: "models/weapons/g_chain/tris.md2"
+  }
+}
+configstrings: {
+  key: 85
+  value: {
+    index: 85
+    data: "models/weapons/v_chain/tris.md2"
+  }
+}
+configstrings: {
+  key: 86
+  value: {
+    index: 86
+    data: "models/items/armor/jacket/tris.md2"
+  }
+}
+configstrings: {
+  key: 87
+  value: {
+    index: 87
+    data: "models/items/healing/stimpack/tris.md2"
+  }
+}
+configstrings: {
+  key: 88
+  value: {
+    index: 88
+    data: "models/weapons/g_rail/tris.md2"
+  }
+}
+configstrings: {
+  key: 89
+  value: {
+    index: 89
+    data: "models/weapons/v_rail/tris.md2"
+  }
+}
+configstrings: {
+  key: 289
+  value: {
+    index: 289
+    data: "player/fry.wav"
+  }
+}
+configstrings: {
+  key: 290
+  value: {
+    index: 290
+    data: "misc/w_pkup.wav"
+  }
+}
+configstrings: {
+  key: 291
+  value: {
+    index: 291
+    data: "weapons/blastf1a.wav"
+  }
+}
+configstrings: {
+  key: 292
+  value: {
+    index: 292
+    data: "misc/lasfly.wav"
+  }
+}
+configstrings: {
+  key: 293
+  value: {
+    index: 293
+    data: "player/lava1.wav"
+  }
+}
+configstrings: {
+  key: 294
+  value: {
+    index: 294
+    data: "player/lava2.wav"
+  }
+}
+configstrings: {
+  key: 295
+  value: {
+    index: 295
+    data: "misc/pc_up.wav"
+  }
+}
+configstrings: {
+  key: 296
+  value: {
+    index: 296
+    data: "misc/talk1.wav"
+  }
+}
+configstrings: {
+  key: 297
+  value: {
+    index: 297
+    data: "misc/udeath.wav"
+  }
+}
+configstrings: {
+  key: 298
+  value: {
+    index: 298
+    data: "items/respawn1.wav"
+  }
+}
+configstrings: {
+  key: 299
+  value: {
+    index: 299
+    data: "*death1.wav"
+  }
+}
+configstrings: {
+  key: 300
+  value: {
+    index: 300
+    data: "*death2.wav"
+  }
+}
+configstrings: {
+  key: 301
+  value: {
+    index: 301
+    data: "*death3.wav"
+  }
+}
+configstrings: {
+  key: 302
+  value: {
+    index: 302
+    data: "*death4.wav"
+  }
+}
+configstrings: {
+  key: 303
+  value: {
+    index: 303
+    data: "*fall1.wav"
+  }
+}
+configstrings: {
+  key: 304
+  value: {
+    index: 304
+    data: "*fall2.wav"
+  }
+}
+configstrings: {
+  key: 305
+  value: {
+    index: 305
+    data: "*gurp1.wav"
+  }
+}
+configstrings: {
+  key: 306
+  value: {
+    index: 306
+    data: "*gurp2.wav"
+  }
+}
+configstrings: {
+  key: 307
+  value: {
+    index: 307
+    data: "*jump1.wav"
+  }
+}
+configstrings: {
+  key: 308
+  value: {
+    index: 308
+    data: "*pain25_1.wav"
+  }
+}
+configstrings: {
+  key: 309
+  value: {
+    index: 309
+    data: "*pain25_2.wav"
+  }
+}
+configstrings: {
+  key: 310
+  value: {
+    index: 310
+    data: "*pain50_1.wav"
+  }
+}
+configstrings: {
+  key: 311
+  value: {
+    index: 311
+    data: "*pain50_2.wav"
+  }
+}
+configstrings: {
+  key: 312
+  value: {
+    index: 312
+    data: "*pain75_1.wav"
+  }
+}
+configstrings: {
+  key: 313
+  value: {
+    index: 313
+    data: "*pain75_2.wav"
+  }
+}
+configstrings: {
+  key: 314
+  value: {
+    index: 314
+    data: "*pain100_1.wav"
+  }
+}
+configstrings: {
+  key: 315
+  value: {
+    index: 315
+    data: "*pain100_2.wav"
+  }
+}
+configstrings: {
+  key: 316
+  value: {
+    index: 316
+    data: "player/gasp1.wav"
+  }
+}
+configstrings: {
+  key: 317
+  value: {
+    index: 317
+    data: "player/gasp2.wav"
+  }
+}
+configstrings: {
+  key: 318
+  value: {
+    index: 318
+    data: "player/watr_in.wav"
+  }
+}
+configstrings: {
+  key: 319
+  value: {
+    index: 319
+    data: "player/watr_out.wav"
+  }
+}
+configstrings: {
+  key: 320
+  value: {
+    index: 320
+    data: "player/watr_un.wav"
+  }
+}
+configstrings: {
+  key: 321
+  value: {
+    index: 321
+    data: "player/u_breath1.wav"
+  }
+}
+configstrings: {
+  key: 322
+  value: {
+    index: 322
+    data: "player/u_breath2.wav"
+  }
+}
+configstrings: {
+  key: 323
+  value: {
+    index: 323
+    data: "items/pkup.wav"
+  }
+}
+configstrings: {
+  key: 324
+  value: {
+    index: 324
+    data: "world/land.wav"
+  }
+}
+configstrings: {
+  key: 325
+  value: {
+    index: 325
+    data: "misc/h2ohit1.wav"
+  }
+}
+configstrings: {
+  key: 326
+  value: {
+    index: 326
+    data: "items/damage.wav"
+  }
+}
+configstrings: {
+  key: 327
+  value: {
+    index: 327
+    data: "items/protect.wav"
+  }
+}
+configstrings: {
+  key: 328
+  value: {
+    index: 328
+    data: "items/protect4.wav"
+  }
+}
+configstrings: {
+  key: 329
+  value: {
+    index: 329
+    data: "weapons/noammo.wav"
+  }
+}
+configstrings: {
+  key: 330
+  value: {
+    index: 330
+    data: "infantry/inflies1.wav"
+  }
+}
+configstrings: {
+  key: 331
+  value: {
+    index: 331
+    data: "world/drip_amb.wav"
+  }
+}
+configstrings: {
+  key: 332
+  value: {
+    index: 332
+    data: "world/wind2.wav"
+  }
+}
+configstrings: {
+  key: 333
+  value: {
+    index: 333
+    data: "items/s_health.wav"
+  }
+}
+configstrings: {
+  key: 334
+  value: {
+    index: 334
+    data: "items/n_health.wav"
+  }
+}
+configstrings: {
+  key: 335
+  value: {
+    index: 335
+    data: "items/l_health.wav"
+  }
+}
+configstrings: {
+  key: 336
+  value: {
+    index: 336
+    data: "items/m_health.wav"
+  }
+}
+configstrings: {
+  key: 337
+  value: {
+    index: 337
+    data: "misc/am_pkup.wav"
+  }
+}
+configstrings: {
+  key: 338
+  value: {
+    index: 338
+    data: "weapons/hgrent1a.wav"
+  }
+}
+configstrings: {
+  key: 339
+  value: {
+    index: 339
+    data: "weapons/hgrena1b.wav"
+  }
+}
+configstrings: {
+  key: 340
+  value: {
+    index: 340
+    data: "weapons/hgrenc1b.wav"
+  }
+}
+configstrings: {
+  key: 341
+  value: {
+    index: 341
+    data: "weapons/hgrenb1a.wav"
+  }
+}
+configstrings: {
+  key: 342
+  value: {
+    index: 342
+    data: "weapons/hgrenb2a.wav"
+  }
+}
+configstrings: {
+  key: 343
+  value: {
+    index: 343
+    data: "misc/ar1_pkup.wav"
+  }
+}
+configstrings: {
+  key: 344
+  value: {
+    index: 344
+    data: "weapons/rockfly.wav"
+  }
+}
+configstrings: {
+  key: 345
+  value: {
+    index: 345
+    data: "weapons/rocklf1a.wav"
+  }
+}
+configstrings: {
+  key: 346
+  value: {
+    index: 346
+    data: "weapons/rocklr1b.wav"
+  }
+}
+configstrings: {
+  key: 347
+  value: {
+    index: 347
+    data: "weapons/hyprbu1a.wav"
+  }
+}
+configstrings: {
+  key: 348
+  value: {
+    index: 348
+    data: "weapons/hyprbl1a.wav"
+  }
+}
+configstrings: {
+  key: 349
+  value: {
+    index: 349
+    data: "weapons/hyprbf1a.wav"
+  }
+}
+configstrings: {
+  key: 350
+  value: {
+    index: 350
+    data: "weapons/hyprbd1a.wav"
+  }
+}
+configstrings: {
+  key: 351
+  value: {
+    index: 351
+    data: "weapons/shotgf1b.wav"
+  }
+}
+configstrings: {
+  key: 352
+  value: {
+    index: 352
+    data: "weapons/shotgr1b.wav"
+  }
+}
+configstrings: {
+  key: 353
+  value: {
+    index: 353
+    data: "weapons/machgf1b.wav"
+  }
+}
+configstrings: {
+  key: 354
+  value: {
+    index: 354
+    data: "weapons/machgf2b.wav"
+  }
+}
+configstrings: {
+  key: 355
+  value: {
+    index: 355
+    data: "weapons/machgf3b.wav"
+  }
+}
+configstrings: {
+  key: 356
+  value: {
+    index: 356
+    data: "weapons/machgf4b.wav"
+  }
+}
+configstrings: {
+  key: 357
+  value: {
+    index: 357
+    data: "weapons/machgf5b.wav"
+  }
+}
+configstrings: {
+  key: 358
+  value: {
+    index: 358
+    data: "misc/ar2_pkup.wav"
+  }
+}
+configstrings: {
+  key: 359
+  value: {
+    index: 359
+    data: "weapons/sshotf1b.wav"
+  }
+}
+configstrings: {
+  key: 360
+  value: {
+    index: 360
+    data: "weapons/grenlf1a.wav"
+  }
+}
+configstrings: {
+  key: 361
+  value: {
+    index: 361
+    data: "weapons/grenlr1b.wav"
+  }
+}
+configstrings: {
+  key: 362
+  value: {
+    index: 362
+    data: "weapons/grenlb1b.wav"
+  }
+}
+configstrings: {
+  key: 363
+  value: {
+    index: 363
+    data: "weapons/chngnu1a.wav"
+  }
+}
+configstrings: {
+  key: 364
+  value: {
+    index: 364
+    data: "weapons/chngnl1a.wav"
+  }
+}
+configstrings: {
+  key: 365
+  value: {
+    index: 365
+    data: "weapons/chngnd1a.wav"
+  }
+}
+configstrings: {
+  key: 366
+  value: {
+    index: 366
+    data: "weapons/rg_hum.wav"
+  }
+}
+configstrings: {
+  key: 367
+  value: {
+    index: 367
+    data: "plats/pt1_strt.wav"
+  }
+}
+configstrings: {
+  key: 368
+  value: {
+    index: 368
+    data: "plats/pt1_mid.wav"
+  }
+}
+configstrings: {
+  key: 369
+  value: {
+    index: 369
+    data: "plats/pt1_end.wav"
+  }
+}
+configstrings: {
+  key: 545
+  value: {
+    index: 545
+    data: "i_help"
+  }
+}
+configstrings: {
+  key: 546
+  value: {
+    index: 546
+    data: "i_health"
+  }
+}
+configstrings: {
+  key: 547
+  value: {
+    index: 547
+    data: "help"
+  }
+}
+configstrings: {
+  key: 548
+  value: {
+    index: 548
+    data: "field_3"
+  }
+}
+configstrings: {
+  key: 549
+  value: {
+    index: 549
+    data: "w_blaster"
+  }
+}
+configstrings: {
+  key: 550
+  value: {
+    index: 550
+    data: "a_shells"
+  }
+}
+configstrings: {
+  key: 551
+  value: {
+    index: 551
+    data: "a_slugs"
+  }
+}
+configstrings: {
+  key: 552
+  value: {
+    index: 552
+    data: "a_grenades"
+  }
+}
+configstrings: {
+  key: 553
+  value: {
+    index: 553
+    data: "i_combatarmor"
+  }
+}
+configstrings: {
+  key: 554
+  value: {
+    index: 554
+    data: "w_rlauncher"
+  }
+}
+configstrings: {
+  key: 555
+  value: {
+    index: 555
+    data: "a_rockets"
+  }
+}
+configstrings: {
+  key: 556
+  value: {
+    index: 556
+    data: "a_cells"
+  }
+}
+configstrings: {
+  key: 557
+  value: {
+    index: 557
+    data: "w_hyperblaster"
+  }
+}
+configstrings: {
+  key: 558
+  value: {
+    index: 558
+    data: "w_shotgun"
+  }
+}
+configstrings: {
+  key: 559
+  value: {
+    index: 559
+    data: "a_bullets"
+  }
+}
+configstrings: {
+  key: 560
+  value: {
+    index: 560
+    data: "w_machinegun"
+  }
+}
+configstrings: {
+  key: 561
+  value: {
+    index: 561
+    data: "i_jacketarmor"
+  }
+}
+configstrings: {
+  key: 562
+  value: {
+    index: 562
+    data: "w_sshotgun"
+  }
+}
+configstrings: {
+  key: 563
+  value: {
+    index: 563
+    data: "w_glauncher"
+  }
+}
+configstrings: {
+  key: 564
+  value: {
+    index: 564
+    data: "i_pack"
+  }
+}
+configstrings: {
+  key: 565
+  value: {
+    index: 565
+    data: "w_chaingun"
+  }
+}
+configstrings: {
+  key: 566
+  value: {
+    index: 566
+    data: "w_railgun"
+  }
+}
+configstrings: {
+  key: 800
+  value: {
+    index: 800
+    data: "m"
+  }
+}
+configstrings: {
+  key: 801
+  value: {
+    index: 801
+    data: "mmnmmommommnonmmonqnmmo"
+  }
+}
+configstrings: {
+  key: 802
+  value: {
+    index: 802
+    data: "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba"
+  }
+}
+configstrings: {
+  key: 803
+  value: {
+    index: 803
+    data: "mmmmmaaaaammmmmaaaaaabcdefgabcdefg"
+  }
+}
+configstrings: {
+  key: 804
+  value: {
+    index: 804
+    data: "mamamamamama"
+  }
+}
+configstrings: {
+  key: 805
+  value: {
+    index: 805
+    data: "jklmnopqrstuvwxyzyxwvutsrqponmlkj"
+  }
+}
+configstrings: {
+  key: 806
+  value: {
+    index: 806
+    data: "nmonqnmomnmomomno"
+  }
+}
+configstrings: {
+  key: 807
+  value: {
+    index: 807
+    data: "mmmaaaabcdefgmmmmaaaammmaamm"
+  }
+}
+configstrings: {
+  key: 808
+  value: {
+    index: 808
+    data: "mmmaaammmaaammmabcdefaaaammmmabcdefmmmaaaa"
+  }
+}
+configstrings: {
+  key: 809
+  value: {
+    index: 809
+    data: "aaaaaaaazzzzzzzz"
+  }
+}
+configstrings: {
+  key: 810
+  value: {
+    index: 810
+    data: "mmamammmmammamamaaamammma"
+  }
+}
+configstrings: {
+  key: 811
+  value: {
+    index: 811
+    data: "abcdefghijklmnopqrrqponmlkjihgfedcba"
+  }
+}
+configstrings: {
+  key: 863
+  value: {
+    index: 863
+    data: "a"
+  }
+}
+configstrings: {
+  key: 1057
+  value: {
+    index: 1057
+    data: "Body Armor"
+  }
+}
+configstrings: {
+  key: 1058
+  value: {
+    index: 1058
+    data: "Combat Armor"
+  }
+}
+configstrings: {
+  key: 1059
+  value: {
+    index: 1059
+    data: "Jacket Armor"
+  }
+}
+configstrings: {
+  key: 1060
+  value: {
+    index: 1060
+    data: "Armor Shard"
+  }
+}
+configstrings: {
+  key: 1061
+  value: {
+    index: 1061
+    data: "Power Screen"
+  }
+}
+configstrings: {
+  key: 1062
+  value: {
+    index: 1062
+    data: "Power Shield"
+  }
+}
+configstrings: {
+  key: 1063
+  value: {
+    index: 1063
+    data: "Blaster"
+  }
+}
+configstrings: {
+  key: 1064
+  value: {
+    index: 1064
+    data: "Shotgun"
+  }
+}
+configstrings: {
+  key: 1065
+  value: {
+    index: 1065
+    data: "Super Shotgun"
+  }
+}
+configstrings: {
+  key: 1066
+  value: {
+    index: 1066
+    data: "Machinegun"
+  }
+}
+configstrings: {
+  key: 1067
+  value: {
+    index: 1067
+    data: "Chaingun"
+  }
+}
+configstrings: {
+  key: 1068
+  value: {
+    index: 1068
+    data: "Grenades"
+  }
+}
+configstrings: {
+  key: 1069
+  value: {
+    index: 1069
+    data: "Grenade Launcher"
+  }
+}
+configstrings: {
+  key: 1070
+  value: {
+    index: 1070
+    data: "Rocket Launcher"
+  }
+}
+configstrings: {
+  key: 1071
+  value: {
+    index: 1071
+    data: "HyperBlaster"
+  }
+}
+configstrings: {
+  key: 1072
+  value: {
+    index: 1072
+    data: "Railgun"
+  }
+}
+configstrings: {
+  key: 1073
+  value: {
+    index: 1073
+    data: "BFG10K"
+  }
+}
+configstrings: {
+  key: 1074
+  value: {
+    index: 1074
+    data: "Shells"
+  }
+}
+configstrings: {
+  key: 1075
+  value: {
+    index: 1075
+    data: "Bullets"
+  }
+}
+configstrings: {
+  key: 1076
+  value: {
+    index: 1076
+    data: "Cells"
+  }
+}
+configstrings: {
+  key: 1077
+  value: {
+    index: 1077
+    data: "Rockets"
+  }
+}
+configstrings: {
+  key: 1078
+  value: {
+    index: 1078
+    data: "Slugs"
+  }
+}
+configstrings: {
+  key: 1079
+  value: {
+    index: 1079
+    data: "Quad Damage"
+  }
+}
+configstrings: {
+  key: 1080
+  value: {
+    index: 1080
+    data: "Invulnerability"
+  }
+}
+configstrings: {
+  key: 1081
+  value: {
+    index: 1081
+    data: "Silencer"
+  }
+}
+configstrings: {
+  key: 1082
+  value: {
+    index: 1082
+    data: "Rebreather"
+  }
+}
+configstrings: {
+  key: 1083
+  value: {
+    index: 1083
+    data: "Environment Suit"
+  }
+}
+configstrings: {
+  key: 1084
+  value: {
+    index: 1084
+    data: "Ancient Head"
+  }
+}
+configstrings: {
+  key: 1085
+  value: {
+    index: 1085
+    data: "Adrenaline"
+  }
+}
+configstrings: {
+  key: 1086
+  value: {
+    index: 1086
+    data: "Bandolier"
+  }
+}
+configstrings: {
+  key: 1087
+  value: {
+    index: 1087
+    data: "Ammo Pack"
+  }
+}
+configstrings: {
+  key: 1088
+  value: {
+    index: 1088
+    data: "Data CD"
+  }
+}
+configstrings: {
+  key: 1089
+  value: {
+    index: 1089
+    data: "Power Cube"
+  }
+}
+configstrings: {
+  key: 1090
+  value: {
+    index: 1090
+    data: "Pyramid Key"
+  }
+}
+configstrings: {
+  key: 1091
+  value: {
+    index: 1091
+    data: "Data Spinner"
+  }
+}
+configstrings: {
+  key: 1092
+  value: {
+    index: 1092
+    data: "Security Pass"
+  }
+}
+configstrings: {
+  key: 1093
+  value: {
+    index: 1093
+    data: "Blue Key"
+  }
+}
+configstrings: {
+  key: 1094
+  value: {
+    index: 1094
+    data: "Red Key"
+  }
+}
+configstrings: {
+  key: 1095
+  value: {
+    index: 1095
+    data: "Commander's Head"
+  }
+}
+configstrings: {
+  key: 1096
+  value: {
+    index: 1096
+    data: "Airstrike Marker"
+  }
+}
+configstrings: {
+  key: 1097
+  value: {
+    index: 1097
+    data: "Health"
+  }
+}
+configstrings: {
+  key: 1312
+  value: {
+    index: 1312
+    data: "claire\\female/jezebel"
+  }
+}
+frames: {
+  key: 1
+  value: {
+    number: 1
+    delta: -1
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+      stats: {
+        key: 0
+        value: 2
+      }
+      stats: {
+        key: 1
+        value: 100
+      }
+      stats: {
+        key: 2
+        value: 11
+      }
+      stats: {
+        key: 3
+        value: 15
+      }
+      stats: {
+        key: 6
+        value: 10
+      }
+      stats: {
+        key: 11
+        value: 10
+      }
+      stats: {
+        key: 12
+        value: 14
+      }
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 24
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 2
+  value: {
+    number: 2
+    delta: 1
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 25
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 3
+  value: {
+    number: 3
+    delta: 2
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 26
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 4
+  value: {
+    number: 4
+    delta: 3
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 27
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 5
+  value: {
+    number: 5
+    delta: 4
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 28
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 6
+  value: {
+    number: 6
+    delta: 5
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 29
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 7
+  value: {
+    number: 7
+    delta: 6
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 30
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 8
+  value: {
+    number: 8
+    delta: 7
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 31
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 9
+  value: {
+    number: 9
+    delta: 8
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 32
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 10
+  value: {
+    number: 10
+    delta: 9
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 42
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 33
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 11
+  value: {
+    number: 11
+    delta: 10
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 43
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 34
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+  }
+}
+frames: {
+  key: 12
+  value: {
+    number: 12
+    delta: 11
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_x: -2
+      view_offset_y: -6
+      view_offset_z: 91
+      kick_angles_x: -4
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 6
+      fov: 105
+      stats: {
+        key: 3
+        value: 14
+      }
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 46
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10111
+        origin_y: 3332
+        origin_z: 5186
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+    flashes1: {
+      entity: 1
+      weapon: 7
+    }
+  }
+}
+frames: {
+  key: 13
+  value: {
+    number: 13
+    delta: 12
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 7
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 47
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10282
+        origin_y: 3775
+        origin_z: 4974
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 14
+  value: {
+    number: 14
+    delta: 13
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 8
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 48
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10453
+        origin_y: 4218
+        origin_z: 4762
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 15
+  value: {
+    number: 15
+    delta: 14
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 9
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 49
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10624
+        origin_y: 4661
+        origin_z: 4550
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 16
+  value: {
+    number: 16
+    delta: 15
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 10
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 50
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10795
+        origin_y: 5104
+        origin_z: 4338
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 17
+  value: {
+    number: 17
+    delta: 16
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 11
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 51
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 10966
+        origin_y: 5547
+        origin_z: 4126
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 18
+  value: {
+    number: 18
+    delta: 17
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 12
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 52
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11137
+        origin_y: 5990
+        origin_z: 3913
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 19
+  value: {
+    number: 19
+    delta: 18
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 13
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 53
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+      }
+    }
+  }
+}
+frames: {
+  key: 20
+  value: {
+    number: 20
+    delta: 19
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 14
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+    temporary_entities: {
+      type: 7
+      position1_x: 11368
+      position1_y: 6589
+      position1_z: 3626
+    }
+  }
+}
+frames: {
+  key: 21
+  value: {
+    number: 21
+    delta: 20
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12544
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 15
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 1
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 22
+  value: {
+    number: 22
+    delta: 21
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 16
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 2
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 23
+  value: {
+    number: 23
+    delta: 22
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 17
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 3
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 24
+  value: {
+    number: 24
+    delta: 23
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 18
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 4
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 25
+  value: {
+    number: 25
+    delta: 24
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 19
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 5
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 26
+  value: {
+    number: 26
+    delta: 25
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 20
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 6
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 27
+  value: {
+    number: 27
+    delta: 26
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 21
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 7
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 28
+  value: {
+    number: 28
+    delta: 27
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 22
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 8
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 29
+  value: {
+    number: 29
+    delta: 28
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4383
+      view_angles_y: 12558
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 23
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 9
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 30
+  value: {
+    number: 30
+    delta: 29
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 24
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 10
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 31
+  value: {
+    number: 31
+    delta: 30
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 25
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 11
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 32
+  value: {
+    number: 32
+    delta: 31
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 25
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 12
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 33
+  value: {
+    number: 33
+    delta: 32
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 25
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 13
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 34
+  value: {
+    number: 34
+    delta: 33
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 25
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 14
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 35
+  value: {
+    number: 35
+    delta: 34
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 26
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 15
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 36
+  value: {
+    number: 36
+    delta: 35
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 27
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 16
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 37
+  value: {
+    number: 37
+    delta: 36
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 28
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 17
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+frames: {
+  key: 38
+  value: {
+    number: 38
+    delta: 37
+    area_bytes: 1
+    area_bits: 2
+    player_state: {
+      movestate: {
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        flags: 4
+        gravity: 800
+      }
+      view_angles_x: 4375
+      view_angles_y: 12565
+      view_offset_z: 88
+      gun_offset_x: -12
+      gun_offset_z: -10
+      gun_index: 30
+      gun_frame: 29
+      fov: 105
+    }
+    entities: {
+      key: 1
+      value: {
+        number: 1
+        origin_x: 9920
+        origin_y: 2835
+        origin_z: 5313
+        angle_x: 5
+        angle_y: 49
+        old_origin_x: 9920
+        old_origin_y: 2835
+        old_origin_z: 5313
+        model_index: 255
+        model_index2: 255
+        skin: 2048
+        solid: 6160
+        frame: 18
+      }
+    }
+    entities: {
+      key: 28
+      value: {
+        number: 28
+      }
+    }
+    entities: {
+      key: 29
+      value: {
+        number: 29
+      }
+    }
+    entities: {
+      key: 33
+      value: {
+        number: 33
+      }
+    }
+    entities: {
+      key: 34
+      value: {
+        number: 34
+      }
+    }
+    entities: {
+      key: 37
+      value: {
+        number: 37
+      }
+    }
+    entities: {
+      key: 38
+      value: {
+        number: 38
+      }
+    }
+    entities: {
+      key: 41
+      value: {
+        number: 41
+      }
+    }
+    entities: {
+      key: 43
+      value: {
+        number: 43
+      }
+    }
+    entities: {
+      key: 45
+      value: {
+        number: 45
+      }
+    }
+    entities: {
+      key: 47
+      value: {
+        number: 47
+      }
+    }
+    entities: {
+      key: 48
+      value: {
+        number: 48
+      }
+    }
+    entities: {
+      key: 49
+      value: {
+        number: 49
+      }
+    }
+    entities: {
+      key: 53
+      value: {
+        number: 53
+      }
+    }
+    entities: {
+      key: 54
+      value: {
+        number: 54
+      }
+    }
+    entities: {
+      key: 55
+      value: {
+        number: 55
+      }
+    }
+    entities: {
+      key: 56
+      value: {
+        number: 56
+      }
+    }
+    entities: {
+      key: 60
+      value: {
+        number: 60
+      }
+    }
+    entities: {
+      key: 61
+      value: {
+        number: 61
+      }
+    }
+    entities: {
+      key: 62
+      value: {
+        number: 62
+      }
+    }
+    entities: {
+      key: 63
+      value: {
+        number: 63
+      }
+    }
+    entities: {
+      key: 65
+      value: {
+        number: 65
+      }
+    }
+    entities: {
+      key: 66
+      value: {
+        number: 66
+      }
+    }
+    entities: {
+      key: 67
+      value: {
+        number: 67
+      }
+    }
+    entities: {
+      key: 68
+      value: {
+        number: 68
+      }
+    }
+    entities: {
+      key: 69
+      value: {
+        number: 69
+      }
+    }
+    entities: {
+      key: 70
+      value: {
+        number: 70
+      }
+    }
+    entities: {
+      key: 71
+      value: {
+        number: 71
+      }
+    }
+    entities: {
+      key: 72
+      value: {
+        number: 72
+      }
+    }
+    entities: {
+      key: 82
+      value: {
+        number: 82
+      }
+    }
+    entities: {
+      key: 84
+      value: {
+        number: 84
+      }
+    }
+    entities: {
+      key: 85
+      value: {
+        number: 85
+      }
+    }
+    entities: {
+      key: 92
+      value: {
+        number: 92
+      }
+    }
+    entities: {
+      key: 93
+      value: {
+        number: 93
+      }
+    }
+    entities: {
+      key: 119
+      value: {
+        number: 119
+      }
+    }
+    entities: {
+      key: 121
+      value: {
+        number: 121
+      }
+    }
+    entities: {
+      key: 128
+      value: {
+        number: 128
+        origin_x: 11307
+        origin_y: 6433
+        origin_z: 3701
+        angle_x: 18
+        angle_y: 48
+        old_origin_x: 9941
+        old_origin_y: 2889
+        old_origin_z: 5398
+        model_index: 32
+        effects: 16
+        sound: 56
+        remove: true
+      }
+    }
+  }
+}
+
