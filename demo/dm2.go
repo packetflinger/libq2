@@ -19,6 +19,8 @@ type DM2Parser struct {
 	binaryPosition int               // where in those contents we are
 	currentFrame   int32             // index of frames map
 	callbacks      map[int]func(any) // index is svc_msg type
+	frameCount     int               // how many frames in total
+	fps            int               // only supports 10
 }
 
 // Read the entire binary demo file into memory
@@ -30,12 +32,17 @@ func NewDM2Demo(filename string) (*DM2Parser, error) {
 	if err != nil {
 		return nil, err
 	}
-	demo := &DM2Parser{binaryData: data}
-	demo.textProto = &pb.DM2Demo{}
-	demo.textProto.Baselines = make(map[int32]*pb.PackedEntity)
-	demo.textProto.Configstrings = make(map[int32]*pb.ConfigString)
-	demo.textProto.Frames = make(map[int32]*pb.Frame)
-	demo.callbacks = make(map[int]func(any))
+	demo := &DM2Parser{
+		binaryData: data,
+		callbacks:  make(map[int]func(any)),
+		frameCount: 0,
+		fps:        10,
+		textProto: &pb.DM2Demo{
+			Baselines:     make(map[int32]*pb.PackedEntity),
+			Configstrings: make(map[int32]*pb.ConfigString),
+			Frames:        make(map[int32]*pb.Frame),
+		},
+	}
 	return demo, nil
 }
 
@@ -108,6 +115,7 @@ func (d *DM2Parser) ApplyPacket(packet *pb.Packet) error {
 		for _, fr := range frames {
 			d.textProto.Frames[int32(fr.GetNumber())] = fr
 			d.currentFrame = fr.GetNumber()
+			d.frameCount++
 		}
 		if cbFunc, found := d.callbacks[message.SVCFrame]; found {
 			for _, fr := range frames {
