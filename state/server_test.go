@@ -35,7 +35,7 @@ func TestNewServer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:  "hostname no port",
+			name:  "hostname with port",
 			input: "test.srv.addr:27910",
 			want: Server{
 				Address: "test.srv.addr",
