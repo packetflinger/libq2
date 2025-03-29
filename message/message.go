@@ -171,6 +171,7 @@ func (msg *Buffer) ReadLong() int {
 	return int(int32(binary.LittleEndian.Uint32(msg.ReadData(4))))
 }
 
+// TODO: Remove this later
 // 4 bytes unsigned
 func (msg *Buffer) ReadULong() uint32 {
 	l := uint32(msg.Data[msg.Index])
@@ -214,7 +215,6 @@ func (msg *Buffer) ReadString() string {
 			break
 		}
 	}
-
 	msg.Index++
 	return buffer.String()
 }
@@ -224,7 +224,6 @@ func (msg *Buffer) WriteString(s string) {
 	for _, ch := range s {
 		msg.WriteByte(byte(ch))
 	}
-
 	msg.WriteByte(0)
 }
 
