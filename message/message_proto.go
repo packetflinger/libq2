@@ -39,6 +39,6 @@ func (b *Buffer) WriteWordP(num int32) {
 	b.WriteWord(int16(num))
 }
 
-func (b *Buffer) WriteLongP(num int32) {
-	b.WriteLong(int32(num))
+func (b *Buffer) WriteLongP(num int) {
+	b.WriteLong(num)
 }

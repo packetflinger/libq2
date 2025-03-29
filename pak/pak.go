@@ -53,13 +53,13 @@ func Marshal(archive *pb.PAKArchive) ([]byte, error) {
 		for i := len(f.Name); i < FileNameLength-1; i++ {
 			metaLump.WriteByte(0) // fill in remaining name space with nulls
 		}
-		metaLump.WriteLong(int32(dataLump.Index) + HeaderLength)
-		metaLump.WriteLong(int32(len(f.Data)))
+		metaLump.WriteLong(dataLump.Index + HeaderLength)
+		metaLump.WriteLong(len(f.Data))
 		dataLump.WriteData(f.Data)
 	}
 	buf.WriteLong(Magic)
-	buf.WriteLong(int32(len(dataLump.Data) + HeaderLength))
-	buf.WriteLong(int32(len(metaLump.Data)))
+	buf.WriteLong(len(dataLump.Data) + HeaderLength)
+	buf.WriteLong(len(metaLump.Data))
 	buf.Append(dataLump)
 	buf.Append(metaLump)
 	return buf.Data, nil

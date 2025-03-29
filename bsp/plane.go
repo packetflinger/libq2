@@ -10,8 +10,8 @@ const (
 
 type BSPPlane struct {
 	Normal   types.Vector3
-	Distance int32
-	Type     int32
+	Distance int
+	Type     int
 }
 
 func (bsp *BSPFile) FetchPlanes() []BSPPlane {

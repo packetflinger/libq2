@@ -1,6 +1,7 @@
 package message
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -35,7 +36,7 @@ func TestWriteLong(t *testing.T) {
 
 	for _, test := range tests {
 		msg := Buffer{}
-		msg.WriteLong(int32(test.input))
+		msg.WriteLong(test.input)
 		for i := range msg.Data {
 			if msg.Data[i] != test.want[i] {
 				t.Errorf("%s failed\n", test.desc)
@@ -186,29 +187,39 @@ func TestReadULong(t *testing.T) {
 func TestReadLong(t *testing.T) {
 	tests := []struct {
 		desc  string
-		input Buffer
-		want  int32
+		input string
+		want  int
 	}{
 		{
 			desc:  "test1",
-			input: NewBuffer([]byte{255, 255, 255, 255}),
+			input: "ffffffff",
 			want:  -1,
 		},
 		{
 			desc:  "test2",
-			input: NewBuffer([]byte{128, 0, 0, 0}),
+			input: "80000000",
 			want:  128,
 		},
 		{
 			desc:  "test3",
-			input: NewBuffer([]byte{0, 0, 0, 128}),
+			input: "00000080",
 			want:  -2147483648,
+		},
+		{
+			desc:  "test4",
+			input: "ffffff7f",
+			want:  2147483647,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			got := tc.input.ReadLong()
+			bytes, err := hex.DecodeString(tc.input)
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			got := in.ReadLong()
 			if got != tc.want {
 				t.Errorf("got %d, want %d", got, tc.want)
 			}

@@ -278,7 +278,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	}
 
 	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
-		b.WriteLong(int32(to.GetSkin()))
+		b.WriteLong(int(to.GetSkin()))
 	} else if (bits & EntitySkin8) > 0 {
 		b.WriteByte(byte(to.GetSkin()))
 	} else if (bits & EntitySkin16) > 0 {
@@ -286,7 +286,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	}
 
 	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
-		b.WriteLong(int32(to.GetEffects()))
+		b.WriteLong(int(to.GetEffects()))
 	} else if (bits & EntityEffects8) > 0 {
 		b.WriteByte(byte(to.GetEffects()))
 	} else if (bits & EntityEffects16) > 0 {
@@ -294,7 +294,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	}
 
 	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
-		b.WriteLong(int32(to.GetRenderFx()))
+		b.WriteLong(int(to.GetRenderFx()))
 	} else if (bits & EntityRenderFX8) > 0 {
 		b.WriteByte(byte(to.GetRenderFx()))
 	} else if (bits & EntityRenderFX16) > 0 {

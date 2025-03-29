@@ -50,8 +50,8 @@ type BSPFile struct {
 
 // Collections of data are organized into "lumps" within the file
 type BSPLumpMeta struct {
-	location int32
-	length   int32
+	location int
+	length   int
 }
 
 type BSPLumpData struct {

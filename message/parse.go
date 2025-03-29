@@ -517,8 +517,8 @@ func (p *Buffer) ParsePacket(oldFrames map[int32]*pb.Frame) (*pb.Packet, error) 
 func MarshalServerData(s *pb.ServerInfo) Buffer {
 	b := Buffer{}
 	b.WriteByte(SVCServerData)
-	b.WriteLong(int32(s.GetProtocol()))
-	b.WriteLong(int32(s.GetServerCount()))
+	b.WriteLong(int(s.GetProtocol()))
+	b.WriteLong(int(s.GetServerCount()))
 	if s.GetDemo() {
 		b.WriteByte(1)
 	} else {
@@ -730,7 +730,7 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 		b.WriteByte(byte(te.GetColor()))
 		b.WriteShort(uint16(te.GetEntity2()))
 		if int32(te.Entity1) != -1 {
-			b.WriteLong(int32(te.GetTime()))
+			b.WriteLong(int(te.GetTime()))
 		}
 	case TentWidowBeamOut:
 		b.WriteShort(uint16(te.GetEntity1()))
@@ -784,8 +784,8 @@ func MarshalCenterPrint(cp *pb.CenterPrint) Buffer {
 func MarshalFrame(fr *pb.Frame) Buffer {
 	msg := Buffer{}
 	msg.WriteByte(SVCFrame)
-	msg.WriteLong(fr.Number)
-	msg.WriteLong(fr.Delta)
+	msg.WriteLong(int(fr.Number))
+	msg.WriteLong(int(fr.Delta))
 	msg.WriteByte(byte(fr.Suppressed))
 	msg.WriteByte(byte(fr.AreaBytes))
 	for _, ab := range fr.AreaBits {

@@ -40,8 +40,8 @@ type NetChan struct {
 	in         message.Buffer
 	out        message.Buffer
 	QPort      uint16
-	Sequence1  int32
-	Sequence2  int32
+	Sequence1  int
+	Sequence2  int
 	ReliableS1 bool
 	ReliableS2 bool
 }

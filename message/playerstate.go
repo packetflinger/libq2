@@ -307,7 +307,7 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 		}
 	}
 
-	b.WriteLong(int32(statsMask))
+	b.WriteLong(int(statsMask))
 	for i = 0; i < MaxStats; i++ {
 		if (statsMask & (1 << i)) != 0 {
 			b.WriteShort(uint16(toStats[i]))

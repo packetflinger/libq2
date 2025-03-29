@@ -291,7 +291,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 // Note first two buffer args are pointers since they get updated
 func buildDemoPacket(final, packet *message.Buffer, msg message.Buffer, force bool) {
 	if ((len(packet.Data) + len(msg.Data)) > message.MaxMessageLength) || force {
-		final.WriteLong(int32(len(packet.Data)))
+		final.WriteLong(len(packet.Data))
 		final.Append(*packet)
 		packet.Reset()
 	}

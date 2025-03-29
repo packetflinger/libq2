@@ -1,14 +1,14 @@
 package types
 
 type Vector3 struct {
-	X int32
-	Y int32
-	Z int32
+	X int
+	Y int
+	Z int
 }
 
 type Vector2 struct {
-	X int32
-	Y int32
+	X int
+	Y int
 }
 
 type Vector uint16

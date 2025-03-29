@@ -1,8 +1,8 @@
 package bsp
 
 type Visibility struct {
-	PVS int32 // visible
-	PHS int32 // audible
+	PVS int // visible
+	PHS int // audible
 }
 
 func (bsp *BSPFile) FetchVisibility() []Visibility {

@@ -2,6 +2,7 @@ package message
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/packetflinger/libq2/util"
 )
@@ -162,14 +163,12 @@ func (m *Buffer) Rewind() {
 	m.Index = 0
 }
 
-// 4 bytes signed
-func (msg *Buffer) ReadLong() int32 {
-	l := int32(msg.Data[msg.Index])
-	l += int32(msg.Data[msg.Index+1]) << 8
-	l += int32(msg.Data[msg.Index+2]) << 16
-	l += int32(msg.Data[msg.Index+3]) << 24
-	msg.Index += 4
-	return l
+// Read 4 bytes and construct a 32 bit signed integer from the data. The `Uint32`
+// from the binary package returns an unsigned `int32“, it then needs to be
+// casted to a `int32` and then finally to an `int`. Skipping that intermediate
+// cast results in the wrong value.
+func (msg *Buffer) ReadLong() int {
+	return int(int32(binary.LittleEndian.Uint32(msg.ReadData(4))))
 }
 
 // 4 bytes unsigned
@@ -182,15 +181,11 @@ func (msg *Buffer) ReadULong() uint32 {
 	return l
 }
 
-func (msg *Buffer) WriteLong(data int32) {
-	b := []byte{
-		byte(data & 0xff),
-		byte((data >> 8) & 0xff),
-		byte((data >> 16) & 0xff),
-		byte((data >> 24) & 0xff),
-	}
-	msg.Data = append(msg.Data, b...)
-	msg.Index += 4
+// 4 bytes signed
+func (msg *Buffer) WriteLong(data int) {
+	b := make([]byte, 4)
+	binary.LittleEndian.PutUint32(b, uint32(int32(data)))
+	msg.WriteData(b)
 }
 
 // just grab a subsection of the buffer

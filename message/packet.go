@@ -7,8 +7,8 @@ import (
 )
 
 type ClientPacket struct {
-	Sequence1   int32
-	Sequence2   int32
+	Sequence1   int
+	Sequence2   int
 	QPort       uint16 //
 	Reliable1   bool   // requires an ack
 	Reliable2   bool
