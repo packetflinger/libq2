@@ -36,6 +36,17 @@ const (
 	EntitySkin16     = 1 << 25
 	EntitySound      = 1 << 26
 	EntitySolid      = 1 << 27
+	EntityModel16    = 1 << 28
+	EntityMoreFX8    = 1 << 29
+	EntityAlpha      = 1 << 30
+	EntityMoreBits4  = 1 << 31 // keep going
+	EntityScale      = 1 << 32
+	EntityMoreFX16   = 1 << 33
+
+	EntitySkin32     = EntitySkin8 | EntitySkin16
+	EntityEffects32  = EntityEffects8 | EntityEffects16
+	EntityRenderFX32 = EntityRenderFX8 | EntityRenderFX16
+	EntityMoreFX32   = EntityMoreFX8 | EntityMoreFX16
 )
 
 // Read up to the first 4 bytes of an entity, depending on the

@@ -95,6 +95,10 @@ message PackedPlayer {
     int32 blend_x = 20;
     int32 blend_y = 21;
     int32 blend_z = 22;
+    int32 damage_blend_w = 27;      // used in mvd
+    int32 damage_blend_x = 28;      // used in mvd
+    int32 damage_blend_y = 29;      // used in mvd
+    int32 damage_blend_z = 30;      // used in mvd
     uint32 fov = 23;
     uint32 rd_flags = 24;
     map<uint32, int32> stats = 26;  // 16 bits each

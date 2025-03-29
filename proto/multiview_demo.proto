@@ -1,12 +1,116 @@
 // compile with:
 // protoc --go_out=. --go_opt=paths=source_relative multiview_demo.proto
-syntax="proto3";
+syntax = "proto3";
 option go_package = "github.com/packetflinger/libq2/proto";
 package proto;
+
+import "server_message.proto";
+
+message MvdDemo {
+    uint32 flags = 1;
+    uint32 entity_state_flags = 2;
+    uint32 player_state_flags = 3;
+    MvdConfigStringRemap remap = 4;
+    MvdEntityStateExtension extension = 5;
+    MvdServerData serverdata = 6;
+    map<uint32,ConfigString> configstrings = 7;
+    map<uint32,MvdPlayer> players = 8;
+    map<uint32,PackedEntity> entities = 9;
+    uint32 max_players = 11;
+    string layout = 12;
+    repeated MvdPacket packets = 13;
+}
 
 message Multicast {
     uint32 type = 1;
     bool reliable = 2;
     uint32 leafnum = 3;
     string data = 4;
+}
+
+/*
+// remove me later
+message MvdState {
+    uint32 flags = 1;
+    uint32 entity_state_flags = 2;
+    uint32 player_state_flags = 3;
+    MvdConfigStringRemap remap = 4;
+    map<uint32,PackedEntity> entities = 5;
+    MvdEntityStateExtension extension = 6;
+}
+*/
+
+message MvdServerData {
+    uint32 version_major = 1;
+    uint32 version_minor = 2;
+    uint32 spawn_count = 3;
+    string game_dir = 4;
+    uint32 client_number = 5; // the number of the dummy
+}
+
+// different max limits and cs offsets depending on protocol version
+message MvdConfigStringRemap {
+    bool extended = 1;
+    uint32 max_edicts = 2;
+    uint32 max_models = 3;
+    uint32 max_sounds = 4;
+    uint32 max_images = 5;
+    uint32 air_accel = 6;
+    uint32 max_clients = 7;
+    uint32 map_checksum = 8;
+    uint32 models = 9;
+    uint32 sounds = 10;
+    uint32 images = 11;
+    uint32 lights = 12;
+    uint32 items = 13;
+    uint32 player_skins = 14;
+    uint32 general = 15;
+    uint32 end = 16;
+}
+
+message MvdPlayer {
+    bool in_use = 1;
+    string name = 2;
+    PackedPlayer player_state = 3;
+}
+
+message MvdEntityStateExtension {
+    uint32 more_fx = 1;
+    int32 alpha = 2;
+    int32 scale = 3;
+    int32 loop_volume = 4;
+    int32 loop_attenuation = 5;
+}
+
+message MvdFrame {
+    int32 portal_bits = 1;
+    bytes portal_data = 2;
+    map<uint32, PackedPlayer> players = 3;  // players introduced this frame
+    map<uint32, PackedEntity> entities = 4; // ents seen this frame
+    repeated PackedSound sounds = 5;
+}
+
+message MvdMulticast {
+    uint32 type = 1;    // byte
+    uint32 leaf = 2;    // word
+    bytes data = 3;
+}
+
+message MvdUnicast {
+    uint32 client_number = 1; // player index
+    MvdPlayer player = 2;
+    repeated Layout layouts = 3;
+    repeated ConfigString configstrings = 4;
+    repeated Print prints = 5;
+    repeated StuffText stuffs = 6;
+}
+
+message MvdPacket {
+    repeated PackedSound sounds = 1;
+    repeated Print prints = 2;
+    repeated MvdUnicast unicasts= 3;
+    repeated MvdMulticast multicasts= 4;
+    repeated MvdFrame frames = 5;
+    repeated ConfigString configstrings = 6;  // maybe a map?
+    MvdServerData server_data = 7;
 }

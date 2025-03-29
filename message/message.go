@@ -43,6 +43,7 @@ const (
 	SoundPosition    = 1 << 2 // 3 coordinates
 	SoundEntity      = 1 << 3 // short 0-2: channel, 3-12: entity
 	SoundOffset      = 1 << 4 // 1 byte, msec offset from frame start
+	SoundIndex16     = 1 << 5 // index is 16 bits
 )
 
 // temporary entity types
@@ -130,6 +131,7 @@ func NewBuffer(data []byte) Buffer {
 	}
 }
 
+// Reinitialize the back to zero
 func (m *Buffer) Reset() {
 	m.Data = []byte{}
 	m.Index = 0
@@ -143,14 +145,19 @@ func (m *Buffer) Append(m2 Buffer) {
 	m.Length = len(m.Data)
 }
 
+// Set the internal pointer to a specific value between zero and the langth of
+// the buffer.
 func (m *Buffer) Seek(offset int) {
 	off := util.Clamp(offset, 0, len(m.Data))
 	m.Index = off
 }
 
+// Get the length of the current buffer
 func (m *Buffer) Size() int {
 	return len(m.Data)
 }
+
+// Set the internal pointer back to the beginning of the buffer. Same as `seek(0)`
 func (m *Buffer) Rewind() {
 	m.Index = 0
 }
@@ -391,4 +398,21 @@ func (msg *Buffer) WriteUInt32(data uint32) {
 	}
 	msg.Data = append(msg.Data, b...)
 	msg.Index += 4
+}
+
+func (msg *Buffer) ReadVarInt64() uint64 {
+	var v uint64
+	var c, bits int
+	for {
+		c = int(msg.ReadByte())
+		if c == -1 {
+			break
+		}
+		v |= uint64((c & 0x7f) << bits)
+		bits += 7
+		if ((c & 0x80) == 0) || (bits >= 64) {
+			break
+		}
+	}
+	return v
 }
