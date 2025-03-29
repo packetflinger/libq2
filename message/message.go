@@ -229,25 +229,10 @@ func (msg *Buffer) WriteString(s string) {
 
 // 2 bytes unsigned
 func (msg *Buffer) ReadShort() int {
-	/*
-		s := uint16(msg.Data[msg.Index] & 0xff)
-		s += uint16(msg.Data[msg.Index+1]) << 8
-		msg.Index += 2
-
-		return s
-	*/
 	return int(int16(binary.LittleEndian.Uint16(msg.ReadData(2))))
 }
 
 func (msg *Buffer) WriteShort(s int) {
-	/*
-		b := []byte{
-			byte(s & 0xff),
-			byte((s >> 8) & 0xff),
-		}
-		msg.Data = append(msg.Data, b...)
-		msg.Index += 2
-	*/
 	b := make([]byte, 2)
 	binary.LittleEndian.PutUint16(b, uint16(int16(s)))
 	msg.WriteData(b)
