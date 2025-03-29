@@ -15,7 +15,7 @@ func TestDeltaPlayerBitmask(t *testing.T) {
 		name string
 		to   *pb.PackedPlayer
 		from *pb.PackedPlayer
-		want uint16
+		want int
 	}{
 		{
 			name: "nil playerstates",

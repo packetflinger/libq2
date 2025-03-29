@@ -46,7 +46,7 @@ func (p ClientPacket) Marshal() []byte {
 	if p.Reliable2 {
 		msg.Data[msg.Index-1] |= 0x80
 	}
-	msg.WriteShort(uint16(p.QPort))
+	msg.WriteShort(int(p.QPort))
 	msg.WriteByte(p.MessageType)
 	msg.WriteData(p.Data)
 	return msg.Data

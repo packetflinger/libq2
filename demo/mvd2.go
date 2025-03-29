@@ -411,7 +411,7 @@ func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[uint32]*pb.Conf
 			break
 		}
 		idx := msg.ReadShort()
-		if idx == uint16(p.demo.Remap.End) {
+		if idx == int(int16(p.demo.Remap.GetEnd())) {
 			break
 		}
 		out[uint32(idx)] = &pb.ConfigString{Index: uint32(idx), Data: msg.ReadString()}
@@ -439,7 +439,7 @@ func (p *MVD2Parser) ParseConfigString(msg *message.Buffer) (*pb.ConfigString, e
 		return nil, fmt.Errorf("ParseConfigString() error - end of buffer")
 	}
 	idx := msg.ReadShort()
-	if idx >= uint16(p.demo.Remap.End) {
+	if idx >= int(int16(p.demo.Remap.End)) {
 		return nil, fmt.Errorf("ParseConfigString() error - index out of bounds: %d", idx)
 	}
 

@@ -32,7 +32,7 @@ func (b *Buffer) WriteCharP(num int32) {
 }
 
 func (b *Buffer) WriteShortP(num uint32) {
-	b.WriteShort(uint16(num))
+	b.WriteShort(int(num))
 }
 
 func (b *Buffer) WriteWordP(num int32) {

@@ -252,7 +252,7 @@ func (bot *Bot) Send() error {
 	if bot.Netchan.ReliableS2 {
 		msg.Data[msg.Index-1] |= 0x80
 	}
-	msg.WriteShort(uint16(bot.Netchan.QPort))
+	msg.WriteShort(int(bot.Netchan.QPort))
 
 	if len(msg2.Data) > 0 {
 		msg.Data = append(msg.Data, msg2.Data...)

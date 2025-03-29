@@ -228,21 +228,29 @@ func (msg *Buffer) WriteString(s string) {
 }
 
 // 2 bytes unsigned
-func (msg *Buffer) ReadShort() uint16 {
-	s := uint16(msg.Data[msg.Index] & 0xff)
-	s += uint16(msg.Data[msg.Index+1]) << 8
-	msg.Index += 2
+func (msg *Buffer) ReadShort() int {
+	/*
+		s := uint16(msg.Data[msg.Index] & 0xff)
+		s += uint16(msg.Data[msg.Index+1]) << 8
+		msg.Index += 2
 
-	return s
+		return s
+	*/
+	return int(int16(binary.LittleEndian.Uint16(msg.ReadData(2))))
 }
 
-func (msg *Buffer) WriteShort(s uint16) {
-	b := []byte{
-		byte(s & 0xff),
-		byte((s >> 8) & 0xff),
-	}
-	msg.Data = append(msg.Data, b...)
-	msg.Index += 2
+func (msg *Buffer) WriteShort(s int) {
+	/*
+		b := []byte{
+			byte(s & 0xff),
+			byte((s >> 8) & 0xff),
+		}
+		msg.Data = append(msg.Data, b...)
+		msg.Index += 2
+	*/
+	b := make([]byte, 2)
+	binary.LittleEndian.PutUint16(b, uint16(int16(s)))
+	msg.WriteData(b)
 }
 
 // for consistency
@@ -289,19 +297,19 @@ func (msg *Buffer) WriteWord(w int16) {
 	msg.Index += 2
 }
 
-func (msg *Buffer) ReadCoord() uint16 {
+func (msg *Buffer) ReadCoord() int {
 	return msg.ReadShort()
 }
 
-func (msg *Buffer) WriteCoord(c uint16) {
+func (msg *Buffer) WriteCoord(c int) {
 	msg.WriteShort(c)
 }
 
-func (msg *Buffer) ReadPosition() [3]uint16 {
+func (msg *Buffer) ReadPosition() [3]int {
 	x := msg.ReadCoord()
 	y := msg.ReadCoord()
 	z := msg.ReadCoord()
-	return [3]uint16{x, y, z}
+	return [3]int{x, y, z}
 }
 
 func (msg *Buffer) ReadDirection() uint8 {

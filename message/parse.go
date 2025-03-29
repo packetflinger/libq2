@@ -525,7 +525,7 @@ func MarshalServerData(s *pb.ServerInfo) Buffer {
 		b.WriteByte(0)
 	}
 	b.WriteString(s.GetGameDir())
-	b.WriteShort(uint16(s.GetClientNumber()))
+	b.WriteShort(int(s.GetClientNumber()))
 	b.WriteString(s.GetMapName())
 	return b
 }
@@ -534,7 +534,7 @@ func MarshalServerData(s *pb.ServerInfo) Buffer {
 func MarshalConfigstring(cs *pb.ConfigString) Buffer {
 	b := Buffer{}
 	b.WriteByte(SVCConfigString)
-	b.WriteShort(uint16(cs.GetIndex()))
+	b.WriteShort(int(cs.GetIndex()))
 	b.WriteString(cs.GetData())
 	return b
 }
@@ -557,7 +557,7 @@ func MarshalPrint(p *pb.Print) Buffer {
 // Write a Muzzleflash proto back to binary
 func MarshalFlash(mf *pb.MuzzleFlash) Buffer {
 	b := Buffer{}
-	b.WriteShort(uint16(mf.GetEntity()))
+	b.WriteShort(int(mf.GetEntity()))
 	b.WriteByte(byte(mf.GetWeapon()))
 	return b
 }
@@ -596,9 +596,9 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	case TentMoreBlood:
 		fallthrough
 	case TentElectricSparks:
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
 		b.WriteByte(byte(te.GetDirection()))
 	case TentSplash:
 		fallthrough
@@ -608,9 +608,9 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 		fallthrough
 	case TentTunnelSparks:
 		b.WriteByte(byte(te.GetCount()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
 		b.WriteByte(byte(te.GetDirection()))
 		b.WriteByte(byte(te.GetColor()))
 	case TentBlueHyperBlaster:
@@ -624,12 +624,12 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	case TentBubbleTrail2:
 		fallthrough
 	case TentBFGLaser:
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteCoord(uint16(te.GetPosition2X()))
-		b.WriteCoord(uint16(te.GetPosition2Y()))
-		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition2X()))
+		b.WriteCoord(int(te.GetPosition2Y()))
+		b.WriteCoord(int(te.GetPosition2Z()))
 	case TentGrenadeExplosion:
 		fallthrough
 	case TentGrenadeExplosionWater:
@@ -667,9 +667,9 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	case TentWidowSplash:
 		fallthrough
 	case TentNukeBlast:
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
 	case TentParasiteAttack:
 		fallthrough
 	case TentMedicCableAttack:
@@ -677,66 +677,66 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	case TentHeatBeam:
 		fallthrough
 	case TentMonsterHeatBeam:
-		b.WriteShort(uint16(te.GetEntity1()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteCoord(uint16(te.GetPosition2X()))
-		b.WriteCoord(uint16(te.GetPosition2Y()))
-		b.WriteCoord(uint16(te.GetPosition2Z()))
-		b.WriteCoord(uint16(te.GetOffsetX()))
-		b.WriteCoord(uint16(te.GetOffsetY()))
-		b.WriteCoord(uint16(te.GetOffsetZ()))
+		b.WriteShort(int(te.GetEntity1()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition2X()))
+		b.WriteCoord(int(te.GetPosition2Y()))
+		b.WriteCoord(int(te.GetPosition2Z()))
+		b.WriteCoord(int(te.GetOffsetX()))
+		b.WriteCoord(int(te.GetOffsetY()))
+		b.WriteCoord(int(te.GetOffsetZ()))
 	case TentGrappleCable:
-		b.WriteShort(uint16(te.GetEntity1()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteCoord(uint16(te.GetPosition2X()))
-		b.WriteCoord(uint16(te.GetPosition2Y()))
-		b.WriteCoord(uint16(te.GetPosition2Z()))
-		b.WriteCoord(uint16(te.GetOffsetX()))
-		b.WriteCoord(uint16(te.GetOffsetY()))
-		b.WriteCoord(uint16(te.GetOffsetZ()))
+		b.WriteShort(int(te.GetEntity1()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition2X()))
+		b.WriteCoord(int(te.GetPosition2Y()))
+		b.WriteCoord(int(te.GetPosition2Z()))
+		b.WriteCoord(int(te.GetOffsetX()))
+		b.WriteCoord(int(te.GetOffsetY()))
+		b.WriteCoord(int(te.GetOffsetZ()))
 	case TentLightning:
-		b.WriteShort(uint16(te.GetEntity1()))
-		b.WriteShort(uint16(te.GetEntity2()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteCoord(uint16(te.GetPosition2X()))
-		b.WriteCoord(uint16(te.GetPosition2Y()))
-		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteShort(int(te.GetEntity1()))
+		b.WriteShort(int(te.GetEntity2()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition2X()))
+		b.WriteCoord(int(te.GetPosition2Y()))
+		b.WriteCoord(int(te.GetPosition2Z()))
 	case TentFlashlight:
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteShort(int(te.GetEntity1()))
 	case TentForceWall:
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
-		b.WriteCoord(uint16(te.GetPosition2X()))
-		b.WriteCoord(uint16(te.GetPosition2Y()))
-		b.WriteCoord(uint16(te.GetPosition2Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition2X()))
+		b.WriteCoord(int(te.GetPosition2Y()))
+		b.WriteCoord(int(te.GetPosition2Z()))
 		b.WriteByte(byte(te.GetColor()))
 	case TentSteam:
-		b.WriteShort(uint16(te.GetEntity1()))
+		b.WriteShort(int(te.GetEntity1()))
 		b.WriteByte(byte(te.GetCount()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
 		b.WriteByte(byte(te.GetDirection()))
 		b.WriteByte(byte(te.GetColor()))
-		b.WriteShort(uint16(te.GetEntity2()))
+		b.WriteShort(int(te.GetEntity2()))
 		if int32(te.Entity1) != -1 {
 			b.WriteLong(int(te.GetTime()))
 		}
 	case TentWidowBeamOut:
-		b.WriteShort(uint16(te.GetEntity1()))
-		b.WriteCoord(uint16(te.GetPosition1X()))
-		b.WriteCoord(uint16(te.GetPosition1Y()))
-		b.WriteCoord(uint16(te.GetPosition1Z()))
+		b.WriteShort(int(te.GetEntity1()))
+		b.WriteCoord(int(te.GetPosition1X()))
+		b.WriteCoord(int(te.GetPosition1Y()))
+		b.WriteCoord(int(te.GetPosition1Z()))
 	}
 	return b
 }
@@ -763,12 +763,12 @@ func MarshalSound(s *pb.PackedSound) Buffer {
 		b.WriteByte(byte(s.GetTimeOffset()))
 	}
 	if (s.GetFlags() & SoundEntity) > 0 {
-		b.WriteShort(uint16((s.GetEntity() << 3) + s.GetChannel()))
+		b.WriteShort(int((s.GetEntity() << 3) + s.GetChannel()))
 	}
 	if (s.GetFlags() & SoundPosition) > 0 {
-		b.WriteCoord(uint16(s.GetPositionX()))
-		b.WriteCoord(uint16(s.GetPositionY()))
-		b.WriteCoord(uint16(s.GetPositionZ()))
+		b.WriteCoord(int(s.GetPositionX()))
+		b.WriteCoord(int(s.GetPositionY()))
+		b.WriteCoord(int(s.GetPositionZ()))
 	}
 	return b
 }

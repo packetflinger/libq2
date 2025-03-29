@@ -34,8 +34,8 @@ const (
 // 36). This is used for both parsing and writing playerstates.
 //
 // The bitmask is an unsigned short
-func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) uint16 {
-	mask := uint16(0)
+func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) int {
+	mask := int(0)
 	mf := from.GetMovestate()
 	mt := to.GetMovestate()
 
@@ -221,15 +221,15 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerOrigin) > 0 {
-		b.WriteShort(uint16(to.GetMovestate().GetOriginX()))
-		b.WriteShort(uint16(to.GetMovestate().GetOriginY()))
-		b.WriteShort(uint16(to.GetMovestate().GetOriginZ()))
+		b.WriteShort(int(to.GetMovestate().GetOriginX()))
+		b.WriteShort(int(to.GetMovestate().GetOriginY()))
+		b.WriteShort(int(to.GetMovestate().GetOriginZ()))
 	}
 
 	if (mask & PlayerVelocity) > 0 {
-		b.WriteShort(uint16(to.GetMovestate().GetVelocityX()))
-		b.WriteShort(uint16(to.GetMovestate().GetVelocityY()))
-		b.WriteShort(uint16(to.GetMovestate().GetVelocityZ()))
+		b.WriteShort(int(to.GetMovestate().GetVelocityX()))
+		b.WriteShort(int(to.GetMovestate().GetVelocityY()))
+		b.WriteShort(int(to.GetMovestate().GetVelocityZ()))
 	}
 
 	if (mask & PlayerTime) > 0 {
@@ -241,13 +241,13 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerGravity) > 0 {
-		b.WriteShort(uint16(to.GetMovestate().GetGravity()))
+		b.WriteShort(int(to.GetMovestate().GetGravity()))
 	}
 
 	if (mask & PlayerDeltaAngles) > 0 {
-		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleX()))
-		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleY()))
-		b.WriteShort(uint16(to.GetMovestate().GetDeltaAngleZ()))
+		b.WriteShort(int(to.GetMovestate().GetDeltaAngleX()))
+		b.WriteShort(int(to.GetMovestate().GetDeltaAngleY()))
+		b.WriteShort(int(to.GetMovestate().GetDeltaAngleZ()))
 	}
 
 	if (mask & PlayerViewOffset) > 0 {
@@ -257,9 +257,9 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerViewAngles) > 0 {
-		b.WriteShort(uint16(to.GetViewAnglesX()))
-		b.WriteShort(uint16(to.GetViewAnglesY()))
-		b.WriteShort(uint16(to.GetViewAnglesZ()))
+		b.WriteShort(int(to.GetViewAnglesX()))
+		b.WriteShort(int(to.GetViewAnglesY()))
+		b.WriteShort(int(to.GetViewAnglesZ()))
 	}
 
 	if (mask & PlayerKickAngles) > 0 {
@@ -310,7 +310,7 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	b.WriteLong(int(statsMask))
 	for i = 0; i < MaxStats; i++ {
 		if (statsMask & (1 << i)) != 0 {
-			b.WriteShort(uint16(toStats[i]))
+			b.WriteShort(int(toStats[i]))
 		}
 	}
 	return b

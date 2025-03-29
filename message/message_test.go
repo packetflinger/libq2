@@ -93,26 +93,79 @@ func TestWriteByte(t *testing.T) {
 	}
 }
 
+func TestReadShort(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+		want  int
+	}{
+		{
+			desc:  "test1",
+			input: "ffff",
+			want:  -1,
+		},
+		{
+			desc:  "test2",
+			input: "8000",
+			want:  128,
+		},
+		{
+			desc:  "test3",
+			input: "0080",
+			want:  -32768,
+		},
+		{
+			desc:  "test4",
+			input: "ff7f",
+			want:  32767,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.input)
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			got := in.ReadShort()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestWriteShort(t *testing.T) {
 	tests := []struct {
 		desc  string
-		input uint16
-		want  []uint8
+		input int
+		want  []byte
 	}{
 		{
-			desc:  "TEST 1",
+			desc:  "test1",
 			input: 5,
-			want:  []uint8{5, 0},
+			want:  []byte{5, 0},
 		},
 		{
-			desc:  "TEST 2",
-			input: 65535,
-			want:  []uint8{255, 255},
+			desc:  "test2",
+			input: -1,
+			want:  []byte{255, 255},
 		},
 		{
-			desc:  "TEST 3",
+			desc:  "test3",
 			input: 257,
-			want:  []uint8{1, 1},
+			want:  []byte{1, 1},
+		},
+		{
+			desc:  "test4",
+			input: 65538,
+			want:  []byte{2, 0},
+		},
+		{
+			desc:  "test5",
+			input: 65535,
+			want:  []byte{255, 255},
 		},
 	}
 	for _, tc := range tests {
