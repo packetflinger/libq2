@@ -43,8 +43,8 @@ func (m *Buffer) ParseServerData() *pb.ServerInfo {
 		return nil
 	}
 	return &pb.ServerInfo{
-		Protocol:     m.ReadULong(),
-		ServerCount:  m.ReadULong(),
+		Protocol:     uint32(m.ReadLong()),
+		ServerCount:  uint32(m.ReadLong()),
 		Demo:         m.ReadByte() == 1,
 		GameDir:      m.ReadString(),
 		ClientNumber: uint32(m.ReadShort()),
