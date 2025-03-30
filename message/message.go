@@ -273,10 +273,11 @@ func (msg *Buffer) WriteCoord(c int) {
 }
 
 func (msg *Buffer) ReadPosition() [3]int {
-	x := msg.ReadCoord()
-	y := msg.ReadCoord()
-	z := msg.ReadCoord()
-	return [3]int{x, y, z}
+	return [3]int{
+		msg.ReadCoord(),
+		msg.ReadCoord(),
+		msg.ReadCoord(),
+	}
 }
 
 func (msg *Buffer) ReadDirection() int {
