@@ -368,8 +368,8 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServerData {
 	s := &pb.MvdServerData{}
 
-	s.VersionMajor = msg.ReadUInt32()
-	s.VersionMinor = uint32(msg.ReadUInt16())
+	s.VersionMajor = uint32(msg.ReadLong())
+	s.VersionMinor = uint32(msg.ReadShort())
 
 	if s.VersionMinor >= ProtocolPlusPlus {
 		p.demo.Flags = uint32(msg.ReadWord())
@@ -377,7 +377,7 @@ func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServ
 		p.demo.Flags = uint32(extra)
 	}
 
-	s.SpawnCount = msg.ReadUInt32()
+	s.SpawnCount = uint32(msg.ReadLong())
 	s.GameDir = msg.ReadString()
 	s.ClientNumber = uint32(msg.ReadShort())
 
