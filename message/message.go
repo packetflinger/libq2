@@ -238,9 +238,9 @@ func (msg *Buffer) WriteShort(s int) {
 	msg.WriteData(b)
 }
 
-// for consistency
+// unsigned
 func (msg *Buffer) ReadByte() int {
-	val := int(int8(msg.Data[msg.Index]))
+	val := int(uint8(msg.Data[msg.Index]))
 	msg.Index++
 	return val
 }

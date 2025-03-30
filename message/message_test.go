@@ -68,17 +68,17 @@ func TestReadByte(t *testing.T) {
 		{
 			name:  "test1",
 			input: "ff",
-			want:  -1,
+			want:  255,
 		},
 		{
 			name:  "test2",
 			input: "80",
-			want:  -128,
+			want:  128,
 		},
 		{
 			name:  "test3",
 			input: "bb",
-			want:  -69,
+			want:  187,
 		},
 		{
 			name:  "test4",
