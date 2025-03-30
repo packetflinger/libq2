@@ -236,43 +236,43 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	bits := DeltaEntityBitmask(to, from)
 
 	// write the bitmask first
-	b.WriteByte(byte(bits & 255))
+	b.WriteByte(bits & 255)
 	if (bits & 0xff000000) > 0 {
-		b.WriteByte(byte((bits >> 8) & 255))
-		b.WriteByte(byte((bits >> 16) & 255))
-		b.WriteByte(byte((bits >> 24) & 255))
+		b.WriteByte((bits >> 8) & 255)
+		b.WriteByte((bits >> 16) & 255)
+		b.WriteByte((bits >> 24) & 255)
 	} else if (bits & 0x00ff0000) > 0 {
-		b.WriteByte(byte((bits >> 8) & 255))
-		b.WriteByte(byte((bits >> 16) & 255))
+		b.WriteByte((bits >> 8) & 255)
+		b.WriteByte((bits >> 16) & 255)
 	} else if (bits & 0x0000ff00) > 0 {
-		b.WriteByte(byte((bits >> 8) & 255))
+		b.WriteByte((bits >> 8) & 255)
 	}
 
 	// write the edict number
 	if (bits & EntityNumber16) > 0 {
 		b.WriteShort(int(to.GetNumber()))
 	} else {
-		b.WriteByte(byte(to.GetNumber()))
+		b.WriteByte(int(to.GetNumber()))
 	}
 
 	if (bits & EntityModel) > 0 {
-		b.WriteByte(byte(to.GetModelIndex()))
+		b.WriteByte(int(to.GetModelIndex()))
 	}
 
 	if (bits & EntityModel2) > 0 {
-		b.WriteByte(byte(to.GetModelIndex2()))
+		b.WriteByte(int(to.GetModelIndex2()))
 	}
 
 	if (bits & EntityModel3) > 0 {
-		b.WriteByte(byte(to.GetModelIndex3()))
+		b.WriteByte(int(to.GetModelIndex3()))
 	}
 
 	if (bits & EntityModel4) > 0 {
-		b.WriteByte(byte(to.GetModelIndex4()))
+		b.WriteByte(int(to.GetModelIndex4()))
 	}
 
 	if (bits & EntityFrame8) > 0 {
-		b.WriteByte(byte(to.GetFrame()))
+		b.WriteByte(int(to.GetFrame()))
 	} else if (bits & EntityFrame16) > 0 {
 		b.WriteShort(int(to.GetFrame()))
 	}
@@ -280,7 +280,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	if (bits & (EntitySkin8 | EntitySkin16)) == (EntitySkin8 | EntitySkin16) {
 		b.WriteLong(int(to.GetSkin()))
 	} else if (bits & EntitySkin8) > 0 {
-		b.WriteByte(byte(to.GetSkin()))
+		b.WriteByte(int(to.GetSkin()))
 	} else if (bits & EntitySkin16) > 0 {
 		b.WriteShort(int(to.GetSkin()))
 	}
@@ -288,7 +288,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	if (bits & (EntityEffects8 | EntityEffects16)) == (EntityEffects8 | EntityEffects16) {
 		b.WriteLong(int(to.GetEffects()))
 	} else if (bits & EntityEffects8) > 0 {
-		b.WriteByte(byte(to.GetEffects()))
+		b.WriteByte(int(to.GetEffects()))
 	} else if (bits & EntityEffects16) > 0 {
 		b.WriteShort(int(to.GetEffects()))
 	}
@@ -296,7 +296,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	if (bits & (EntityRenderFX8 | EntityRenderFX16)) == (EntityRenderFX8 | EntityRenderFX16) {
 		b.WriteLong(int(to.GetRenderFx()))
 	} else if (bits & EntityRenderFX8) > 0 {
-		b.WriteByte(byte(to.GetRenderFx()))
+		b.WriteByte(int(to.GetRenderFx()))
 	} else if (bits & EntityRenderFX16) > 0 {
 		b.WriteShort(int(to.GetRenderFx()))
 	}
@@ -314,15 +314,15 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	}
 
 	if (bits & EntityAngle1) > 0 {
-		b.WriteByte(byte(to.GetAngleX()))
+		b.WriteByte(int(to.GetAngleX()))
 	}
 
 	if (bits & EntityAngle2) > 0 {
-		b.WriteByte(byte(to.GetAngleY()))
+		b.WriteByte(int(to.GetAngleY()))
 	}
 
 	if (bits & EntityAngle3) > 0 {
-		b.WriteByte(byte(to.GetAngleZ()))
+		b.WriteByte(int(to.GetAngleZ()))
 	}
 
 	if (bits & EntityOldOrigin) > 0 {
@@ -332,11 +332,11 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 	}
 
 	if (bits & EntitySound) > 0 {
-		b.WriteByte(byte(to.GetSound()))
+		b.WriteByte(int(to.GetSound()))
 	}
 
 	if (bits & EntityEvent) > 0 {
-		b.WriteByte(byte(to.GetEvent()))
+		b.WriteByte(int(to.GetEvent()))
 	}
 
 	if (bits & EntitySolid) > 0 {
@@ -347,9 +347,9 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 
 // DeltaEntityBitmask will return the bitmask representing the differences
 // between the `to` and `from` entities.
-func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
-	bits := uint32(0)
-	mask := uint32(0xffff8000)
+func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
+	bits := int(0)
+	mask := int(0xffff8000)
 	if to == nil {
 		to = &pb.PackedEntity{}
 	}
@@ -386,7 +386,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetSkin() != from.GetSkin() {
-		if (to.GetSkin() & mask) > 0 {
+		if (int(to.GetSkin()) & mask) > 0 {
 			bits |= EntitySkin8 | EntitySkin16
 		} else if (to.GetSkin() & uint32(0x0000ff00)) > 0 {
 			bits |= EntitySkin16
@@ -404,7 +404,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.Effects != from.Effects {
-		if (to.Effects & mask) > 0 {
+		if (int(to.Effects) & mask) > 0 {
 			bits |= EntityEffects8 | EntityEffects16
 		} else if (to.Effects & 0x0000ff00) > 0 {
 			bits |= EntityEffects16
@@ -414,7 +414,7 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) uint32 {
 	}
 
 	if to.GetRenderFx() != from.GetRenderFx() {
-		if (to.GetRenderFx() & mask) > 0 {
+		if (int(to.GetRenderFx()) & mask) > 0 {
 			bits |= EntityRenderFX8 | EntityRenderFX16
 		} else if (to.GetRenderFx() & 0x0000ff00) > 0 {
 			bits |= EntityRenderFX16

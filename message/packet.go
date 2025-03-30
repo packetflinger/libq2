@@ -9,10 +9,10 @@ import (
 type ClientPacket struct {
 	Sequence1   int
 	Sequence2   int
-	QPort       uint16 //
-	Reliable1   bool   // requires an ack
+	QPort       int  //
+	Reliable1   bool // requires an ack
 	Reliable2   bool
-	MessageType byte   // what kind of msg?
+	MessageType int    // what kind of msg?
 	Data        []byte // the actual msg
 }
 

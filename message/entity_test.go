@@ -308,7 +308,7 @@ func TestDeltaEntityBitmask(t *testing.T) {
 		name string
 		to   *pb.PackedEntity
 		from *pb.PackedEntity
-		want uint32
+		want int
 	}{
 		{
 			name: "nil entities",

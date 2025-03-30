@@ -39,7 +39,7 @@ type Connection struct {
 type NetChan struct {
 	in         message.Buffer
 	out        message.Buffer
-	QPort      uint16
+	QPort      int
 	Sequence1  int
 	Sequence2  int
 	ReliableS1 bool
@@ -104,7 +104,7 @@ func (bot *Bot) ClientCommand(str string, reliable bool) error {
 
 func (bot *Bot) Run() error {
 	if bot.Netchan.QPort == 0 {
-		bot.Netchan.QPort = uint16(rand.Intn(256))
+		bot.Netchan.QPort = rand.Intn(256)
 	}
 	addr := fmt.Sprintf("%s:%d", bot.Net.Address, bot.Net.Port)
 	c, e := net.Dial("udp4", addr)

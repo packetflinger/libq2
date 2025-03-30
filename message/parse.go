@@ -549,7 +549,7 @@ func MarshalStuffText(st *pb.StuffText) Buffer {
 // Write a Print proto back to binary
 func MarshalPrint(p *pb.Print) Buffer {
 	b := Buffer{}
-	b.WriteByte(byte(p.GetLevel()))
+	b.WriteByte(int(p.GetLevel()))
 	b.WriteString(p.GetData())
 	return b
 }
@@ -558,14 +558,14 @@ func MarshalPrint(p *pb.Print) Buffer {
 func MarshalFlash(mf *pb.MuzzleFlash) Buffer {
 	b := Buffer{}
 	b.WriteShort(int(mf.GetEntity()))
-	b.WriteByte(byte(mf.GetWeapon()))
+	b.WriteByte(int(mf.GetWeapon()))
 	return b
 }
 
 // Write a TempEntity proto back to binary
 func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	b := Buffer{}
-	b.WriteByte(byte(te.GetType()))
+	b.WriteByte(int(te.GetType()))
 	switch te.GetType() {
 	case TentBlood:
 		fallthrough
@@ -599,7 +599,7 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 		b.WriteCoord(int(te.GetPosition1X()))
 		b.WriteCoord(int(te.GetPosition1Y()))
 		b.WriteCoord(int(te.GetPosition1Z()))
-		b.WriteByte(byte(te.GetDirection()))
+		b.WriteByte(int(te.GetDirection()))
 	case TentSplash:
 		fallthrough
 	case TentLaserSparks:
@@ -607,12 +607,12 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 	case TentWeldingSparks:
 		fallthrough
 	case TentTunnelSparks:
-		b.WriteByte(byte(te.GetCount()))
+		b.WriteByte(int(te.GetCount()))
 		b.WriteCoord(int(te.GetPosition1X()))
 		b.WriteCoord(int(te.GetPosition1Y()))
 		b.WriteCoord(int(te.GetPosition1Z()))
-		b.WriteByte(byte(te.GetDirection()))
-		b.WriteByte(byte(te.GetColor()))
+		b.WriteByte(int(te.GetDirection()))
+		b.WriteByte(int(te.GetColor()))
 	case TentBlueHyperBlaster:
 		fallthrough
 	case TentRailTrail:
@@ -719,15 +719,15 @@ func MarshalTempEntity(te *pb.TemporaryEntity) Buffer {
 		b.WriteCoord(int(te.GetPosition2X()))
 		b.WriteCoord(int(te.GetPosition2Y()))
 		b.WriteCoord(int(te.GetPosition2Z()))
-		b.WriteByte(byte(te.GetColor()))
+		b.WriteByte(int(te.GetColor()))
 	case TentSteam:
 		b.WriteShort(int(te.GetEntity1()))
-		b.WriteByte(byte(te.GetCount()))
+		b.WriteByte(int(te.GetCount()))
 		b.WriteCoord(int(te.GetPosition1X()))
 		b.WriteCoord(int(te.GetPosition1Y()))
 		b.WriteCoord(int(te.GetPosition1Z()))
-		b.WriteByte(byte(te.GetDirection()))
-		b.WriteByte(byte(te.GetColor()))
+		b.WriteByte(int(te.GetDirection()))
+		b.WriteByte(int(te.GetColor()))
 		b.WriteShort(int(te.GetEntity2()))
 		if int32(te.Entity1) != -1 {
 			b.WriteLong(int(te.GetTime()))
@@ -751,16 +751,16 @@ func MarshalLayout(lo *pb.Layout) Buffer {
 // Write a PackedSound proto back to binary
 func MarshalSound(s *pb.PackedSound) Buffer {
 	b := Buffer{}
-	b.WriteByte(byte(s.GetFlags()))
-	b.WriteByte(byte(s.GetIndex()))
+	b.WriteByte(int(s.GetFlags()))
+	b.WriteByte(int(s.GetIndex()))
 	if (s.GetFlags() & SoundVolume) > 0 {
-		b.WriteByte(byte(s.GetVolume()))
+		b.WriteByte(int(s.GetVolume()))
 	}
 	if (s.GetFlags() & SoundAttenuation) > 0 {
-		b.WriteByte(byte(s.GetAttenuation()))
+		b.WriteByte(int(s.GetAttenuation()))
 	}
 	if (s.GetFlags() & SoundOffset) > 0 {
-		b.WriteByte(byte(s.GetTimeOffset()))
+		b.WriteByte(int(s.GetTimeOffset()))
 	}
 	if (s.GetFlags() & SoundEntity) > 0 {
 		b.WriteShort(int((s.GetEntity() << 3) + s.GetChannel()))
@@ -786,10 +786,10 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 	msg.WriteByte(SVCFrame)
 	msg.WriteLong(int(fr.Number))
 	msg.WriteLong(int(fr.Delta))
-	msg.WriteByte(byte(fr.Suppressed))
-	msg.WriteByte(byte(fr.AreaBytes))
+	msg.WriteByte(int(fr.Suppressed))
+	msg.WriteByte(int(fr.AreaBytes))
 	for _, ab := range fr.AreaBits {
-		msg.WriteByte(byte(ab))
+		msg.WriteByte(int(ab))
 	}
 
 	// from state is empty

@@ -24,11 +24,11 @@ func (b *Buffer) ReadLongP() int32 {
 }
 
 func (b *Buffer) WriteByteP(num uint32) {
-	b.WriteByte(byte(num))
+	b.WriteByte(int(num))
 }
 
 func (b *Buffer) WriteCharP(num int32) {
-	b.WriteChar(uint8(num))
+	b.WriteChar(int(num))
 }
 
 func (b *Buffer) WriteShortP(num uint32) {
@@ -36,7 +36,7 @@ func (b *Buffer) WriteShortP(num uint32) {
 }
 
 func (b *Buffer) WriteWordP(num int32) {
-	b.WriteWord(int16(num))
+	b.WriteWord(int(num))
 }
 
 func (b *Buffer) WriteLongP(num int) {

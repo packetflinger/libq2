@@ -217,7 +217,7 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	b.WriteShort(mask)
 
 	if (mask & PlayerType) > 0 {
-		b.WriteByte(byte(to.GetMovestate().GetType()))
+		b.WriteByte(int(to.GetMovestate().GetType()))
 	}
 
 	if (mask & PlayerOrigin) > 0 {
@@ -233,11 +233,11 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerTime) > 0 {
-		b.WriteByte(byte(to.GetMovestate().GetTime()))
+		b.WriteByte(int(to.GetMovestate().GetTime()))
 	}
 
 	if (mask & PlayerFlags) > 0 {
-		b.WriteByte(byte(to.GetMovestate().GetFlags()))
+		b.WriteByte(int(to.GetMovestate().GetFlags()))
 	}
 
 	if (mask & PlayerGravity) > 0 {
@@ -251,9 +251,9 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerViewOffset) > 0 {
-		b.WriteChar(uint8(to.GetViewOffsetX()))
-		b.WriteChar(uint8(to.GetViewOffsetY()))
-		b.WriteChar(uint8(to.GetViewOffsetZ()))
+		b.WriteChar(int(to.GetViewOffsetX()))
+		b.WriteChar(int(to.GetViewOffsetY()))
+		b.WriteChar(int(to.GetViewOffsetZ()))
 	}
 
 	if (mask & PlayerViewAngles) > 0 {
@@ -263,38 +263,38 @@ func WriteDeltaPlayerstate(from *pb.PackedPlayer, to *pb.PackedPlayer) Buffer {
 	}
 
 	if (mask & PlayerKickAngles) > 0 {
-		b.WriteChar(uint8(to.GetKickAnglesX()))
-		b.WriteChar(uint8(to.GetKickAnglesY()))
-		b.WriteChar(uint8(to.GetKickAnglesZ()))
+		b.WriteChar(int(to.GetKickAnglesX()))
+		b.WriteChar(int(to.GetKickAnglesY()))
+		b.WriteChar(int(to.GetKickAnglesZ()))
 	}
 
 	if (mask & PlayerWeaponIndex) > 0 {
-		b.WriteByte(byte(to.GetGunIndex()))
+		b.WriteByte(int(to.GetGunIndex()))
 	}
 
 	if (mask & PlayerWeaponFrame) > 0 {
-		b.WriteByte(byte(to.GetGunFrame()))
-		b.WriteChar(uint8(to.GetGunOffsetX()))
-		b.WriteChar(uint8(to.GetGunOffsetY()))
-		b.WriteChar(uint8(to.GetGunOffsetZ()))
-		b.WriteChar(uint8(to.GetGunAnglesX()))
-		b.WriteChar(uint8(to.GetGunAnglesY()))
-		b.WriteChar(uint8(to.GetGunAnglesZ()))
+		b.WriteByte(int(to.GetGunFrame()))
+		b.WriteChar(int(to.GetGunOffsetX()))
+		b.WriteChar(int(to.GetGunOffsetY()))
+		b.WriteChar(int(to.GetGunOffsetZ()))
+		b.WriteChar(int(to.GetGunAnglesX()))
+		b.WriteChar(int(to.GetGunAnglesY()))
+		b.WriteChar(int(to.GetGunAnglesZ()))
 	}
 
 	if (mask & PlayerBlend) > 0 {
-		b.WriteByte(byte(to.GetBlendW()))
-		b.WriteByte(byte(to.GetBlendX()))
-		b.WriteByte(byte(to.GetBlendY()))
-		b.WriteByte(byte(to.GetBlendZ()))
+		b.WriteByte(int(to.GetBlendW()))
+		b.WriteByte(int(to.GetBlendX()))
+		b.WriteByte(int(to.GetBlendY()))
+		b.WriteByte(int(to.GetBlendZ()))
 	}
 
 	if (mask & PlayerFOV) > 0 {
-		b.WriteByte(byte(to.GetFov()))
+		b.WriteByte(int(to.GetFov()))
 	}
 
 	if (mask & PlayerRDFlags) > 0 {
-		b.WriteByte(byte(to.GetRdFlags()))
+		b.WriteByte(int(to.GetRdFlags()))
 	}
 
 	statsMask := uint32(0)

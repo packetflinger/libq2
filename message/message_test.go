@@ -127,7 +127,84 @@ func TestWriteByte(t *testing.T) {
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
 			msg := Buffer{}
-			msg.WriteByte(byte(tc.input))
+			msg.WriteByte(int(tc.input))
+			got := msg.Data
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error("got diff:", diff)
+			}
+		})
+	}
+}
+
+func TestReadChar(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int
+	}{
+		{
+			name:  "test1",
+			input: "ff",
+			want:  -1,
+		},
+		{
+			name:  "test2",
+			input: "80",
+			want:  -128,
+		},
+		{
+			name:  "test3",
+			input: "bb",
+			want:  -69,
+		},
+		{
+			name:  "test4",
+			input: "15",
+			want:  21,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.input)
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			got := in.ReadChar()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestWriteChar(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input int
+		want  []byte
+	}{
+		{
+			desc:  "TEST 1",
+			input: 5,
+			want:  []byte{5},
+		},
+		{
+			desc:  "TEST 2",
+			input: -1,
+			want:  []byte{255},
+		},
+		{
+			desc:  "TEST 3",
+			input: -6,
+			want:  []byte{250},
+		},
+	}
+	for _, tc := range tests {
+		t.Run("", func(t *testing.T) {
+			msg := Buffer{}
+			msg.WriteByte(int(tc.input))
 			got := msg.Data
 			if diff := cmp.Diff(got, tc.want); diff != "" {
 				t.Error("got diff:", diff)
@@ -215,6 +292,93 @@ func TestWriteShort(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			msg := Buffer{}
 			msg.WriteShort(tc.input)
+			got := msg.Data
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error("got diff:", diff)
+			}
+		})
+	}
+}
+
+func TestReadWord(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+		want  int
+	}{
+		{
+			desc:  "test1",
+			input: "ffff",
+			want:  65535,
+		},
+		{
+			desc:  "test2",
+			input: "8000",
+			want:  128,
+		},
+		{
+			desc:  "test3",
+			input: "0080",
+			want:  32768,
+		},
+		{
+			desc:  "test4",
+			input: "ff7f",
+			want:  32767,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.input)
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			got := in.ReadWord()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestWriteWord(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input int
+		want  []byte
+	}{
+		{
+			desc:  "test1",
+			input: 5,
+			want:  []byte{5, 0},
+		},
+		{
+			desc:  "test2",
+			input: 65535,
+			want:  []byte{255, 255},
+		},
+		{
+			desc:  "test3",
+			input: 257,
+			want:  []byte{1, 1},
+		},
+		{
+			desc:  "test4",
+			input: 65538,
+			want:  []byte{2, 0},
+		},
+		{
+			desc:  "test5",
+			input: -1,
+			want:  []byte{255, 255},
+		},
+	}
+	for _, tc := range tests {
+		t.Run("", func(t *testing.T) {
+			msg := Buffer{}
+			msg.WriteWord(tc.input)
 			got := msg.Data
 			if diff := cmp.Diff(got, tc.want); diff != "" {
 				t.Error("got diff:", diff)

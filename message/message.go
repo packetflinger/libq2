@@ -222,12 +222,12 @@ func (msg *Buffer) ReadString() string {
 // Strings are null terminated, so add a 0x00 at the end.
 func (msg *Buffer) WriteString(s string) {
 	for _, ch := range s {
-		msg.WriteByte(byte(ch))
+		msg.WriteByte(int(ch))
 	}
 	msg.WriteByte(0)
 }
 
-// 2 bytes unsigned
+// 2 bytes signed
 func (msg *Buffer) ReadShort() int {
 	return int(int16(binary.LittleEndian.Uint16(msg.ReadData(2))))
 }
@@ -245,41 +245,34 @@ func (msg *Buffer) ReadByte() int {
 	return val
 }
 
-func (msg *Buffer) WriteByte(b byte) {
-	bb := []byte{b}
+func (msg *Buffer) WriteByte(b int) {
+	bb := []byte{uint8(int8(b))}
 	msg.Data = append(msg.Data, bb...)
 	msg.Index++
 }
 
 // 1 byte signed
-func (msg *Buffer) ReadChar() int8 {
-	val := int8(msg.Data[msg.Index])
+func (msg *Buffer) ReadChar() int {
+	val := int(int8(msg.Data[msg.Index]))
 	msg.Index++
 	return val
 }
 
-func (msg *Buffer) WriteChar(c uint8) {
-	bb := []byte{byte(c)}
+func (msg *Buffer) WriteChar(c int) {
+	bb := []byte{uint8(int8(c))}
 	msg.Data = append(msg.Data, bb...)
 	msg.Index++
 }
 
-// 2 bytes signed
-func (msg *Buffer) ReadWord() int16 {
-	s := int16(msg.Data[msg.Index] & 0xff)
-	s += int16(msg.Data[msg.Index+1]) << 8
-	msg.Index += 2
-
-	return s
+// 2 bytes unsigned
+func (msg *Buffer) ReadWord() int {
+	return int(binary.LittleEndian.Uint16(msg.ReadData(2)))
 }
 
-func (msg *Buffer) WriteWord(w int16) {
-	b := []byte{
-		byte(w & 0xff),
-		byte(w >> 8),
-	}
-	msg.Data = append(msg.Data, b...)
-	msg.Index += 2
+func (msg *Buffer) WriteWord(w int) {
+	b := make([]byte, 2)
+	binary.LittleEndian.PutUint16(b, uint16(int16(w)))
+	msg.WriteData(b)
 }
 
 func (msg *Buffer) ReadCoord() int {

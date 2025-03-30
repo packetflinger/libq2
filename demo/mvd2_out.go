@@ -39,7 +39,7 @@ func (w *MVD2Writer) Marshal() error {
 // Generate a binary buffer from a PackedSound proto
 func (w *MVD2Writer) MarshalSound(sound *pb.PackedSound) (message.Buffer, error) {
 	out := message.Buffer{}
-	out.WriteByte(byte(sound.Flags))
+	out.WriteByte(int(sound.Flags))
 	if sound.Index > 255 {
 		out.WriteWordP(int32(sound.Index))
 	} else {
