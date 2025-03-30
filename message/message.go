@@ -239,8 +239,8 @@ func (msg *Buffer) WriteShort(s int) {
 }
 
 // for consistency
-func (msg *Buffer) ReadByte() byte {
-	val := byte(msg.Data[msg.Index])
+func (msg *Buffer) ReadByte() int {
+	val := int(int8(msg.Data[msg.Index]))
 	msg.Index++
 	return val
 }
@@ -297,7 +297,7 @@ func (msg *Buffer) ReadPosition() [3]int {
 	return [3]int{x, y, z}
 }
 
-func (msg *Buffer) ReadDirection() uint8 {
+func (msg *Buffer) ReadDirection() int {
 	return msg.ReadByte()
 }
 

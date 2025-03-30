@@ -365,7 +365,7 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 // ServerData is the first message in a demo, it contains info about what
 // protocol versions were used at the time of the capture, the game directory,
 // the client number of the dummy spec, and more.
-func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra byte) *pb.MvdServerData {
+func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServerData {
 	s := &pb.MvdServerData{}
 
 	s.VersionMajor = msg.ReadUInt32()
@@ -857,7 +857,7 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits uint64, from *pb
 	return to, nil
 }
 
-func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra byte) (*pb.MvdUnicast, error) {
+func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int) (*pb.MvdUnicast, error) {
 	out := &pb.MvdUnicast{}
 	len := msg.ReadByteP()
 	len |= uint32(extra) << 8
@@ -897,7 +897,7 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra byte
 	return out, nil
 }
 
-func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra byte) *pb.PackedSound {
+func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound {
 	var index uint32
 	s := &pb.PackedSound{}
 	flags := msg.ReadByteP()
@@ -927,7 +927,7 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra byte) *pb.PackedSound
 }
 
 // ParseMulticast is used to parse all 6 multicast cmd types
-func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, to int, extra byte) *pb.MvdMulticast {
+func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, to int, extra int) *pb.MvdMulticast {
 	out := &pb.MvdMulticast{}
 	len := msg.ReadByteP()
 	len |= uint32(extra) << 8

@@ -59,6 +59,49 @@ func TestAppend(t *testing.T) {
 	}
 }
 
+func TestReadByte(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  int
+	}{
+		{
+			name:  "test1",
+			input: "ff",
+			want:  -1,
+		},
+		{
+			name:  "test2",
+			input: "80",
+			want:  -128,
+		},
+		{
+			name:  "test3",
+			input: "bb",
+			want:  -69,
+		},
+		{
+			name:  "test4",
+			input: "15",
+			want:  21,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			bytes, err := hex.DecodeString(tc.input)
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			got := in.ReadByte()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestWriteByte(t *testing.T) {
 	tests := []struct {
 		desc  string
