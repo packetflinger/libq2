@@ -41,7 +41,7 @@ func (w *MVD2Writer) MarshalSound(sound *pb.PackedSound) (message.Buffer, error)
 	out := message.Buffer{}
 	out.WriteByte(int(sound.Flags))
 	if sound.Index > 255 {
-		out.WriteWordP(int32(sound.Index))
+		out.WriteWordP(sound.Index)
 	} else {
 		out.WriteByteP(sound.Index)
 	}
@@ -53,7 +53,7 @@ func (w *MVD2Writer) MarshalMulticast(mc *pb.MvdMulticast) (*message.Buffer, err
 	out := message.Buffer{}
 	out.WriteByteP(uint32(len(mc.Data)))
 	if mc.Leaf != 0 {
-		out.WriteWordP(int32(mc.Leaf))
+		out.WriteWordP(mc.Leaf)
 	}
 	out.WriteData(mc.Data)
 	return &out, nil

@@ -31,14 +31,14 @@ func (b *Buffer) WriteCharP(num int32) {
 	b.WriteChar(int(num))
 }
 
-func (b *Buffer) WriteShortP(num uint32) {
+func (b *Buffer) WriteShortP(num int32) {
 	b.WriteShort(int(num))
 }
 
-func (b *Buffer) WriteWordP(num int32) {
+func (b *Buffer) WriteWordP(num uint32) {
 	b.WriteWord(int(num))
 }
 
-func (b *Buffer) WriteLongP(num int) {
-	b.WriteLong(num)
+func (b *Buffer) WriteLongP(num int32) {
+	b.WriteLong(int(num))
 }
