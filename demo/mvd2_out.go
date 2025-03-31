@@ -53,7 +53,7 @@ func (w *MVD2Writer) MarshalMulticast(mc *pb.MvdMulticast) (*message.Buffer, err
 	out := message.Buffer{}
 	out.WriteByteP(uint32(len(mc.Data)))
 	if mc.Leaf != 0 {
-		out.WriteWordP(mc.Leaf)
+		out.WriteWordP(uint32(mc.Leaf))
 	}
 	out.WriteData(mc.Data)
 	return &out, nil

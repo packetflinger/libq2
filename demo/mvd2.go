@@ -139,8 +139,7 @@ const (
 )
 
 type MVD2Parser struct {
-	demo *pb.MvdDemo
-	// state          *pb.MvdState
+	demo           *pb.MvdDemo
 	binaryData     []byte            // .mvd2 file contents
 	binaryPosition int               // where in those contents we are
 	callbacks      map[int]func(any) // index is svc_msg type
@@ -157,13 +156,13 @@ var (
 		MaxClients:  30,
 		MapChecksum: 31,
 		Models:      32,
-		Sounds:      32 + 256,
-		Images:      32 + 256 + 256,
-		Lights:      32 + 256 + 256 + 256,
-		Items:       32 + 256 + 256 + 256 + 256,
-		PlayerSkins: 32 + 256 + 256 + 256 + 256 + 256,
-		General:     32 + 256 + 256 + 256 + 256 + 256 + 256,
-		End:         (32 + 256 + 256 + 256 + 256 + 256 + 256) + (256 * 2),
+		Sounds:      288,
+		Images:      544,
+		Lights:      800,
+		Items:       1056,
+		PlayerSkins: 1312,
+		General:     1568,
+		End:         1568 + (256 * 2),
 	}
 
 	csRemapNew = &pb.MvdConfigStringRemap{
@@ -176,13 +175,13 @@ var (
 		MaxClients:  60,
 		MapChecksum: 61,
 		Models:      62,
-		Sounds:      62 + 8192,
-		Images:      62 + 8192 + 2048,
-		Lights:      62 + 8192 + 2048 + 2048,
-		Items:       62 + 8192 + 2048 + 2048 + 256,
-		PlayerSkins: 62 + 8192 + 2048 + 2048 + 256 + 256,
-		General:     62 + 8192 + 2048 + 2048 + 256 + 256 + 256,
-		End:         (62 + 8192 + 2048 + 2048 + 256 + 256 + 256) + (256 * 2),
+		Sounds:      8254,
+		Images:      10302,
+		Lights:      12350,
+		Items:       12606,
+		PlayerSkins: 12862,
+		General:     13118,
+		End:         13118 + (256 * 2),
 	}
 )
 
@@ -287,14 +286,14 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 			if err != nil {
 				return nil, err
 			}
-			p.demo.Configstrings[cs.GetIndex()] = cs
+			p.demo.Configstrings[int32(cs.GetIndex())] = cs
 			if cbFunc, found := p.callbacks[MVDSvcConfigString]; found {
 				cbFunc(cs)
 			}
 
 			// is it a player skin? then add the player
-			playerNum := cs.GetIndex() - p.demo.Remap.PlayerSkins
-			if playerNum <= p.demo.MaxPlayers {
+			playerNum := int32(cs.GetIndex()) - p.demo.Remap.PlayerSkins
+			if 0 <= playerNum && playerNum <= p.demo.MaxPlayers {
 				p.demo.Players[playerNum] = &pb.MvdPlayer{
 					Name: cs.Data[:strings.Index(cs.Data, "\\")],
 				}
@@ -368,18 +367,18 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServerData {
 	s := &pb.MvdServerData{}
 
-	s.VersionMajor = uint32(msg.ReadLong())
-	s.VersionMinor = uint32(msg.ReadShort())
+	s.VersionMajor = msg.ReadLongP()
+	s.VersionMinor = msg.ReadShortP()
 
 	if s.VersionMinor >= ProtocolPlusPlus {
-		p.demo.Flags = uint32(msg.ReadWord())
+		p.demo.Flags = msg.ReadShortP()
 	} else {
-		p.demo.Flags = uint32(extra)
+		p.demo.Flags = int32(extra)
 	}
 
-	s.SpawnCount = uint32(msg.ReadLong())
+	s.SpawnCount = msg.ReadLongP()
 	s.GameDir = msg.ReadString()
-	s.ClientNumber = uint32(msg.ReadShort())
+	s.ClientNumber = msg.ReadShortP()
 
 	p.demo.EntityStateFlags = EntityStateUMask | EntityStateBeamOrigin
 	p.demo.Remap = csRemap
@@ -404,24 +403,24 @@ func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServ
 // The list of players in the demo is built using configstrings for skins. The
 // cs_index - skin offset == the player number (0-maxclients), and the player
 // name is the prefix of the skin string.
-func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[uint32]*pb.ConfigString {
-	out := make(map[uint32]*pb.ConfigString)
+func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[int32]*pb.ConfigString {
+	out := make(map[int32]*pb.ConfigString)
 	for {
 		if msg.Index >= msg.Length {
 			break
 		}
-		idx := msg.ReadShort()
-		if idx == int(int16(p.demo.Remap.GetEnd())) {
+		idx := int32(msg.ReadShort())
+		if idx == int32(p.demo.Remap.GetEnd()) {
 			break
 		}
-		out[uint32(idx)] = &pb.ConfigString{Index: uint32(idx), Data: msg.ReadString()}
+		out[idx] = &pb.ConfigString{Index: uint32(idx), Data: msg.ReadString()}
 	}
-	mc, ok := out[p.demo.Remap.MaxClients]
+	mc, ok := out[p.demo.Remap.GetMaxClients()]
 	if ok {
 		maxclients, _ := strconv.Atoi(mc.Data)
-		p.demo.MaxPlayers = uint32(maxclients)
-		p.demo.Players = make(map[uint32]*pb.MvdPlayer)
-		for i := uint32(0); i < p.demo.MaxPlayers; i++ {
+		p.demo.MaxPlayers = int32(maxclients)
+		p.demo.Players = make(map[int32]*pb.MvdPlayer)
+		for i := int32(0); i < p.demo.MaxPlayers; i++ {
 			cs, ok := out[p.demo.Remap.GetPlayerSkins()+i]
 			if ok {
 				p.demo.Players[i] = &pb.MvdPlayer{
@@ -470,11 +469,11 @@ func (p *MVD2Parser) ParseFrame(msg *message.Buffer) (*pb.MvdFrame, error) {
 }
 
 // Read all the player info from a frame.
-func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[uint32]*pb.PackedPlayer, error) {
+func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.PackedPlayer, error) {
 	var bits uint32
-	out := make(map[uint32]*pb.PackedPlayer)
+	out := make(map[int32]*pb.PackedPlayer)
 	for {
-		number := uint32(msg.ReadByte())
+		number := int32(msg.ReadByte())
 		if number == ClientNumNone {
 			break
 		}
@@ -495,13 +494,14 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[uint32]*pb.Pac
 			continue
 		}
 		pl.InUse = true
+		out[number] = ps
 	}
 	return out, nil
 }
 
 // Parse a compressed player. Parsing delta players from regular DM2 demos is
 // similar but not identical, so a separate func is needed.
-func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags uint32) (*pb.PackedPlayer, error) {
+func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags int32) (*pb.PackedPlayer, error) {
 	to := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
 	if (bits & MvdPlayerType) != 0 {
@@ -610,7 +610,7 @@ func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags ui
 //
 // Some stats numbers are direct values (health, armor), and some are indexes
 // to things like config string values.
-func (p *MVD2Parser) ParsePlayerStats(msg *message.Buffer, flags uint32) map[uint32]int32 {
+func (p *MVD2Parser) ParsePlayerStats(msg *message.Buffer, flags int32) map[uint32]int32 {
 	stats := make(map[uint32]int32)
 	var bits uint64
 	var num uint32
@@ -633,13 +633,13 @@ func (p *MVD2Parser) ParsePlayerStats(msg *message.Buffer, flags uint32) map[uin
 }
 
 // Parse all the entities from a frame. These come directly after all the playerstates.
-func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[uint32]*pb.PackedEntity, error) {
-	var bits uint64
-	var num uint32
+func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[int32]*pb.PackedEntity, error) {
+	var bits int64
+	var num int32
 	var err error
 
 	if p.demo.Entities == nil {
-		p.demo.Entities = make(map[uint32]*pb.PackedEntity)
+		p.demo.Entities = make(map[int32]*pb.PackedEntity)
 	}
 
 	for {
@@ -663,7 +663,7 @@ func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[uint32]*pb.Pac
 			}
 			// set inuse false
 		}
-		ent.Number = num
+		ent.Number = uint32(num)
 		p.demo.Entities[num] = ent
 	}
 	return nil, nil
@@ -671,32 +671,32 @@ func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[uint32]*pb.Pac
 
 // Each entity is prefixed with up to 5 bytes of bitmask followed by the entity
 // number (up to 2 bytes) and then the actual data.
-func (p *MVD2Parser) ParseEntityBits(msg *message.Buffer) (uint32, uint64) {
-	number := uint32(0)
+func (p *MVD2Parser) ParseEntityBits(msg *message.Buffer) (int32, int64) {
+	number := int32(0)
 	if msg.Index == msg.Length {
 		return 0, 0
 	}
 
-	mask := uint64(msg.ReadByte())
+	mask := int64(msg.ReadByte())
 	if (mask & message.EntityMoreBits1) != 0 {
-		mask |= (uint64(msg.ReadByte()) << 8)
+		mask |= (int64(msg.ReadByte()) << 8)
 	}
 	if (mask & message.EntityMoreBits2) != 0 {
-		mask |= (uint64(msg.ReadByte()) << 16)
+		mask |= (int64(msg.ReadByte()) << 16)
 	}
 	if (mask & message.EntityMoreBits3) != 0 {
-		mask |= (uint64(msg.ReadByte()) << 24)
+		mask |= (int64(msg.ReadByte()) << 24)
 	}
 	if (p.demo.EntityStateFlags & EntityStateExtensions) != 0 {
 		if (mask & message.EntityMoreBits4) != 0 {
-			mask |= (uint64(msg.ReadByte()) << 32)
+			mask |= (int64(msg.ReadByte()) << 32)
 		}
 	}
 
 	if (mask & message.EntityNumber16) != 0 {
-		number = uint32(msg.ReadWord())
+		number = int32(msg.ReadWord())
 	} else {
-		number = uint32(msg.ReadByte())
+		number = int32(msg.ReadByte())
 	}
 	return number, mask
 }
@@ -704,7 +704,7 @@ func (p *MVD2Parser) ParseEntityBits(msg *message.Buffer) (uint32, uint64) {
 // Parse an individual edict_t. These are delta compressed (only changes from
 // the last update are emitted); the PackedEntity proto returned merged with
 // the previos version of this entity.
-func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits uint64, from *pb.PackedEntity) (*pb.PackedEntity, error) {
+func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits int64, from *pb.PackedEntity) (*pb.PackedEntity, error) {
 	flags := p.demo.EntityStateFlags
 	to := &pb.PackedEntity{}
 	if bits == 0 {
@@ -838,11 +838,11 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits uint64, from *pb
 			p.demo.Extension = &pb.MvdEntityStateExtension{}
 		}
 		if (bits & message.EntityMoreFX32) == message.EntityMoreFX32 {
-			p.demo.Extension.MoreFx = uint32(msg.ReadLong())
+			p.demo.Extension.MoreFx = int32(msg.ReadLong())
 		} else if (bits & message.EntityMoreFX8) != 0 {
-			p.demo.Extension.MoreFx = uint32(msg.ReadByte())
+			p.demo.Extension.MoreFx = int32(msg.ReadByte())
 		} else if (bits & message.EntityMoreFX16) != 0 {
-			p.demo.Extension.MoreFx = uint32(msg.ReadWord())
+			p.demo.Extension.MoreFx = int32(msg.ReadWord())
 		}
 
 		if (bits & message.EntityAlpha) != 0 {
@@ -862,8 +862,8 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 	len := msg.ReadByteP()
 	len |= uint32(extra) << 8
 
-	clientNum := msg.ReadByteP()
-	if clientNum >= p.demo.Remap.MaxClients {
+	clientNum := int32(msg.ReadByteP())
+	if clientNum >= p.demo.Remap.GetMaxClients() {
 		return nil, fmt.Errorf("ParseUnicast error - client more than max: %d", clientNum)
 	}
 	player, ok := p.demo.GetPlayers()[clientNum]
@@ -920,7 +920,7 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 	}
 
 	sendchan := msg.ReadWordP()
-	entnum := uint32(sendchan >> 3)
+	entnum := int32(sendchan >> 3)
 	ent := p.demo.Entities[entnum]
 	s.Entity = ent.GetNumber()
 	return s
@@ -932,7 +932,7 @@ func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, to int, extra int) *pb.
 	len := msg.ReadByteP()
 	len |= uint32(extra) << 8
 	if to != 0 {
-		out.Leaf = msg.ReadWordP()
+		out.Leaf = int32(msg.ReadWordP())
 	}
 	out.Data = msg.ReadData(int(len))
 

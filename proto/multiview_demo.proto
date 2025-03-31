@@ -7,24 +7,24 @@ package proto;
 import "server_message.proto";
 
 message MvdDemo {
-    uint32 flags = 1;
-    uint32 entity_state_flags = 2;
-    uint32 player_state_flags = 3;
+    int32 flags = 1;
+    int32 entity_state_flags = 2;
+    int32 player_state_flags = 3;
     MvdConfigStringRemap remap = 4;
     MvdEntityStateExtension extension = 5;
     MvdServerData serverdata = 6;
-    map<uint32,ConfigString> configstrings = 7;
-    map<uint32,MvdPlayer> players = 8;
-    map<uint32,PackedEntity> entities = 9;
-    uint32 max_players = 11;
+    map<int32,ConfigString> configstrings = 7;
+    map<int32,MvdPlayer> players = 8;
+    map<int32,PackedEntity> entities = 9;
+    int32 max_players = 11;
     string layout = 12;
     repeated MvdPacket packets = 13;
 }
 
 message Multicast {
-    uint32 type = 1;
+    int32 type = 1;
     bool reliable = 2;
-    uint32 leafnum = 3;
+    int32 leafnum = 3;
     string data = 4;
 }
 
@@ -41,31 +41,31 @@ message MvdState {
 */
 
 message MvdServerData {
-    uint32 version_major = 1;
-    uint32 version_minor = 2;
-    uint32 spawn_count = 3;
+    int32 version_major = 1;
+    int32 version_minor = 2;
+    int32 spawn_count = 3;
     string game_dir = 4;
-    uint32 client_number = 5; // the number of the dummy
+    int32 client_number = 5; // the number of the dummy
 }
 
 // different max limits and cs offsets depending on protocol version
 message MvdConfigStringRemap {
     bool extended = 1;
-    uint32 max_edicts = 2;
-    uint32 max_models = 3;
-    uint32 max_sounds = 4;
-    uint32 max_images = 5;
-    uint32 air_accel = 6;
-    uint32 max_clients = 7;
-    uint32 map_checksum = 8;
-    uint32 models = 9;
-    uint32 sounds = 10;
-    uint32 images = 11;
-    uint32 lights = 12;
-    uint32 items = 13;
-    uint32 player_skins = 14;
-    uint32 general = 15;
-    uint32 end = 16;
+    int32 max_edicts = 2;
+    int32 max_models = 3;
+    int32 max_sounds = 4;
+    int32 max_images = 5;
+    int32 air_accel = 6;
+    int32 max_clients = 7;
+    int32 map_checksum = 8;
+    int32 models = 9;
+    int32 sounds = 10;
+    int32 images = 11;
+    int32 lights = 12;
+    int32 items = 13;
+    int32 player_skins = 14;
+    int32 general = 15;
+    int32 end = 16;
 }
 
 message MvdPlayer {
@@ -75,7 +75,7 @@ message MvdPlayer {
 }
 
 message MvdEntityStateExtension {
-    uint32 more_fx = 1;
+    int32 more_fx = 1;
     int32 alpha = 2;
     int32 scale = 3;
     int32 loop_volume = 4;
@@ -85,19 +85,19 @@ message MvdEntityStateExtension {
 message MvdFrame {
     int32 portal_bits = 1;
     bytes portal_data = 2;
-    map<uint32, PackedPlayer> players = 3;  // players introduced this frame
-    map<uint32, PackedEntity> entities = 4; // ents seen this frame
+    map<int32, PackedPlayer> players = 3;  // players introduced this frame
+    map<int32, PackedEntity> entities = 4; // ents seen this frame
     repeated PackedSound sounds = 5;
 }
 
 message MvdMulticast {
-    uint32 type = 1;    // byte
-    uint32 leaf = 2;    // word
+    int32 type = 1;    // byte
+    int32 leaf = 2;    // word
     bytes data = 3;
 }
 
 message MvdUnicast {
-    uint32 client_number = 1; // player index
+    int32 client_number = 1; // player index
     MvdPlayer player = 2;
     repeated Layout layouts = 3;
     repeated ConfigString configstrings = 4;

@@ -11,29 +11,16 @@ import (
 	pb "github.com/packetflinger/libq2/proto"
 )
 
-/*
-func TestMVDUnmarshal(t *testing.T) {
-	parser, err := NewMVD2Demo("../testdata/test.mvd2")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-	err = parser.Unmarshal()
-	if err != nil {
-		t.Error(err)
-	}
-}
-*/
-
 func TestMvdParseConfigstrings(t *testing.T) {
 	tests := []struct {
 		name string
 		data string
-		want map[uint32]*pb.ConfigString
+		want map[int32]*pb.ConfigString
 	}{
 		{
 			name: "2_strings_complete_proper_ending",
 			data: "000061626300010078797a002008",
-			want: map[uint32]*pb.ConfigString{
+			want: map[int32]*pb.ConfigString{
 				0: {Index: 0, Data: "abc"},
 				1: {Index: 1, Data: "xyz"},
 			},
@@ -41,7 +28,7 @@ func TestMvdParseConfigstrings(t *testing.T) {
 		{
 			name: "2_strings_invalid_ending",
 			data: "000061626300010078797a00",
-			want: map[uint32]*pb.ConfigString{
+			want: map[int32]*pb.ConfigString{
 				0: {Index: 0, Data: "abc"},
 				1: {Index: 1, Data: "xyz"},
 			},
@@ -49,11 +36,11 @@ func TestMvdParseConfigstrings(t *testing.T) {
 		{
 			name: "maxclients_and_players",
 			data: "1E003235003F04416D6D6F205061636B0040044865616C746800200557616C6C466C795B425A5A5A5D5C6D616C652F6772756E740021055B647265616D5D73686C6F6F5C6D616C652F6772756E74002205636C616972655C66656D616C652F617468656E610034055B4D5644535045435D5C6D616C652F6772756E74002008",
-			want: map[uint32]*pb.ConfigString{
+			want: map[int32]*pb.ConfigString{
 				30:   {Index: 30, Data: "25"},
 				1087: {Index: 1087, Data: "Ammo Pack"},
 				1088: {Index: 1088, Data: "Health"},
-				1312: {Index: 1312, Data: "Wallfly[BZZZ]\\male/grunt"},
+				1312: {Index: 1312, Data: "WallFly[BZZZ]\\male/grunt"},
 				1313: {Index: 1313, Data: "[dream]shloo\\male/grunt"},
 				1314: {Index: 1314, Data: "claire\\female/athena"},
 				1332: {Index: 1332, Data: "[MVDSPEC]\\male/grunt"},
@@ -85,8 +72,8 @@ func TestMvdParseEntityBits(t *testing.T) {
 		name     string
 		data     string
 		parser   *MVD2Parser
-		wantBits uint64
-		wantNum  uint32
+		wantBits int64
+		wantNum  int32
 	}{
 		{
 			name: "empty",
@@ -148,7 +135,7 @@ func TestMvdParseEntityBits(t *testing.T) {
 			data: "808080800102",
 			parser: &MVD2Parser{
 				demo: &pb.MvdDemo{
-					EntityStateFlags: 0,
+					EntityStateFlags: 128,
 				},
 			},
 			wantBits: message.EntityMoreBits1 | message.EntityMoreBits2 | message.EntityMoreBits3 | message.EntityMoreBits4 | message.EntityScale,
@@ -174,20 +161,20 @@ func TestMvdParsePacketPlayersFromSkins(t *testing.T) {
 	tests := []struct {
 		name string
 		data string
-		want map[uint32]*pb.ConfigString
+		want map[int32]*pb.ConfigString
 	}{
 		{
 			name: "2_strings_complete_proper_ending",
-			data: "000061626300010078797a002008",
-			want: map[uint32]*pb.ConfigString{
-				0: {Index: 0, Data: "abc"},
-				1: {Index: 1, Data: "xyz"},
+			data: "010061626300020078797a002008",
+			want: map[int32]*pb.ConfigString{
+				1: {Index: 1, Data: "abc"},
+				2: {Index: 2, Data: "xyz"},
 			},
 		},
 		{
 			name: "2_strings_invalid_ending",
 			data: "000061626300010078797a00",
-			want: map[uint32]*pb.ConfigString{
+			want: map[int32]*pb.ConfigString{
 				0: {Index: 0, Data: "abc"},
 				1: {Index: 1, Data: "xyz"},
 			},
@@ -195,11 +182,11 @@ func TestMvdParsePacketPlayersFromSkins(t *testing.T) {
 		{
 			name: "maxclients_and_players",
 			data: "1E003235003F04416D6D6F205061636B0040044865616C746800200557616C6C466C795B425A5A5A5D5C6D616C652F6772756E740021055B647265616D5D73686C6F6F5C6D616C652F6772756E74002205636C616972655C66656D616C652F617468656E610034055B4D5644535045435D5C6D616C652F6772756E74002008",
-			want: map[uint32]*pb.ConfigString{
+			want: map[int32]*pb.ConfigString{
 				30:   {Index: 30, Data: "25"},
 				1087: {Index: 1087, Data: "Ammo Pack"},
 				1088: {Index: 1088, Data: "Health"},
-				1312: {Index: 1312, Data: "Wallfly[BZZZ]\\male/grunt"},
+				1312: {Index: 1312, Data: "WallFly[BZZZ]\\male/grunt"},
 				1313: {Index: 1313, Data: "[dream]shloo\\male/grunt"},
 				1314: {Index: 1314, Data: "claire\\female/athena"},
 				1332: {Index: 1332, Data: "[MVDSPEC]\\male/grunt"},
@@ -230,13 +217,91 @@ func TestMvdParsePacketPlayers(t *testing.T) {
 	tests := []struct {
 		name string
 		data string
-		want map[uint32]*pb.PackedPlayer
+		want map[int32]*pb.PackedPlayer
 	}{
 		{
 			name: "test0",
 			data: "011E577B21812AEE1B0000584B0950BC3B2E0003016E7F1800840200640007002F001B0091000A0016000E0026062406021E47612D7F37C1180000588C072E8C2019697F387E840200C4000B0032001B0064000A000A000E0001006400C8003200C8003200320026062406141E5100270015C80E0000580000004000DCEE5A012000840200010026062406FF",
-			want: map[uint32]*pb.PackedPlayer{
-				0: {Fov: 90},
+			want: map[int32]*pb.PackedPlayer{
+				1: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 8571,
+						OriginY: 10881,
+						OriginZ: 7150,
+					},
+					ViewAnglesX: 2379,
+					ViewAnglesY: -17328,
+					ViewOffsetZ: 88,
+					GunAnglesY:  3,
+					GunAnglesZ:  1,
+					GunIndex:    59,
+					GunFrame:    46,
+					Fov:         110,
+					Stats: map[uint32]int32{
+						0:  2,
+						1:  100,
+						2:  7,
+						3:  47,
+						4:  27,
+						5:  145,
+						6:  10,
+						11: 22,
+						12: 14,
+						26: 1574,
+						31: 1572,
+					},
+				},
+				2: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 11617,
+						OriginY: 14207,
+						OriginZ: 6337,
+					},
+					ViewAnglesX: 1932,
+					ViewAnglesY: -29650,
+					ViewOffsetZ: 88,
+					GunIndex:    32,
+					GunFrame:    25,
+					Fov:         105,
+					Stats: map[uint32]int32{
+						0:  2,
+						1:  196,
+						2:  11,
+						3:  50,
+						4:  27,
+						5:  100,
+						6:  10,
+						11: 10,
+						12: 14,
+						13: 1,
+						17: 100,
+						18: 200,
+						19: 50,
+						20: 200,
+						21: 50,
+						22: 50,
+						26: 1574,
+						31: 1572,
+					},
+				},
+				20: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 9984,
+						OriginY: 5376,
+						OriginZ: 3784,
+					},
+					ViewAnglesY: 16384,
+					ViewOffsetZ: 88,
+					GunAnglesY:  -36,
+					GunAnglesZ:  -18,
+					Fov:         90,
+					Stats: map[uint32]int32{
+						0:  2,
+						13: 1,
+						26: 1574,
+						31: 1572,
+					},
+				},
 			},
 		},
 	}
@@ -250,11 +315,11 @@ func TestMvdParsePacketPlayers(t *testing.T) {
 			parser := MVD2Parser{
 				demo: &pb.MvdDemo{
 					Remap: csRemap,
-					Players: map[uint32]*pb.MvdPlayer{
-						0: {Name: "Wallfly[BZZZ]"},
-						1: {Name: "[dream]shloo"},
-						2: {Name: "claire"},
-						3: {Name: "[MVDSPEC]"},
+					Players: map[int32]*pb.MvdPlayer{
+						0:  {Name: "Wallfly[BZZZ]"},
+						1:  {Name: "[dream]shloo"},
+						2:  {Name: "claire"},
+						20: {Name: "[MVDSPEC]"},
 					},
 				},
 			}
