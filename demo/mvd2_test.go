@@ -357,8 +357,6 @@ func TestMvdUnmarshal(t *testing.T) {
 			if demo == nil {
 				t.Error()
 			}
-			//fmt.Println(prototext.Format(demo))
-			//t.Error()
 		})
 	}
 }
