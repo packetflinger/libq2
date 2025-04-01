@@ -49,6 +49,22 @@ func (w *MVD2Writer) MarshalServerData(data *pb.MvdServerData) message.Buffer {
 	return out
 }
 
+func (w *MVD2Writer) MarshalConfigstrings(data map[int32]*pb.ConfigString) message.Buffer {
+	out := message.NewBuffer(nil)
+	for _, cs := range data {
+		out.Append(w.MarshalConfigstring(cs))
+	}
+	out.WriteShortP(w.demo.GetRemap().GetEnd())
+	return out
+}
+
+func (w *MVD2Writer) MarshalConfigstring(data *pb.ConfigString) message.Buffer {
+	out := message.NewBuffer(nil)
+	out.WriteShortP(int32(data.GetIndex()))
+	out.WriteString(data.GetData())
+	return out
+}
+
 // Generate a binary buffer from a PackedSound proto
 func (w *MVD2Writer) MarshalSound(sound *pb.PackedSound) (message.Buffer, error) {
 	out := message.Buffer{}
