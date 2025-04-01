@@ -36,6 +36,19 @@ func (w *MVD2Writer) Marshal() error {
 	return nil
 }
 
+func (w *MVD2Writer) MarshalServerData(data *pb.MvdServerData) message.Buffer {
+	out := message.NewBuffer(nil)
+	out.WriteLongP(data.GetVersionMajor())
+	out.WriteShortP(data.GetVersionMinor())
+	if data.GetVersionMinor() >= ProtocolPlusPlus {
+		out.WriteShortP(w.demo.GetFlags())
+	}
+	out.WriteLongP(data.GetSpawnCount())
+	out.WriteString(data.GetGameDir())
+	out.WriteShortP(data.GetClientNumber())
+	return out
+}
+
 // Generate a binary buffer from a PackedSound proto
 func (w *MVD2Writer) MarshalSound(sound *pb.PackedSound) (message.Buffer, error) {
 	out := message.Buffer{}
