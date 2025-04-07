@@ -1,7 +1,9 @@
 package demo
 
 import (
+	"fmt"
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -10,6 +12,48 @@ import (
 
 	pb "github.com/packetflinger/libq2/proto"
 )
+
+func TestMvdParseServerData(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+		want *pb.MvdDemo
+	}{
+		{
+			name: "test0",
+			data: "2425000000DA07B5218E5E6F70656E74646D00140000",
+			want: &pb.MvdDemo{
+				Version:          2010,
+				Identity:         1586373045,
+				GameDir:          "opentdm",
+				Dummy:            20,
+				Flags:            1,
+				EntityStateFlags: 48,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			in, err := hex.DecodeString(tc.data)
+			if err != nil {
+				t.Error("error decoding hex string")
+			}
+			buf := message.NewBuffer(in)
+
+			parser := MVD2Parser{
+				demo: &pb.MvdDemo{},
+			}
+			err = parser.ParseServerData(&buf, (buf.ReadByte() >> CommandBits))
+			if err != nil {
+				t.Errorf("ParseServerData(%v) error: %v", tc.data, err)
+			}
+			parser.demo.Remap = nil // don't care about cs map
+			if diff := cmp.Diff(parser.demo, tc.want, protocmp.Transform(), protocmp.IgnoreFields(parser.demo.Remap)); diff != "" {
+				t.Errorf("ParseServerData(%v) = \n%v,\nwant \n%v\n", &buf, parser.demo, tc.want)
+			}
+		})
+	}
+}
 
 func TestMvdParseConfigstrings(t *testing.T) {
 	tests := []struct {
@@ -304,10 +348,96 @@ func TestMvdParsePacketPlayers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "leading zero",
+			data: "001ED100270015C80E0000580000004000DCEE5A012000840200010026062406011E478030C012410B0000580000006004276E431800840200640005000500070026062406021ED100270015C80E0000580000004000DCEE78012000840200010026062406035E57382D01FD0E1D0000607F0596730700FA3B1D08F5FB787F180084020064000700260009002F000A0016000E0026062406041E474A136D2AC1180000587E0330B1201C6F7F38008C020064000B0032001B00640016000A0010000100260627062406051EC746290125011D000058000000202C0D697F38008402005C000F00C8001B003C00100010000A00010026062406065E57CD0FFB1EC11800005DBEF7D2440400FE201905F5FB787F187E84020064000B0032001B0064000E000A0008006400C8003200C8003200320026062406071E5721358A1E790F00005D6A08DCC03221070C06697F18008402006200080019001B002D0012001300090026062406081EC7003B001701110000580000008030056E7F38008402006400060064001B006400120012000900010026062406091ED100270015C80E0000580000004000DCEE6E0120008402000100260624060A5E57DC28F330C11A00005DAF092B74030002201905F6FB647F180084020064000B0031001B005B000D000A000F00260624060B1ED100270015C80E0000580000004000DCEE640120008402000100260624060C5ED7F031BCF8C11400005B58FF9F7F0300FF201903FC FE5A7F10 00940200 64000B00 2E001B00 64000A00 0E002606 28062406 0D1ED100 270015C8 0E000058 00000040 00DCEE5D 01200084 02000100 26062406 0E5ED7CA 276223C1 1400005D B0012B01 0400022C 17050B05 5A7F1000 84020064 000F00C8 001B0089 000A000E 00260624 06141F41 01002700 15C80E00 00580000 00405A01 20008402 00010026 062406FF",
+			want: map[int32]*pb.PackedPlayer{
+				1: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 8571,
+						OriginY: 10881,
+						OriginZ: 7150,
+					},
+					ViewAnglesX: 2379,
+					ViewAnglesY: -17328,
+					ViewOffsetZ: 88,
+					GunAnglesY:  3,
+					GunAnglesZ:  1,
+					GunIndex:    59,
+					GunFrame:    46,
+					Fov:         110,
+					Stats: map[uint32]int32{
+						0:  2,
+						1:  100,
+						2:  7,
+						3:  47,
+						4:  27,
+						5:  145,
+						6:  10,
+						11: 22,
+						12: 14,
+						26: 1574,
+						31: 1572,
+					},
+				},
+				2: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 11617,
+						OriginY: 14207,
+						OriginZ: 6337,
+					},
+					ViewAnglesX: 1932,
+					ViewAnglesY: -29650,
+					ViewOffsetZ: 88,
+					GunIndex:    32,
+					GunFrame:    25,
+					Fov:         105,
+					Stats: map[uint32]int32{
+						0:  2,
+						1:  196,
+						2:  11,
+						3:  50,
+						4:  27,
+						5:  100,
+						6:  10,
+						11: 10,
+						12: 14,
+						13: 1,
+						17: 100,
+						18: 200,
+						19: 50,
+						20: 200,
+						21: 50,
+						22: 50,
+						26: 1574,
+						31: 1572,
+					},
+				},
+				20: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 9984,
+						OriginY: 5376,
+						OriginZ: 3784,
+					},
+					ViewAnglesY: 16384,
+					ViewOffsetZ: 88,
+					GunAnglesY:  -36,
+					GunAnglesZ:  -18,
+					Fov:         90,
+					Stats: map[uint32]int32{
+						0:  2,
+						13: 1,
+						26: 1574,
+						31: 1572,
+					},
+				},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			in, err := hex.DecodeString(tc.data)
+			data := strings.ReplaceAll(tc.data, " ", "")
+			in, err := hex.DecodeString(data)
 			if err != nil {
 				t.Error("error decoding hex string")
 			}
@@ -339,14 +469,19 @@ func TestMvdUnmarshal(t *testing.T) {
 		name     string
 		demofile string
 	}{
-		{
+		/*{
 			name:     "test1",
 			demofile: "../testdata/test.mvd2",
+		},*/
+		{
+			name:     "test2",
+			demofile: "../testdata/big.mvd2",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			parser, err := NewMVD2Parser(tc.demofile)
+			parser.debug = true
 			if err != nil {
 				t.Errorf("error creating parser: %v", err)
 			}
@@ -357,6 +492,9 @@ func TestMvdUnmarshal(t *testing.T) {
 			if demo == nil {
 				t.Error()
 			}
+
+			fmt.Println("demo count:", len(parser.allDemos))
 		})
 	}
+	t.Error()
 }

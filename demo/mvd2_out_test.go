@@ -11,32 +11,26 @@ func TestMvdMarshalServerData(t *testing.T) {
 	tests := []struct {
 		name string
 		demo *pb.MvdDemo
-		data *pb.MvdServerData
 		want string
 	}{
 		{
 			name: "no demo flags",
-			demo: &pb.MvdDemo{},
-			data: &pb.MvdServerData{
-				VersionMajor: 37,
-				VersionMinor: 2010,
-				SpawnCount:   123456789,
-				GameDir:      "uranus",
-				ClientNumber: 20,
+			demo: &pb.MvdDemo{
+				Version:  2010,
+				Identity: 123456789,
+				GameDir:  "uranus",
+				Dummy:    20,
 			},
 			want: "25000000da0715cd5b077572616e7573001400",
 		},
 		{
 			name: "with demo flags",
 			demo: &pb.MvdDemo{
-				Flags: 715,
-			},
-			data: &pb.MvdServerData{
-				VersionMajor: 37,
-				VersionMinor: 2012,
-				SpawnCount:   123456789,
-				GameDir:      "uranus",
-				ClientNumber: 20,
+				Version:  2012,
+				Identity: 123456789,
+				GameDir:  "uranus",
+				Dummy:    20,
+				Flags:    715,
 			},
 			want: "25000000dc07cb0215cd5b077572616e7573001400",
 		},
@@ -44,10 +38,10 @@ func TestMvdMarshalServerData(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			writer := NewMVD2Writer(tc.demo)
-			msg := writer.MarshalServerData(tc.data)
+			msg := writer.MarshalServerData()
 			got := hex.EncodeToString(msg.Data)
 			if got != tc.want {
-				t.Errorf("MarshalServerData(%v) = %s, want %s\n", tc.data, got, tc.want)
+				t.Errorf("MarshalServerData(%v) = %s, want %s\n", tc.demo, got, tc.want)
 			}
 		})
 	}
@@ -136,6 +130,160 @@ func TestMvdMarshalConfigStrings(t *testing.T) {
 			got := hex.EncodeToString(msg.Data)
 			if got != tc.want {
 				t.Errorf("MarshalConfigstrings(%v) = %s, want %s\n", tc.data, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestMvdMarshalPlayer(t *testing.T) {
+	tests := []struct {
+		name   string
+		number int32
+		from   *pb.PackedPlayer
+		to     *pb.PackedPlayer
+		want   string
+	}{
+		{
+			name:   "player2",
+			number: 2,
+			from: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 5,
+					OriginY: 25,
+				},
+				Fov: 105,
+				Stats: map[uint32]int32{
+					1: 95,
+				},
+			},
+			to: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 10,
+					OriginY: 25,
+				},
+				Fov: 105,
+				Stats: map[uint32]int32{
+					1: 100,
+				},
+			},
+			want: "0202001102000a0019000000020000006400",
+		},
+		{
+			name:   "player3",
+			number: 3,
+			from: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 200,
+					OriginY: -4,
+				},
+				Fov: 110,
+				Stats: map[uint32]int32{
+					3: 50,
+				},
+			},
+			to: &pb.PackedPlayer{
+				Movestate: &pb.PlayerMove{
+					OriginX: 10,
+					OriginY: 25,
+				},
+				Fov: 105,
+				Stats: map[uint32]int32{
+					1: 100,
+				},
+			},
+			want: "0302081102080a0019000000690a00000064000000",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			writer := NewMVD2Writer(&pb.MvdDemo{
+				Players: map[int32]*pb.MvdPlayer{
+					tc.number: {
+						Name:        "claire",
+						PlayerState: tc.from,
+					},
+				},
+			})
+			msg := writer.MarshalPlayer(tc.number, tc.to)
+			got := hex.EncodeToString(msg.Data)
+			if got != tc.want {
+				t.Errorf("MarshalPlayer(%v, %v) = %s, want %s\n", tc.number, tc.to, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestMvdMarshalPlayers(t *testing.T) {
+	tests := []struct {
+		name    string
+		from    map[int32]*pb.MvdPlayer
+		players map[int32]*pb.PackedPlayer
+		want    string
+	}{
+		{
+			name: "player2",
+			from: map[int32]*pb.MvdPlayer{
+				3: {
+					Name: "claire",
+					PlayerState: &pb.PackedPlayer{
+						Movestate: &pb.PlayerMove{
+							OriginX: 5,
+							OriginY: 25,
+						},
+						Fov: 105,
+						Stats: map[uint32]int32{
+							1: 95,
+						},
+					},
+				},
+				4: {
+					Name: "someone_else",
+					PlayerState: &pb.PackedPlayer{
+						Movestate: &pb.PlayerMove{
+							OriginX: 10,
+							OriginY: 25,
+						},
+						Fov: 105,
+						Stats: map[uint32]int32{
+							1: 100,
+						},
+					},
+				},
+			},
+			players: map[int32]*pb.PackedPlayer{
+				3: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 5,
+						OriginY: 25,
+					},
+					Fov: 105,
+					Stats: map[uint32]int32{
+						1: 95,
+					},
+				},
+				4: {
+					Movestate: &pb.PlayerMove{
+						OriginX: 10,
+						OriginY: 25,
+					},
+					Fov: 105,
+					Stats: map[uint32]int32{
+						1: 100,
+					},
+				},
+			},
+			want: "????",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			writer := NewMVD2Writer(&pb.MvdDemo{
+				Players: tc.from,
+			})
+			msg := writer.MarshalPlayers(tc.players)
+			got := hex.EncodeToString(msg.Data)
+			if got != tc.want {
+				t.Errorf("MarshalPlayers(%v) = %s, want %s\n", tc.players, got, tc.want)
 			}
 		})
 	}

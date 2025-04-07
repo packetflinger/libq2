@@ -2,6 +2,7 @@ package demo
 
 import (
 	"os"
+	"slices"
 
 	"github.com/packetflinger/libq2/message"
 	pb "github.com/packetflinger/libq2/proto"
@@ -36,16 +37,16 @@ func (w *MVD2Writer) Marshal() error {
 	return nil
 }
 
-func (w *MVD2Writer) MarshalServerData(data *pb.MvdServerData) message.Buffer {
+func (w *MVD2Writer) MarshalServerData() message.Buffer {
 	out := message.NewBuffer(nil)
-	out.WriteLongP(data.GetVersionMajor())
-	out.WriteShortP(data.GetVersionMinor())
-	if data.GetVersionMinor() >= ProtocolPlusPlus {
+	out.WriteLongP(37)
+	out.WriteShortP(w.demo.GetVersion())
+	if w.demo.GetVersion() >= ProtocolPlusPlus {
 		out.WriteShortP(w.demo.GetFlags())
 	}
-	out.WriteLongP(data.GetSpawnCount())
-	out.WriteString(data.GetGameDir())
-	out.WriteShortP(data.GetClientNumber())
+	out.WriteLongP(w.demo.GetIdentity())
+	out.WriteString(w.demo.GetGameDir())
+	out.WriteShortP(w.demo.GetDummy())
 	return out
 }
 
@@ -86,4 +87,52 @@ func (w *MVD2Writer) MarshalMulticast(mc *pb.MvdMulticast) (*message.Buffer, err
 	}
 	out.WriteData(mc.Data)
 	return &out, nil
+}
+
+func (w *MVD2Writer) MarshalFrame(frame *pb.MvdFrame) message.Buffer {
+	out := message.NewBuffer(nil)
+	out.WriteByte(len(frame.GetPortalData()))
+	out.WriteData(frame.GetPortalData())
+	out.Append(w.MarshalPlayers(frame.GetPlayers()))
+	return out
+}
+
+func (w *MVD2Writer) MarshalPlayers(players map[int32]*pb.PackedPlayer) message.Buffer {
+	out := message.NewBuffer(nil)
+	for num, pl := range players {
+		out.Append(w.MarshalPlayer(num, pl))
+	}
+	out.WriteByte(ClientNumNone)
+	return out
+}
+
+func (w *MVD2Writer) MarshalPlayer(num int32, player *pb.PackedPlayer) message.Buffer {
+	out := message.NewBuffer(nil)
+
+	from := w.demo.GetPlayers()[num]
+	bits := message.DeltaPlayerBitmask(from.GetPlayerState(), player)
+
+	out.WriteByte(int(num))
+	out.WriteWord(bits)
+	out.Append(message.WriteDeltaPlayerstate(from.GetPlayerState(), player))
+	return out
+}
+
+func (w *MVD2Writer) MarshalEntities(ents map[int32]*pb.PackedEntity) message.Buffer {
+	out := message.NewBuffer(nil)
+
+	// ents need to be in numeric order and maps are not guaranteed to give
+	// their values in the order they were added. So export the keys and
+	// sort them.
+	var keys []int32
+	for k := range ents {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+
+	for _, k := range keys {
+		out.Append(message.WriteDeltaEntity(ents[k], w.demo.GetEntities()[k]))
+	}
+	out.WriteShort(0) // combined bitmask and number
+	return out
 }

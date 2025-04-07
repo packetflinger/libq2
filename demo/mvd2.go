@@ -14,26 +14,28 @@ import (
 )
 
 const (
-	MVDMagic         = 843339341 // {'M','V','D','2'}
-	MaxMessageLength = 32768     // 0x8000
-	MaxPacketLength  = 1400      // default Q2 UDP packet len
-	MaxStats         = 32        // playerstate stats uint32 bitmask
-	MaxStatsExt      = 64        // extended playerstates supported
-	MaxQpath         = 64        // max len for file path
-	MaxStringChars   = 1024      // biggest string to deal with
-	MaxConfigStrings = 2080      // CS_MAX
-	MaxClients       = 256       // hard limit
-	MaxEdicts        = 1024      // hard limit
-	ProtocolVersion  = 37        // major q2 protocol version
-	ProtocolMinimum  = 2009      // minor proto version required
-	ProtocolCurrent  = 2010      // minor proto version
-	ProtocolPlus     = 2011      // not sure this is used
-	ProtocolPlusPlus = 2012      // same
-	CommandBits      = 5
-	CommandMask      = ((1 << CommandBits) - 1)
-	ClientNumNone    = MaxClients - 1
-	FlagExtLimits    = 1 << 2 // multiview flags extended limits
-	FlagExtLimits2   = 1 << 3 // even more extended!!
+	MVDMagic          = 843339341 // {'M','V','D','2'}
+	MaxMessageLength  = 32768     // 0x8000
+	MaxPacketLength   = 1400      // default Q2 UDP packet len
+	MaxStats          = 32        // playerstate stats uint32 bitmask
+	MaxStatsExt       = 64        // extended playerstates supported
+	MaxQpath          = 64        // max len for file path
+	MaxStringChars    = 1024      // biggest string to deal with
+	MaxConfigStrings  = 2080      // CS_MAX
+	MaxClients        = 256       // hard limit
+	MaxEdicts         = 1024      // hard limit
+	ProtocolVersion   = 37        // major q2 protocol version
+	ProtocolMinimum   = 2009      // minor proto version required
+	ProtocolCurrent   = 2010      // minor proto version
+	ProtocolPlus      = 2011      // not sure this is used
+	ProtocolPlusPlus  = 2012      // same
+	ProtocolPlayerFog = 2013
+	//ProtocolCurrent   = 2013
+	CommandBits    = 5
+	CommandMask    = ((1 << CommandBits) - 1)
+	ClientNumNone  = MaxClients - 1
+	FlagExtLimits  = 1 << 2 // multiview flags extended limits
+	FlagExtLimits2 = 1 << 3 // even more extended!!
 )
 
 const (
@@ -102,6 +104,8 @@ const (
 	MvdPlayerStats       = 1 << 14
 	MvdPlayerRemove      = 1 << 15
 
+	MvdPlayerMoreBits = 1 << 8
+
 	MvdPlayerBits = 16
 	MvdPlayerMask = (1 << MvdPlayerBits) - 1
 )
@@ -139,10 +143,13 @@ const (
 )
 
 type MVD2Parser struct {
-	demo           *pb.MvdDemo
+	allDemos       []*pb.MvdDemo     // can be multiple per .mvd2 file
+	demo           *pb.MvdDemo       // the current one
+	index          int               // which demo?
 	binaryData     []byte            // .mvd2 file contents
 	binaryPosition int               // where in those contents we are
 	callbacks      map[int]func(any) // index is svc_msg type
+	debug          bool              // print stuff while parsing
 }
 
 var (
@@ -203,8 +210,9 @@ func NewMVD2Parser(f string) (*MVD2Parser, error) {
 	return &MVD2Parser{
 		binaryData:     data,
 		binaryPosition: 4,
+		allDemos:       []*pb.MvdDemo{},
 		demo:           &pb.MvdDemo{},
-		// state:          &pb.MvdState{},
+		index:          -1,
 	}, nil
 }
 
@@ -273,7 +281,10 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 
 		switch cmd {
 		case MVDSvcServerData:
-			p.demo.Serverdata = p.ParseServerData(msg, extra)
+			err := p.ParseServerData(msg, extra)
+			if err != nil {
+				return nil, err
+			}
 			p.demo.Configstrings = p.ParseConfigStrings(msg)
 			frame, err := p.ParseFrame(msg)
 			if err != nil {
@@ -364,37 +375,48 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 // ServerData is the first message in a demo, it contains info about what
 // protocol versions were used at the time of the capture, the game directory,
 // the client number of the dummy spec, and more.
-func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) *pb.MvdServerData {
-	s := &pb.MvdServerData{}
+func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) error {
+	p.index++
+	p.allDemos = append(p.allDemos, &pb.MvdDemo{})
+	demo := p.allDemos[p.index]
+	p.demo = p.allDemos[p.index] // set the pointer to the new current demo
+	
+	if msg.ReadLongP() != 37 {
+		return fmt.Errorf("parse error: demo protocol not 37")
+	}
+	demo.Version = msg.ReadShortP()
 
-	s.VersionMajor = msg.ReadLongP()
-	s.VersionMinor = msg.ReadShortP()
-
-	if s.VersionMinor >= ProtocolPlusPlus {
-		p.demo.Flags = msg.ReadShortP()
+	if demo.Version >= ProtocolPlusPlus {
+		demo.Flags = msg.ReadShortP()
 	} else {
-		p.demo.Flags = int32(extra)
+		demo.Flags = int32(extra)
 	}
 
-	s.SpawnCount = msg.ReadLongP()
-	s.GameDir = msg.ReadString()
-	s.ClientNumber = msg.ReadShortP()
+	demo.Identity = msg.ReadLongP()
+	demo.GameDir = msg.ReadString()
+	demo.Dummy = msg.ReadShortP()
 
-	p.demo.EntityStateFlags = EntityStateUMask | EntityStateBeamOrigin
-	p.demo.Remap = csRemap
+	demo.EntityStateFlags = EntityStateUMask | EntityStateBeamOrigin
+	demo.Remap = csRemap
 
-	if (s.VersionMinor >= ProtocolPlus) && ((p.demo.Flags & FlagExtLimits) != 0) {
-		p.demo.EntityStateFlags |= EntityStateLongSolid | EntityStateShortAngles | EntityStateExtensions
-		p.demo.PlayerStateFlags |= PlayerStateExtensions
-		p.demo.Remap = csRemapNew
+	if (demo.Version >= ProtocolPlus) && ((demo.Flags & FlagExtLimits) != 0) {
+		demo.EntityStateFlags |= EntityStateLongSolid | EntityStateShortAngles | EntityStateExtensions
+		demo.PlayerStateFlags |= PlayerStateExtensions
+		demo.Remap = csRemapNew
 	}
 
-	if (s.VersionMinor >= ProtocolPlusPlus) && ((p.demo.Flags & FlagExtLimits2) != 0) {
-		p.demo.EntityStateFlags |= EntityStateExtensions2
-		p.demo.PlayerStateFlags |= PlayerStateExtensions2
-		// check for FlagExtLimits also?
+	if (demo.Version >= ProtocolPlusPlus) && ((demo.Flags & FlagExtLimits2) != 0) {
+		demo.EntityStateFlags |= EntityStateExtensions2
+		demo.PlayerStateFlags |= PlayerStateExtensions2
+		if demo.Version >= ProtocolPlayerFog {
+			demo.PlayerStateFlags |= MvdPlayerMoreBits
+		}
 	}
-	return s
+
+	if p.debug {
+		fmt.Printf("serverdata - ver:%d, dummy:%d, ident:%d game:%q\n", demo.GetVersion(), demo.GetDummy(), demo.GetIdentity(), demo.GetGameDir())
+	}
+	return nil
 }
 
 // This parses the blob of configstrings that directly follow the serverdata at
@@ -414,6 +436,9 @@ func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[int32]*pb.Confi
 			break
 		}
 		out[idx] = &pb.ConfigString{Index: uint32(idx), Data: msg.ReadString()}
+		if p.debug {
+			fmt.Printf("configstring - [%d] %q\n", idx, out[idx].GetData())
+		}
 	}
 	mc, ok := out[p.demo.Remap.GetMaxClients()]
 	if ok {
@@ -441,10 +466,13 @@ func (p *MVD2Parser) ParseConfigString(msg *message.Buffer) (*pb.ConfigString, e
 	if idx >= int(int16(p.demo.Remap.End)) {
 		return nil, fmt.Errorf("ParseConfigString() error - index out of bounds: %d", idx)
 	}
-
+	str := msg.ReadString()
+	if p.debug {
+		fmt.Printf("configstring - [%d] %q\n", idx, str)
+	}
 	return &pb.ConfigString{
 		Index: uint32(idx),
-		Data:  msg.ReadString(),
+		Data:  str,
 	}, nil
 }
 
@@ -452,8 +480,7 @@ func (p *MVD2Parser) ParseConfigString(msg *message.Buffer) (*pb.ConfigString, e
 // and then all the compressed entities.
 func (p *MVD2Parser) ParseFrame(msg *message.Buffer) (*pb.MvdFrame, error) {
 	frame := &pb.MvdFrame{}
-	frame.PortalBits = int32(msg.ReadByte())
-	frame.PortalData = msg.ReadData(int(frame.GetPortalBits()))
+	frame.PortalData = msg.ReadData(msg.ReadByte())
 
 	players, err := p.ParsePacketPlayers(msg)
 	if err != nil {
@@ -465,6 +492,9 @@ func (p *MVD2Parser) ParseFrame(msg *message.Buffer) (*pb.MvdFrame, error) {
 		return nil, err
 	}
 	frame.Entities = ents
+	if p.debug {
+		fmt.Printf("frame - portal data:%v\n", frame.PortalData)
+	}
 	return frame, nil
 }
 
@@ -479,7 +509,10 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.Pack
 		}
 		pl, ok := p.demo.Players[number]
 		if !ok {
-			return nil, fmt.Errorf("ParsePacketPlayers(%d) - player not found", number)
+			//return nil, fmt.Errorf("ParsePacketPlayers(%d) - player not found", number)
+			pl = &pb.MvdPlayer{
+				Name: "unknown",
+			}
 		}
 		// check num bounds later
 		bits = uint32(msg.ReadWord())
@@ -495,6 +528,13 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.Pack
 		}
 		pl.InUse = true
 		out[number] = ps
+	}
+	if p.debug {
+		var names []string
+		for k := range out {
+			names = append(names, p.demo.GetPlayers()[k].GetName())
+		}
+		fmt.Printf("players - %q\n", strings.Join(names, ", "))
 	}
 	return out, nil
 }
@@ -665,6 +705,9 @@ func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[int32]*pb.Pack
 		}
 		ent.Number = uint32(num)
 		p.demo.Entities[num] = ent
+	}
+	if p.debug {
+		fmt.Printf("entities\n")
 	}
 	return nil, nil
 }
@@ -868,7 +911,7 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 	}
 	player, ok := p.demo.GetPlayers()[clientNum]
 	if !ok {
-		return nil, fmt.Errorf("ParseUnicast error - unknown player: %d", clientNum)
+		player = &pb.MvdPlayer{Name: "[unknown]", InUse: true}
 	}
 	out.ClientNumber = clientNum
 	out.Player = player
@@ -892,6 +935,21 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 		case SvcStuffText:
 			st := &pb.StuffText{Data: msg.ReadString()}
 			out.Stuffs = append(out.Stuffs, st)
+		}
+	}
+	if p.debug {
+		fmt.Printf("unicast - [%d] %q\n", clientNum, player.Name)
+		for _, s := range out.GetStuffs() {
+			fmt.Printf("  stuff - %q\n", s.Data)
+		}
+		for _, c := range out.GetConfigstrings() {
+			fmt.Printf("  configstring - [%d] %q\n", c.GetIndex(), c.GetData())
+		}
+		for _, lo := range out.GetLayouts() {
+			fmt.Printf("  layout - %q\n", lo.GetData())
+		}
+		for _, p := range out.GetPrints() {
+			fmt.Printf("  print - [%d] %q\n", p.GetLevel(), p.GetData())
 		}
 	}
 	return out, nil
@@ -923,6 +981,13 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 	entnum := int32(sendchan >> 3)
 	ent := p.demo.Entities[entnum]
 	s.Entity = ent.GetNumber()
+	if p.debug {
+		fmt.Printf(
+			"sound - [%d] %q\n",
+			s.GetIndex(),
+			p.demo.GetConfigstrings()[p.demo.GetRemap().GetSounds()+int32(s.GetIndex())].Data,
+		)
+	}
 	return s
 }
 
@@ -938,6 +1003,9 @@ func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, to int, extra int) *pb.
 
 	if cbFunc, found := p.callbacks[to]; found {
 		cbFunc(out)
+	}
+	if p.debug {
+		fmt.Printf("multicast - %v\n", out.GetData())
 	}
 	return out
 }

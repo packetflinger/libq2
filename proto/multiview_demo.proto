@@ -6,19 +6,25 @@ package proto;
 
 import "server_message.proto";
 
+// All the messages that make up a complete multi-view demo. A .mvd2 file can
+// contain more than one MvdDemo. Each map is technically considered a separate
+// demo even though they're all contained in the same file.
 message MvdDemo {
-    int32 flags = 1;
-    int32 entity_state_flags = 2;
-    int32 player_state_flags = 3;
-    MvdConfigStringRemap remap = 4;
-    MvdEntityStateExtension extension = 5;
-    MvdServerData serverdata = 6;
-    map<int32,ConfigString> configstrings = 7;
-    map<int32,MvdPlayer> players = 8;
-    map<int32,PackedEntity> entities = 9;
-    int32 max_players = 11;
-    string layout = 12;
-    repeated MvdPacket packets = 13;
+    int32 version = 1;                      // minor version, 2010 is current
+    int32 identity = 2;                     // unique number
+    string game_dir = 3;                    // "opentdm", "baseq2", etc
+    int32 dummy = 4;                        // player number of observer dummy
+    int32 max_players = 5;                  // server cvar
+    string map = 6;                         // the current map
+    int32 flags = 7;
+    int32 entity_state_flags = 8;
+    int32 player_state_flags = 9;
+    MvdConfigStringRemap remap = 10;         // cs numbers, flags depenedant
+    MvdEntityStateExtension extension = 11;
+    map<int32,ConfigString> configstrings = 12;
+    map<int32,MvdPlayer> players = 13;
+    map<int32,PackedEntity> entities = 14;
+    repeated MvdPacket packets = 15;
 }
 
 message Multicast {
@@ -28,27 +34,7 @@ message Multicast {
     string data = 4;
 }
 
-/*
-// remove me later
-message MvdState {
-    uint32 flags = 1;
-    uint32 entity_state_flags = 2;
-    uint32 player_state_flags = 3;
-    MvdConfigStringRemap remap = 4;
-    map<uint32,PackedEntity> entities = 5;
-    MvdEntityStateExtension extension = 6;
-}
-*/
-
-message MvdServerData {
-    int32 version_major = 1;
-    int32 version_minor = 2;
-    int32 spawn_count = 3;
-    string game_dir = 4;
-    int32 client_number = 5; // the number of the dummy
-}
-
-// different max limits and cs offsets depending on protocol version
+// Different max limits and cs offsets depending on protocol version.
 message MvdConfigStringRemap {
     bool extended = 1;
     int32 max_edicts = 2;
@@ -83,7 +69,7 @@ message MvdEntityStateExtension {
 }
 
 message MvdFrame {
-    int32 portal_bits = 1;
+    //int32 portal_bits = 1;  // remove later this is len(portal_data)
     bytes portal_data = 2;
     map<int32, PackedPlayer> players = 3;  // players introduced this frame
     map<int32, PackedEntity> entities = 4; // ents seen this frame
@@ -112,5 +98,4 @@ message MvdPacket {
     repeated MvdMulticast multicasts= 4;
     repeated MvdFrame frames = 5;
     repeated ConfigString configstrings = 6;  // maybe a map?
-    MvdServerData server_data = 7;
 }
