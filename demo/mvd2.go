@@ -266,11 +266,6 @@ func ReadGZIPFile(filename string) ([]byte, error) {
 	return content, nil
 }
 
-// Access to private data
-func (p *MVD2Parser) GetRawData() []byte {
-	return p.binaryData
-}
-
 // Load the binary demo into protobuf
 func (p *MVD2Parser) Unmarshal() (*pb.MvdDemo, error) {
 	demo := &pb.MvdDemo{}
@@ -1087,4 +1082,29 @@ func (p *MVD2Parser) RegisterCallback(event int, dofunc func(any)) {
 // Dynamically remove a particular callback
 func (p *MVD2Parser) UnregisterCallback(msgtype int) {
 	delete(p.callbacks, msgtype)
+}
+
+// Private member accessor
+func (p *MVD2Parser) GetRawData() []byte {
+	return p.binaryData
+}
+
+// Private member accessor
+func (p *MVD2Parser) GetRawPosition() int {
+	return p.binaryPosition
+}
+
+// Private member accessor
+func (p *MVD2Parser) IsZipped() bool {
+	return p.zipped
+}
+
+// Private member accessor
+func (p *MVD2Parser) GetDemos() []*pb.MvdDemo {
+	return p.allDemos
+}
+
+// Private member accessor
+func (p *MVD2Parser) GetDebug() bool {
+	return p.debug
 }
