@@ -1,7 +1,9 @@
 package demo
 
 import (
+	"compress/gzip"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -15,6 +17,7 @@ import (
 
 const (
 	MVDMagic          = 843339341 // {'M','V','D','2'}
+	GZIPMagic         = 35615     // {0x8b, 0x1f}
 	MaxMessageLength  = 32768     // 0x8000
 	MaxPacketLength   = 1400      // default Q2 UDP packet len
 	MaxStats          = 32        // playerstate stats uint32 bitmask
@@ -150,9 +153,11 @@ type MVD2Parser struct {
 	binaryPosition int               // where in those contents we are
 	callbacks      map[int]func(any) // index is svc_msg type
 	debug          bool              // print stuff while parsing
+	zipped         bool              // file is gzipped
 }
 
 var (
+	// Original (protocol 34/35/36) configstring boundaries
 	csRemap = &pb.MvdConfigStringRemap{
 		Extended:    false,
 		MaxEdicts:   1024,
@@ -172,6 +177,7 @@ var (
 		End:         1568 + (256 * 2),
 	}
 
+	// Extended configstring boundaries
 	csRemapNew = &pb.MvdConfigStringRemap{
 		Extended:    true,
 		MaxEdicts:   8192,
@@ -195,7 +201,12 @@ var (
 // Read the contents of the multi-view demo file and setup a receiver for
 // parsing the data into textproto. The data is checked to make sure it's a
 // valid demo file and the internal pointer set to just after the magic value.
+//
+// Multi-view demo files can be deflated using GZIP (rfc1952) compression on
+// the fly. Compression is detected using the file header and automatically
+// uncompressed if utilized.
 func NewMVD2Parser(f string) (*MVD2Parser, error) {
+	var gzip bool
 	if f == "" {
 		return nil, fmt.Errorf("no file specified")
 	}
@@ -203,17 +214,61 @@ func NewMVD2Parser(f string) (*MVD2Parser, error) {
 	if err != nil {
 		return nil, err
 	}
-	magic := message.NewBuffer(data[:4])
-	if (&magic).ReadLong() != MVDMagic {
+
+	msg := message.NewBuffer(data[:4])
+	magic := msg.ReadWord()
+
+	if magic == GZIPMagic {
+		data, err = ReadGZIPFile(f)
+		if err != nil {
+			return nil, err
+		}
+		msg = message.NewBuffer(data[:4])
+		gzip = true
+	} else {
+		msg.Rewind()
+	}
+
+	magic = msg.ReadLong()
+	if magic != MVDMagic {
 		return nil, fmt.Errorf("%q invalid multi-view demo", f)
 	}
+
 	return &MVD2Parser{
 		binaryData:     data,
 		binaryPosition: 4,
 		allDemos:       []*pb.MvdDemo{},
 		demo:           &pb.MvdDemo{},
 		index:          -1,
+		zipped:         gzip,
 	}, nil
+}
+
+// Get the decompressed demo data
+func ReadGZIPFile(filename string) ([]byte, error) {
+	var out []byte
+	file, err := os.Open(filename)
+	if err != nil {
+		return out, fmt.Errorf("ReadGZIPFile: %v", err)
+	}
+	defer file.Close()
+
+	reader, err := gzip.NewReader(file)
+	if err != nil {
+		return out, fmt.Errorf("error creating gzip reader: %v", err)
+	}
+	defer reader.Close()
+
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return out, fmt.Errorf("error reading decompressed data: %v", err)
+	}
+	return content, nil
+}
+
+// Access to private data
+func (p *MVD2Parser) GetRawData() []byte {
+	return p.binaryData
 }
 
 // Load the binary demo into protobuf
@@ -380,7 +435,7 @@ func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) error {
 	p.allDemos = append(p.allDemos, &pb.MvdDemo{})
 	demo := p.allDemos[p.index]
 	p.demo = p.allDemos[p.index] // set the pointer to the new current demo
-	
+
 	if msg.ReadLongP() != 37 {
 		return fmt.Errorf("parse error: demo protocol not 37")
 	}
