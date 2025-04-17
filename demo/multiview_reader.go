@@ -99,11 +99,11 @@ func ReadGZIPFile(filename string) ([]byte, error) {
 func (p *MVD2Parser) Unmarshal() (*pb.MvdDemo, error) {
 	demo := &pb.MvdDemo{}
 	for {
-		data, length, err := p.NextPacket()
+		data, err := p.NextPacket()
 		if err != nil {
 			return nil, err
 		}
-		if length == 0 {
+		if data.Length == 0 {
 			break
 		}
 		packet, err := p.ParsePacket(&data)
@@ -126,19 +126,19 @@ func (p *MVD2Parser) Unmarshal() (*pb.MvdDemo, error) {
 // 0 (0x0000), there are no more packets and the end of the demo has been
 // reached. This is different from regular DM2 demos where a value of -1
 // (signed 0xffff) is the end of the demo.
-func (p *MVD2Parser) NextPacket() (message.Buffer, int, error) {
+func (p *MVD2Parser) NextPacket() (message.Buffer, error) {
 	if p.binaryPosition >= len(p.binaryData) {
-		return message.Buffer{}, 0, fmt.Errorf("read past end of packet")
+		return message.Buffer{}, fmt.Errorf("read past end of packet")
 	}
 	sizebytes := message.NewBuffer(p.binaryData[p.binaryPosition : p.binaryPosition+2])
 	packetLen := int(sizebytes.ReadShort())
 	if packetLen == 0 { // EoD
-		return message.Buffer{}, 0, nil
+		return message.Buffer{}, nil
 	}
 	p.binaryPosition += 2
 	packet := message.NewBuffer(p.binaryData[p.binaryPosition : p.binaryPosition+packetLen])
 	p.binaryPosition += packetLen
-	return packet, packetLen, nil
+	return packet, nil
 }
 
 // Loop through all the messages included in this shard of data.
