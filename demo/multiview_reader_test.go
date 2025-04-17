@@ -2,7 +2,6 @@ package demo
 
 import (
 	"encoding/hex"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -466,20 +465,24 @@ func TestMvdParsePacketPlayers(t *testing.T) {
 
 func TestMvdUnmarshal(t *testing.T) {
 	tests := []struct {
-		name     string
-		demofile string
+		name      string
+		demofile  string
+		democount int
 	}{
-		/*{
-			name:     "test1",
-			demofile: "../testdata/test.mvd2",
-		},*/
 		{
-			name:     "test2",
-			demofile: "../testdata/big.mvd2",
+			name:      "test1",
+			demofile:  "../testdata/test.mvd2",
+			democount: 1,
 		},
 		{
-			name:     "gzip test",
-			demofile: "../testdata/ziptest.mvd2.gz",
+			name:      "test2",
+			demofile:  "../testdata/big.mvd2",
+			democount: 21,
+		},
+		{
+			name:      "gzip test",
+			demofile:  "../testdata/ziptest.mvd2.gz",
+			democount: 1,
 		},
 	}
 	for _, tc := range tests {
@@ -488,7 +491,6 @@ func TestMvdUnmarshal(t *testing.T) {
 			if err != nil {
 				t.Errorf("error creating parser: %v", err)
 			}
-			parser.debug = true
 			demo, err := parser.Unmarshal()
 			if err != nil {
 				t.Errorf("error unmarshalling: %v", err)
@@ -496,9 +498,9 @@ func TestMvdUnmarshal(t *testing.T) {
 			if demo == nil {
 				t.Error()
 			}
-
-			fmt.Println("demo count:", len(parser.allDemos))
+			if len(parser.GetDemos()) != tc.democount {
+				t.Errorf("demo count mismatch, got %d, want %d", len(parser.GetDemos()), tc.democount)
+			}
 		})
 	}
-	t.Error()
 }
