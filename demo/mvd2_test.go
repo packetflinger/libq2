@@ -1,8 +1,8 @@
 package demo
 
 import (
-	"fmt"
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -477,14 +477,18 @@ func TestMvdUnmarshal(t *testing.T) {
 			name:     "test2",
 			demofile: "../testdata/big.mvd2",
 		},
+		{
+			name:     "gzip test",
+			demofile: "../testdata/ziptest.mvd2.gz",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			parser, err := NewMVD2Parser(tc.demofile)
-			parser.debug = true
 			if err != nil {
 				t.Errorf("error creating parser: %v", err)
 			}
+			parser.debug = true
 			demo, err := parser.Unmarshal()
 			if err != nil {
 				t.Errorf("error unmarshalling: %v", err)
