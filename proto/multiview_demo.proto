@@ -92,10 +92,22 @@ message MvdUnicast {
 }
 
 message MvdPacket {
+    MvdServerData serverdata = 8;   // one per demo
     repeated PackedSound sounds = 1;
     repeated Print prints = 2;
     repeated MvdUnicast unicasts= 3;
     repeated MvdMulticast multicasts= 4;
     repeated MvdFrame frames = 5;
-    repeated ConfigString configstrings = 6;  // maybe a map?
+    map<int32,ConfigString> configstrings = 6;
+}
+
+message MvdServerData {
+    int32 protocol = 1; // minor version
+    int32 flags = 2;
+    int32 identity = 3; // random identifier
+    string game_directory = 4; 
+    int32 dummy_client = 5;
+    int32 entitystate_flags = 6;
+    int32 playerstate_flags = 7;
+    MvdConfigStringRemap remap = 8;
 }

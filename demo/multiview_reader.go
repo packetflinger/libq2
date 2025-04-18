@@ -25,6 +25,7 @@ type MVD2Parser struct {
 	callbacks      map[int]func(any) // index is svc_msg type
 	debug          bool              // print stuff while parsing
 	zipped         bool              // file is gzipped
+	remap          *pb.MvdConfigStringRemap
 }
 
 // Read the contents of the multi-view demo file and setup a receiver for
@@ -96,8 +97,9 @@ func ReadGZIPFile(filename string) ([]byte, error) {
 }
 
 // Load the binary demo into protobuf
-func (p *MVD2Parser) Unmarshal() (*pb.MvdDemo, error) {
-	demo := &pb.MvdDemo{}
+func (p *MVD2Parser) Unmarshal() ([]*pb.MvdDemo, error) {
+	i := -1
+	demos := []*pb.MvdDemo{}
 	for {
 		data, err := p.NextPacket()
 		if err != nil {
@@ -110,9 +112,15 @@ func (p *MVD2Parser) Unmarshal() (*pb.MvdDemo, error) {
 		if err != nil {
 			return nil, err
 		}
-		demo.Packets = append(demo.Packets, packet)
+
+		if i < 0 || (packet.GetServerdata().GetIdentity() > 0 && demos[i].GetIdentity() != packet.GetServerdata().GetIdentity()) {
+			i++
+			demos = append(demos, &pb.MvdDemo{})
+			demos[i].Identity = packet.GetServerdata().GetIdentity()
+		}
+		demos[i].Packets = append(demos[i].Packets, packet)
 	}
-	return demo, nil
+	return demos, nil
 }
 
 // Demos are organized by shards of data that are essentially packets. Even
@@ -160,29 +168,35 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 
 		switch cmd {
 		case MVDSvcServerData:
-			err := p.ParseServerData(msg, extra)
+			data, err := p.ParseServerData(msg, extra)
 			if err != nil {
 				return nil, err
 			}
-			p.demo.Configstrings = p.ParseConfigStrings(msg)
+			packet.Serverdata = data
+			p.demo.Configstrings = p.ParseConfigStrings(msg, p.remap)
 			frame, err := p.ParseFrame(msg)
 			if err != nil {
 				return nil, err
 			}
+			packet.Frames = append(packet.Frames, frame)
 			p.demo.Entities = frame.GetEntities()
 
 		case MVDSvcConfigString:
-			cs, err := p.ParseConfigString(msg)
+			cs, err := p.ParseConfigString(msg, p.remap)
 			if err != nil {
 				return nil, err
 			}
-			p.demo.Configstrings[int32(cs.GetIndex())] = cs
+			if packet.Configstrings == nil {
+				packet.Configstrings = make(map[int32]*pb.ConfigString)
+			}
+			packet.Configstrings[int32(cs.GetIndex())] = cs
+			//p.demo.Configstrings[int32(cs.GetIndex())] = cs
 			if cbFunc, found := p.callbacks[MVDSvcConfigString]; found {
 				cbFunc(cs)
 			}
 
 			// is it a player skin? then add the player
-			playerNum := int32(cs.GetIndex()) - p.demo.Remap.PlayerSkins
+			playerNum := int32(cs.GetIndex()) - p.remap.PlayerSkins
 			if 0 <= playerNum && playerNum <= p.demo.MaxPlayers {
 				p.demo.Players[playerNum] = &pb.MvdPlayer{
 					Name: cs.Data[:strings.Index(cs.Data, "\\")],
@@ -254,48 +268,53 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 // ServerData is the first message in a demo, it contains info about what
 // protocol versions were used at the time of the capture, the game directory,
 // the client number of the dummy spec, and more.
-func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) error {
-	p.index++
-	p.allDemos = append(p.allDemos, &pb.MvdDemo{})
-	demo := p.allDemos[p.index]
-	p.demo = p.allDemos[p.index] // set the pointer to the new current demo
+func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) (*pb.MvdServerData, error) {
+	data := &pb.MvdServerData{}
+	// p.index++
+	// p.allDemos = append(p.allDemos, &pb.MvdDemo{})
+	// demo := p.allDemos[p.index]
+	// p.demo = p.allDemos[p.index] // set the pointer to the new current demo
 
 	if msg.ReadLongP() != 37 {
-		return fmt.Errorf("parse error: demo protocol not 37")
+		return nil, fmt.Errorf("parse error: demo protocol not 37")
 	}
-	demo.Version = msg.ReadShortP()
+	data.Protocol = msg.ReadShortP()
 
-	if demo.Version >= ProtocolPlusPlus {
-		demo.Flags = msg.ReadShortP()
+	if data.Protocol >= ProtocolPlusPlus {
+		data.Flags = msg.ReadShortP()
 	} else {
-		demo.Flags = int32(extra)
+		data.Flags = int32(extra)
 	}
 
-	demo.Identity = msg.ReadLongP()
-	demo.GameDir = msg.ReadString()
-	demo.Dummy = msg.ReadShortP()
+	data.Identity = msg.ReadLongP()
+	data.GameDirectory = msg.ReadString()
+	data.DummyClient = msg.ReadShortP()
 
-	demo.EntityStateFlags = EntityStateUMask | EntityStateBeamOrigin
-	demo.Remap = csRemap
+	data.EntitystateFlags = EntityStateUMask | EntityStateBeamOrigin
+	data.Remap = csRemap
+	p.remap = csRemap
 
-	if (demo.Version >= ProtocolPlus) && ((demo.Flags & FlagExtLimits) != 0) {
-		demo.EntityStateFlags |= EntityStateLongSolid | EntityStateShortAngles | EntityStateExtensions
-		demo.PlayerStateFlags |= PlayerStateExtensions
-		demo.Remap = csRemapNew
+	if (data.GetProtocol() >= ProtocolPlus) && ((data.GetFlags() & FlagExtLimits) != 0) {
+		data.EntitystateFlags |= EntityStateLongSolid | EntityStateShortAngles | EntityStateExtensions
+		data.PlayerstateFlags |= PlayerStateExtensions
+		data.Remap = csRemapNew
+		p.remap = csRemapNew
 	}
 
-	if (demo.Version >= ProtocolPlusPlus) && ((demo.Flags & FlagExtLimits2) != 0) {
-		demo.EntityStateFlags |= EntityStateExtensions2
-		demo.PlayerStateFlags |= PlayerStateExtensions2
-		if demo.Version >= ProtocolPlayerFog {
-			demo.PlayerStateFlags |= MvdPlayerMoreBits
+	if (data.GetProtocol() >= ProtocolPlusPlus) && ((data.GetFlags() & FlagExtLimits2) != 0) {
+		data.EntitystateFlags |= EntityStateExtensions2
+		data.PlayerstateFlags |= PlayerStateExtensions2
+		if data.GetProtocol() >= ProtocolPlayerFog {
+			data.PlayerstateFlags |= MvdPlayerMoreBits
 		}
 	}
 
 	if p.debug {
-		fmt.Printf("serverdata - ver:%d, dummy:%d, ident:%d game:%q\n", demo.GetVersion(), demo.GetDummy(), demo.GetIdentity(), demo.GetGameDir())
+		fmt.Printf("serverdata - ver:%d, dummy:%d, ident:%d game:%q\n",
+			data.GetProtocol(), data.GetDummyClient(), data.GetIdentity(), data.GetGameDirectory(),
+		)
 	}
-	return nil
+	return data, nil
 }
 
 // This parses the blob of configstrings that directly follow the serverdata at
@@ -304,14 +323,14 @@ func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) error {
 // The list of players in the demo is built using configstrings for skins. The
 // cs_index - skin offset == the player number (0-maxclients), and the player
 // name is the prefix of the skin string.
-func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[int32]*pb.ConfigString {
+func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer, remap *pb.MvdConfigStringRemap) map[int32]*pb.ConfigString {
 	out := make(map[int32]*pb.ConfigString)
 	for {
 		if msg.Index >= msg.Length {
 			break
 		}
 		idx := int32(msg.ReadShort())
-		if idx == int32(p.demo.Remap.GetEnd()) {
+		if idx == int32(remap.GetEnd()) {
 			break
 		}
 		out[idx] = &pb.ConfigString{Index: uint32(idx), Data: msg.ReadString()}
@@ -319,13 +338,13 @@ func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[int32]*pb.Confi
 			fmt.Printf("configstring - [%d] %q\n", idx, out[idx].GetData())
 		}
 	}
-	mc, ok := out[p.demo.Remap.GetMaxClients()]
+	mc, ok := out[remap.GetMaxClients()]
 	if ok {
 		maxclients, _ := strconv.Atoi(mc.Data)
 		p.demo.MaxPlayers = int32(maxclients)
 		p.demo.Players = make(map[int32]*pb.MvdPlayer)
 		for i := int32(0); i < p.demo.MaxPlayers; i++ {
-			cs, ok := out[p.demo.Remap.GetPlayerSkins()+i]
+			cs, ok := out[remap.GetPlayerSkins()+i]
 			if ok {
 				p.demo.Players[i] = &pb.MvdPlayer{
 					Name: cs.Data[:strings.Index(cs.Data, "\\")],
@@ -337,12 +356,12 @@ func (p *MVD2Parser) ParseConfigStrings(msg *message.Buffer) map[int32]*pb.Confi
 }
 
 // Parse a single configstring from MVD data
-func (p *MVD2Parser) ParseConfigString(msg *message.Buffer) (*pb.ConfigString, error) {
+func (p *MVD2Parser) ParseConfigString(msg *message.Buffer, remap *pb.MvdConfigStringRemap) (*pb.ConfigString, error) {
 	if msg.Index >= msg.Length {
 		return nil, fmt.Errorf("ParseConfigString() error - end of buffer")
 	}
 	idx := msg.ReadShort()
-	if idx >= int(int16(p.demo.Remap.End)) {
+	if idx >= int(int16(p.remap.End)) {
 		return nil, fmt.Errorf("ParseConfigString() error - index out of bounds: %d", idx)
 	}
 	str := msg.ReadString()
@@ -785,7 +804,7 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 	len |= uint32(extra) << 8
 
 	clientNum := int32(msg.ReadByteP())
-	if clientNum >= p.demo.Remap.GetMaxClients() {
+	if clientNum >= p.remap.GetMaxClients() {
 		return nil, fmt.Errorf("ParseUnicast error - client more than max: %d", clientNum)
 	}
 	player, ok := p.demo.GetPlayers()[clientNum]
@@ -839,7 +858,7 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 	s := &pb.PackedSound{}
 	flags := msg.ReadByteP()
 	s.Flags = flags
-	if p.demo.Remap.Extended && ((flags & message.SoundIndex16) != 0) {
+	if p.remap.Extended && ((flags & message.SoundIndex16) != 0) {
 		index = msg.ReadWordP()
 	} else {
 		index = msg.ReadByteP()
@@ -864,7 +883,7 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 		fmt.Printf(
 			"sound - [%d] %q\n",
 			s.GetIndex(),
-			p.demo.GetConfigstrings()[p.demo.GetRemap().GetSounds()+int32(s.GetIndex())].Data,
+			p.demo.GetConfigstrings()[p.remap.GetSounds()+int32(s.GetIndex())].Data,
 		)
 	}
 	return s

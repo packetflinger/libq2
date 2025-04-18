@@ -16,18 +16,19 @@ func TestMvdParseServerData(t *testing.T) {
 	tests := []struct {
 		name string
 		data string
-		want *pb.MvdDemo
+		want *pb.MvdServerData
 	}{
 		{
 			name: "test0",
 			data: "2425000000DA07B5218E5E6F70656E74646D00140000",
-			want: &pb.MvdDemo{
-				Version:          2010,
+			want: &pb.MvdServerData{
+				Protocol:         2010,
 				Identity:         1586373045,
-				GameDir:          "opentdm",
-				Dummy:            20,
+				GameDirectory:    "opentdm",
+				DummyClient:      20,
 				Flags:            1,
-				EntityStateFlags: 48,
+				EntitystateFlags: 48,
+				Remap:            csRemap,
 			},
 		},
 	}
@@ -42,13 +43,13 @@ func TestMvdParseServerData(t *testing.T) {
 			parser := MVD2Parser{
 				demo: &pb.MvdDemo{},
 			}
-			err = parser.ParseServerData(&buf, (buf.ReadByte() >> CommandBits))
+			got, err := parser.ParseServerData(&buf, (buf.ReadByte() >> CommandBits))
 			if err != nil {
 				t.Errorf("ParseServerData(%v) error: %v", tc.data, err)
 			}
-			parser.demo.Remap = nil // don't care about cs map
-			if diff := cmp.Diff(parser.demo, tc.want, protocmp.Transform(), protocmp.IgnoreFields(parser.demo.Remap)); diff != "" {
-				t.Errorf("ParseServerData(%v) = \n%v,\nwant \n%v\n", &buf, parser.demo, tc.want)
+			// parser.demo.Remap = nil // don't care about cs map
+			if diff := cmp.Diff(got, tc.want, protocmp.Transform(), protocmp.IgnoreFields(parser.demo.Remap)); diff != "" {
+				t.Errorf("ParseServerData(%v) = \n%v,\nwant \n%v\n", &buf, got, tc.want)
 			}
 		})
 	}
@@ -102,7 +103,7 @@ func TestMvdParseConfigstrings(t *testing.T) {
 					Remap: csRemap,
 				},
 			}
-			got := parser.ParseConfigStrings(&buf)
+			got := parser.ParseConfigStrings(&buf, csRemap)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Errorf("ParseConfigStrings(%v) = \n%v,\nwant \n%v\n", &buf, got, tc.want)
 			}
@@ -248,7 +249,7 @@ func TestMvdParsePacketPlayersFromSkins(t *testing.T) {
 					Remap: csRemap,
 				},
 			}
-			got := parser.ParseConfigStrings(&buf)
+			got := parser.ParseConfigStrings(&buf, csRemap)
 			if diff := cmp.Diff(got, tc.want, protocmp.Transform()); diff != "" {
 				t.Errorf("ParseConfigStrings(%v) = \n%v,\nwant \n%v\n", &buf, got, tc.want)
 			}
@@ -477,7 +478,7 @@ func TestMvdUnmarshal(t *testing.T) {
 		{
 			name:      "test2",
 			demofile:  "../testdata/big.mvd2",
-			democount: 21,
+			democount: 7,
 		},
 		{
 			name:      "gzip test",
@@ -491,15 +492,16 @@ func TestMvdUnmarshal(t *testing.T) {
 			if err != nil {
 				t.Errorf("error creating parser: %v", err)
 			}
-			demo, err := parser.Unmarshal()
+			parser.debug = false
+			demos, err := parser.Unmarshal()
 			if err != nil {
 				t.Errorf("error unmarshalling: %v", err)
 			}
-			if demo == nil {
+			if demos == nil {
 				t.Error()
 			}
-			if len(parser.GetDemos()) != tc.democount {
-				t.Errorf("demo count mismatch, got %d, want %d", len(parser.GetDemos()), tc.democount)
+			if len(demos) != tc.democount {
+				t.Errorf("demo count mismatch, got %d, want %d", len(demos), tc.democount)
 			}
 		})
 	}
