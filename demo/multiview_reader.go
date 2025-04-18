@@ -49,7 +49,7 @@ func NewMVD2Parser(f string) (*MVD2Parser, error) {
 	magic := msg.ReadWord()
 
 	if magic == GZIPMagic {
-		data, err = ReadGZIPFile(f)
+		data, err = decompress(f)
 		if err != nil {
 			return nil, err
 		}
@@ -74,12 +74,18 @@ func NewMVD2Parser(f string) (*MVD2Parser, error) {
 	}, nil
 }
 
-// Get the decompressed demo data
-func ReadGZIPFile(filename string) ([]byte, error) {
+// Multi-view demos support "transparent" compression. It's not really
+// transparent, but q2pro can automatically apply GZIP compression on fly while
+// recording a demo, and it can automatically decompress for playback if
+// necessary.
+//
+// This is called automatically when creating a new parser if the demo file is
+// compressed.
+func decompress(filename string) ([]byte, error) {
 	var out []byte
 	file, err := os.Open(filename)
 	if err != nil {
-		return out, fmt.Errorf("ReadGZIPFile: %v", err)
+		return out, fmt.Errorf("decompress: %v", err)
 	}
 	defer file.Close()
 
@@ -96,7 +102,15 @@ func ReadGZIPFile(filename string) ([]byte, error) {
 	return content, nil
 }
 
-// Load the binary demo into protobuf
+// Parse a demo file into one or more protobufs.
+//
+// Each .mvd2 file can contain multiple "demos", each usually being a unique
+// map. Recording a multi-view demo can survive a map change on the server, the
+// demo will just contain another MvdServerData message with configstrings,
+// playerstates and entity baselines.
+//
+// Unmarshal will return a list of demo protos in event a .mvd2 file contains
+// more than a single demo.
 func (p *MVD2Parser) Unmarshal() ([]*pb.MvdDemo, error) {
 	i := -1
 	demos := []*pb.MvdDemo{}
@@ -190,7 +204,6 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 				packet.Configstrings = make(map[int32]*pb.ConfigString)
 			}
 			packet.Configstrings[int32(cs.GetIndex())] = cs
-			//p.demo.Configstrings[int32(cs.GetIndex())] = cs
 			if cbFunc, found := p.callbacks[MVDSvcConfigString]; found {
 				cbFunc(cs)
 			}
@@ -270,11 +283,6 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 // the client number of the dummy spec, and more.
 func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) (*pb.MvdServerData, error) {
 	data := &pb.MvdServerData{}
-	// p.index++
-	// p.allDemos = append(p.allDemos, &pb.MvdDemo{})
-	// demo := p.allDemos[p.index]
-	// p.demo = p.allDemos[p.index] // set the pointer to the new current demo
-
 	if msg.ReadLongP() != 37 {
 		return nil, fmt.Errorf("parse error: demo protocol not 37")
 	}
@@ -407,7 +415,6 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.Pack
 		}
 		pl, ok := p.demo.Players[number]
 		if !ok {
-			//return nil, fmt.Errorf("ParsePacketPlayers(%d) - player not found", number)
 			pl = &pb.MvdPlayer{
 				Name: "unknown",
 			}
