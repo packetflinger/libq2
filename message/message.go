@@ -168,6 +168,9 @@ func (m *Buffer) Rewind() {
 // casted to a `int32` and then finally to an `int`. Skipping that intermediate
 // cast results in the wrong value.
 func (msg *Buffer) ReadLong() int {
+	if msg.Index+4 > msg.Length {
+		return 0
+	}
 	return int(int32(binary.LittleEndian.Uint32(msg.ReadData(4))))
 }
 
@@ -180,6 +183,9 @@ func (msg *Buffer) WriteLong(data int) {
 
 // just grab a subsection of the buffer
 func (msg *Buffer) ReadData(length int) []byte {
+	if msg.Index+length > msg.Length {
+		return []byte{}
+	}
 	start := msg.Index
 	msg.Index += length
 	return msg.Data[start:msg.Index]
@@ -218,6 +224,9 @@ func (msg *Buffer) WriteString(s string) {
 
 // 2 bytes signed
 func (msg *Buffer) ReadShort() int {
+	if msg.Index+2 > msg.Length {
+		return 0
+	}
 	return int(int16(binary.LittleEndian.Uint16(msg.ReadData(2))))
 }
 
@@ -229,6 +238,9 @@ func (msg *Buffer) WriteShort(s int) {
 
 // unsigned
 func (msg *Buffer) ReadByte() int {
+	if msg.Index == msg.Length {
+		return 0
+	}
 	val := int(uint8(msg.Data[msg.Index]))
 	msg.Index++
 	return val
@@ -242,6 +254,9 @@ func (msg *Buffer) WriteByte(b int) {
 
 // 1 byte signed
 func (msg *Buffer) ReadChar() int {
+	if msg.Index == msg.Length {
+		return 0
+	}
 	val := int(int8(msg.Data[msg.Index]))
 	msg.Index++
 	return val
@@ -255,6 +270,9 @@ func (msg *Buffer) WriteChar(c int) {
 
 // 2 bytes unsigned
 func (msg *Buffer) ReadWord() int {
+	if msg.Index+2 > msg.Length {
+		return 0
+	}
 	return int(binary.LittleEndian.Uint16(msg.ReadData(2)))
 }
 
@@ -285,6 +303,9 @@ func (msg *Buffer) ReadDirection() int {
 }
 
 func (msg *Buffer) ReadVarInt64() uint64 {
+	if msg.Index+8 > msg.Length {
+		return 0
+	}
 	var v uint64
 	var c, bits int
 	for {
