@@ -2,6 +2,7 @@ package message
 
 import (
 	"encoding/hex"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -449,6 +450,67 @@ func TestReadLong(t *testing.T) {
 			got := in.ReadLong()
 			if got != tc.want {
 				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestReadString(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+		start int // start position
+		want  string
+	}{
+		{
+			desc:  "empty input",
+			input: "",
+			start: 0,
+			want:  "",
+		},
+		{
+			desc:  "null terminated",
+			input: "6a75 7374 2061 696d 2064 6f77 6e00",
+			start: 0,
+			want:  "just aim down",
+		},
+		{
+			desc:  "no ending null",
+			input: "6a75 7374 2061 696d 2064 6f77 6e",
+			start: 0,
+			want:  "just aim down",
+		},
+		{
+			desc:  "mid null",
+			input: "6a75 7374 2061 696d 0000 2064 6f77 6e00",
+			start: 0,
+			want:  "just aim",
+		},
+		{
+			desc:  "beginning null",
+			input: "0000 6a75 7374 2061 696d 2064 6f77 6e00",
+			start: 0,
+			want:  "",
+		},
+		{
+			desc:  "at end",
+			input: "0000 6a75 7374 2061 696d 2064 6f77 6e00",
+			start: 15,
+			want:  "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			bytes, err := hex.DecodeString(strings.ReplaceAll(tc.input, " ", ""))
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			in.Index = tc.start
+			got := in.ReadString()
+			if got != tc.want {
+				t.Errorf("got %s, want %s", got, tc.want)
 			}
 		})
 	}

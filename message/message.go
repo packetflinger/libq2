@@ -163,6 +163,16 @@ func (m *Buffer) Rewind() {
 	m.Index = 0
 }
 
+// Find out if the buffer has any data or not
+func (m *Buffer) IsEmpty() bool {
+	return m.Length == 0
+}
+
+// As the buffer been parsed all the way to the end?
+func (m *Buffer) AtEnd() bool {
+	return m.Index == m.Length
+}
+
 // Read 4 bytes and construct a 32 bit signed integer from the data. The `Uint32`
 // from the binary package returns an unsigned `int32“, it then needs to be
 // casted to a `int32` and then finally to an `int`. Skipping that intermediate
@@ -199,6 +209,10 @@ func (msg *Buffer) WriteData(data []byte) {
 // Keep building a string until we hit a null
 func (msg *Buffer) ReadString() string {
 	var buffer bytes.Buffer
+
+	if msg.IsEmpty() || msg.AtEnd() {
+		return ""
+	}
 
 	// find the next null (terminates the string)
 	for i := 0; msg.Data[msg.Index] != 0; i++ {
