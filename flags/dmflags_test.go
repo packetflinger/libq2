@@ -28,7 +28,7 @@ func TestModify(t *testing.T) {
 			want:  SameLevel | InstantItems | NoFalling,
 		},
 		{
-			name:  "add infinite ammo",
+			name:  "add something",
 			flags: QuadDrop,
 			instr: "+ia",
 			want:  InfiniteAmmo | QuadDrop,
@@ -40,13 +40,13 @@ func TestModify(t *testing.T) {
 			want:  QuadDrop | NoArmor | InstantItems | NoFalling,
 		},
 		{
-			name:  "remove no health",
+			name:  "remove something",
 			flags: QuadDrop | NoHealth | InstantItems,
 			instr: "-nh",
 			want:  QuadDrop | InstantItems,
 		},
 		{
-			name:  "add infinite ammo, remove weapon stay, add existing quad drop",
+			name:  "add, rmove, add existing",
 			flags: QuadDrop | WeaponsStay | InstantItems,
 			instr: "-ws +ia +qd",
 			want:  QuadDrop | InstantItems | InfiniteAmmo,
