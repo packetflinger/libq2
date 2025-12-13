@@ -20,4 +20,6 @@ message PAKFile {
     string name = 1;
     // the actual binary data
     bytes data = 2;
+    // byte offset where the data resides in the current pak file
+    int32 location = 3;
 }

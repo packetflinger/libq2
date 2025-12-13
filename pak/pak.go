@@ -33,8 +33,9 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 		dataloc := index.ReadLong()
 		datalen := index.ReadLong()
 		files = append(files, &pb.PAKFile{
-			Name: name,
-			Data: data[dataloc : dataloc+datalen],
+			Name:     name,
+			Data:     data[dataloc : dataloc+datalen],
+			Location: int32(dataloc),
 		})
 	}
 	pak := &pb.PAKArchive{
