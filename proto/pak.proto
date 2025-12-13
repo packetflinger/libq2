@@ -22,4 +22,6 @@ message PAKFile {
     bytes data = 2;
     // byte offset where the data resides in the current pak file
     int32 location = 3;
+    // how many bytes the file is
+    int32 length = 4;
 }

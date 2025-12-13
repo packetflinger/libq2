@@ -36,6 +36,7 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 			Name:     name,
 			Data:     data[dataloc : dataloc+datalen],
 			Location: int32(dataloc),
+			Length:   int32(datalen),
 		})
 	}
 	pak := &pb.PAKArchive{
