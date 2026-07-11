@@ -51,6 +51,8 @@ type MasterServerStats struct {
 	StartTime     time.Time // when the server started
 	ApiHits       int       // how many times the API has been queried
 	GetServerHits int       // how many times GetServers/query was issued
+	ServerCount   int       // how many q2 servers are registered
+	PlayerCount   int       // how many players are known?
 }
 
 // A public Q2 server, also a client for the master
@@ -62,6 +64,7 @@ type MasterClient struct {
 	GameDir     string
 	MaxPlayers  int
 	Players     []MasterClientPlayer
+	CurrentMap  string
 	LastContact time.Time
 	Heartbeats  int
 	Missedbeats int
