@@ -37,6 +37,19 @@ const (
 	SVCNumTypes  // r1q2/q2pro
 )
 
+// client to server message types
+const (
+	CLCBad = iota
+	CLCNop
+	CLCMove
+	CLCUserinfo
+	CLCStringCommand
+	CLCSetting              // r1q2 specific
+	CLCMoveNoDelta     = 10 // q2pro specific
+	CLCMoveBatched          // q2pro specific
+	CLCUserinfoNoDelta      // q2pro specific
+)
+
 // Sound properties
 const (
 	SoundVolume      = 1 << 0 // 1 byte
@@ -132,6 +145,10 @@ func NewBuffer(data []byte) Buffer {
 	}
 }
 
+func NewEmptyBuffer() Buffer {
+	return NewBuffer(nil)
+}
+
 // Reinitialize the back to zero
 func (m *Buffer) Reset() {
 	m.Data = []byte{}
@@ -173,15 +190,21 @@ func (m *Buffer) AtEnd() bool {
 	return m.Index == m.Length
 }
 
-// Read 4 bytes and construct a 32 bit signed integer from the data. The `Uint32`
-// from the binary package returns an unsigned `int32“, it then needs to be
-// casted to a `int32` and then finally to an `int`. Skipping that intermediate
-// cast results in the wrong value.
+// Read 4 bytes and construct a 32 bit signed integer from the data. Using the
+// binary.LittleEndian package for this conversion doesn't work as it only can
+// give you an UNsigned int which is insufficient. Negative delta frame numbers
+// are interpreted as uncompressed and connectionless packets (rcon/etc) have a
+// prefix of -1; we need negative values.
 func (msg *Buffer) ReadLong() int {
 	if msg.Index+4 > msg.Length {
 		return 0
 	}
-	return int(int32(binary.LittleEndian.Uint32(msg.ReadData(4))))
+	val := (int32(msg.Data[msg.Index])) +
+		(int32(msg.Data[msg.Index+1]) << 8) +
+		(int32(msg.Data[msg.Index+2]) << 16) +
+		(int32(msg.Data[msg.Index+3]) << 24)
+	msg.Index += 4
+	return int(val)
 }
 
 // 4 bytes signed
@@ -253,7 +276,8 @@ func (msg *Buffer) WriteShort(s int) {
 // unsigned
 func (msg *Buffer) ReadByte() int {
 	if msg.Index == msg.Length {
-		return 0
+		// matches https://github.com/packetflinger/q2pro/blob/master/src/common/msg.c#L1687
+		return -1
 	}
 	val := int(uint8(msg.Data[msg.Index]))
 	msg.Index++
@@ -269,7 +293,8 @@ func (msg *Buffer) WriteByte(b int) {
 // 1 byte signed
 func (msg *Buffer) ReadChar() int {
 	if msg.Index == msg.Length {
-		return 0
+		// matches https://github.com/packetflinger/q2pro/blob/master/src/common/msg.c#L1673
+		return -1
 	}
 	val := int(int8(msg.Data[msg.Index]))
 	msg.Index++

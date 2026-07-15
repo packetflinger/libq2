@@ -10,31 +10,26 @@ import (
 
 func TestWriteLong(t *testing.T) {
 	tests := []struct {
-		desc      string
-		input     int
-		want      []byte
-		wantmatch bool
+		desc  string
+		input int
+		want  []byte
 	}{
 		{
-			desc:      "test_1",
-			input:     -1,
-			want:      []byte{255, 255, 255, 255},
-			wantmatch: true,
+			desc:  "test_1",
+			input: -1,
+			want:  []byte{255, 255, 255, 255},
 		},
 		{
-			desc:      "test_2",
-			input:     0,
-			want:      []byte{0, 0, 0, 0},
-			wantmatch: true,
+			desc:  "test_2",
+			input: 0,
+			want:  []byte{0, 0, 0, 0},
 		},
 		{
-			desc:      "test_3",
-			input:     3453445,
-			want:      []byte{5, 178, 52, 0},
-			wantmatch: true,
+			desc:  "test_3",
+			input: 3453445,
+			want:  []byte{5, 178, 52, 0},
 		},
 	}
-
 	for _, test := range tests {
 		msg := Buffer{}
 		msg.WriteLong(test.input)
@@ -162,6 +157,11 @@ func TestReadChar(t *testing.T) {
 			name:  "test4",
 			input: "15",
 			want:  21,
+		},
+		{
+			name:  "test5",
+			input: "7f",
+			want:  127,
 		},
 	}
 
