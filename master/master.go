@@ -57,20 +57,23 @@ type MasterServerStats struct {
 
 // A public Q2 server, also a client for the master
 type MasterClient struct {
-	Address     net.Addr // ip and port (192.0.2.1:27910)
-	IP          net.IP
-	Port        int
-	Hostname    string
-	GameDir     string
-	MaxPlayers  int
-	Players     []MasterClientPlayer
-	CurrentMap  string
-	LastContact time.Time
-	Heartbeats  int
-	Missedbeats int
-	PendingAcks int
-	Active      bool
-	Info        map[string]string
+	Address      net.Addr // ip and port (192.0.2.1:27910)
+	IP           net.IP
+	Port         int
+	Hostname     string
+	GameDir      string
+	MaxPlayers   int
+	Players      []MasterClientPlayer
+	CurrentMap   string
+	FirstContact time.Time
+	LastContact  time.Time
+	Heartbeats   int
+	Missedbeats  int
+	PendingAcks  int
+	Active       bool
+	Info         map[string]string
+	Passworded   bool
+	Software     string
 }
 
 type MasterClientPlayer struct {
@@ -257,7 +260,6 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 	if msg.ReadLong() == -1 {
 		tok := strings.Split(string(msg.ReadData(len(buf))), "\n")
 		cmd := strings.Trim(tok[0], "\x00\x0a\x20\x09") // null, new line, space, tab
-
 		switch cmd {
 		case "getservers":
 			if m.ClientListFunc != nil {
@@ -315,8 +317,13 @@ func heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 	cl.LastContact = time.Now()
 	cl.Hostname = info["hostname"]
 	cl.GameDir = info["gamedir"]
-	// game?
-	mp, _ := strconv.Atoi(info["maxclients"])
+	cl.CurrentMap = info["mapname"]
+	cl.Passworded = info["needpass"] == "1"
+	mp, err := strconv.Atoi(info["maxclients"])
+	if err != nil {
+		log.Printf("invalid maxclients value %q defaulting to 8\n", info["maxclients"])
+		mp = 8
+	}
 	cl.MaxPlayers = mp
 	send("ack", m, from)
 	log.Println("heartbeat from", (*from).String(), "-", info["hostname"])
@@ -330,11 +337,15 @@ func ping(m *MasterServer, from *net.Addr) *MasterClient {
 	}
 
 	tokens := strings.Split((*from).String(), ":")
-	port, _ := strconv.Atoi(tokens[1])
+	port, err := strconv.Atoi(tokens[1])
+	if err != nil {
+		log.Printf("ping - unable to parse port %q, defaulting to 27900\n", tokens[1])
+	}
 	cl := MasterClient{
-		Address: *from,
-		IP:      net.ParseIP(tokens[0]),
-		Port:    port,
+		Address:      *from,
+		IP:           net.ParseIP(tokens[0]),
+		Port:         port,
+		FirstContact: time.Now(),
 	}
 	m.Clients = append(m.Clients, cl)
 	log.Println("adding client", (*from).String(), "-", len(m.Clients), "total")
