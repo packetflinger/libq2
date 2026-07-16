@@ -28,58 +28,59 @@ const (
 
 // the all-knowning master server
 type MasterServer struct {
+	AckFunc        func(m *MasterServer, from *net.Addr)
 	Address        string // IP or DNS name
-	Port           int    // default 27900
 	ApiEnabled     bool
 	ApiIP          string
 	ApiPort        int
+	ClientListFunc func(m *MasterServer, recip *net.Addr)
 	Clients        []MasterClient  // our known q2 server
 	Conn           *net.PacketConn // the socket
-	ThinkInterval  int             // seconds between thinks
-	PingInterval   int
-	ThinkFunc      func(m *MasterServer)
-	ProcessFunc    func(m *MasterServer)
-	ClientListFunc func(m *MasterServer, recip *net.Addr)
 	HeartbeatFunc  func(m *MasterServer, from *net.Addr, info map[string]string)
 	PingFunc       func(m *MasterServer, from *net.Addr) *MasterClient
-	AckFunc        func(m *MasterServer, from *net.Addr)
+	PingInterval   int
+	Port           int // default 27900
+	ProcessFunc    func(m *MasterServer)
 	ShutdownFunc   func(m *MasterServer, from *net.Addr)
 	Stats          MasterServerStats
+	ThinkFunc      func(m *MasterServer)
+	ThinkInterval  int // seconds between thinks
 }
 
 type MasterServerStats struct {
-	StartTime     time.Time // when the server started
 	ApiHits       int       // how many times the API has been queried
 	GetServerHits int       // how many times GetServers/query was issued
-	ServerCount   int       // how many q2 servers are registered
 	PlayerCount   int       // how many players are known?
+	ServerCount   int       // how many q2 servers are registered
+	StartTime     time.Time // when the server started
 }
 
 // A public Q2 server, also a client for the master
 type MasterClient struct {
+	Active       bool
 	Address      net.Addr // ip and port (192.0.2.1:27910)
-	IP           net.IP
-	Port         int
-	Hostname     string
-	GameDir      string
-	MaxPlayers   int
-	Players      []MasterClientPlayer
 	CurrentMap   string
 	FirstContact time.Time
-	LastContact  time.Time
+	GameDir      string
 	Heartbeats   int
-	Missedbeats  int
-	PendingAcks  int
-	Active       bool
+	Hostname     string
 	Info         map[string]string
+	IP           net.IP
+	LastContact  time.Time
+	MaxPlayers   int
+	Missedbeats  int
 	Passworded   bool
+	PendingAcks  int
+	Players      []MasterClientPlayer
+	Port         int
 	Software     string
 }
 
 type MasterClientPlayer struct {
-	Name  string // 15 chars max
-	Score int    // specs will be 0
-	Ping  int
+	ConnectTime time.Time // first seen
+	Name        string    // 15 chars max
+	Ping        int       // in milliseconds
+	Score       int       // specs will be 0
 }
 
 // Setup a new server struct with default function calls and values
@@ -319,6 +320,7 @@ func heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 	cl.GameDir = info["gamedir"]
 	cl.CurrentMap = info["mapname"]
 	cl.Passworded = info["needpass"] == "1"
+	cl.Software = info["version"]
 	mp, err := strconv.Atoi(info["maxclients"])
 	if err != nil {
 		log.Printf("invalid maxclients value %q defaulting to 8\n", info["maxclients"])
