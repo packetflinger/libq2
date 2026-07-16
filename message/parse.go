@@ -14,9 +14,6 @@ const (
 	MaxEntities      = 1024
 	MaxConfigStrings = 2080
 	MaxMessageLength = 1390
-	CLCMove          = 2
-	CLCUserinfo      = 3
-	CLCStringCommand = 4
 	PrintLevelLow    = 1
 	PrintLevelObit   = 2
 	PrintLevelHigh   = 3
