@@ -515,3 +515,40 @@ func TestReadString(t *testing.T) {
 		})
 	}
 }
+
+func TestUnreadSize(t *testing.T) {
+	tests := []struct {
+		desc  string
+		input string
+		start int // start position
+		want  int
+	}{
+		{
+			desc:  "empty input",
+			input: "",
+			start: 0,
+			want:  0,
+		},
+		{
+			desc:  "2 longs",
+			input: "ffffffff ffffffff",
+			start: 4,
+			want:  4,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			bytes, err := hex.DecodeString(strings.ReplaceAll(tc.input, " ", ""))
+			if err != nil {
+				t.Error(err)
+			}
+			in := NewBuffer(bytes)
+			in.Index = tc.start
+			got := in.UnreadSize()
+			if got != tc.want {
+				t.Errorf("got %d, want %d", got, tc.want)
+			}
+		})
+	}
+}

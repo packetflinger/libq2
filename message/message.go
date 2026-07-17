@@ -175,6 +175,12 @@ func (m *Buffer) Size() int {
 	return len(m.Data)
 }
 
+// Get the length of the buffer remaining to be read. This is from the current
+// index position to the end.
+func (m *Buffer) UnreadSize() int {
+	return m.Size() - m.Index
+}
+
 // Set the internal pointer back to the beginning of the buffer. Same as `seek(0)`
 func (m *Buffer) Rewind() {
 	m.Index = 0
