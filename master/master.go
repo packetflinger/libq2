@@ -255,11 +255,9 @@ func send(cmd string, m *MasterServer, recip *net.Addr) {
 
 // Runs concurrently for every datagram recieved by the server
 func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
-	msg := message.Buffer{
-		Data: buf,
-	}
+	msg := message.NewBuffer(buf)
 	if msg.ReadLong() == -1 {
-		tok := strings.Split(string(msg.ReadData(len(buf))), "\n")
+		tok := strings.Split(string(msg.ReadData(msg.UnreadSize())), "\n")
 		cmd := strings.Trim(tok[0], "\x00\x0a\x20\x09") // null, new line, space, tab
 		switch cmd {
 		case "getservers":
