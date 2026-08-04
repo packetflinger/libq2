@@ -65,7 +65,7 @@ func LoadIPCountries(inputFile string, cont bool) (NetCountryList, error) {
 
 // Get the country code for a particular IP address string. Output of "zz" is
 // considered country-less (think RFC1918).
-func (n *NetCountryList) Country(addr string) string {
+func (n *NetCountryList) Lookup(addr string) string {
 	if addr == "" {
 		return "zz"
 	}

@@ -43,7 +43,7 @@ func TestCountry(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := (&IPCountryList).Country(tc.addr)
+			got := (&IPCountryList).Lookup(tc.addr)
 			if got != tc.want {
 				t.Errorf("Country(%q) = %q, want %q", tc.addr, got, tc.want)
 			}
