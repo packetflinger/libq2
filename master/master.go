@@ -1,10 +1,9 @@
-// A master server keeps track of all public q2 servers.
-// Q2 servers need to specifically be told to report
-// to a master server.
+// A master server keeps track of all public q2 servers. Q2 servers need to
+// specifically be told to report to a master server. All versions of R1Q2
+// and Q2Pro have `master.q2servers.com` hard coded as the default master.
 package master
 
 import (
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
@@ -30,9 +29,6 @@ const (
 type MasterServer struct {
 	AckFunc        func(m *MasterServer, from *net.Addr)
 	Address        string // IP or DNS name
-	ApiEnabled     bool
-	ApiIP          string
-	ApiPort        int
 	ClientListFunc func(m *MasterServer, recip *net.Addr)
 	Clients        []MasterClient  // our known q2 server
 	Conn           *net.PacketConn // the socket
@@ -59,6 +55,7 @@ type MasterServerStats struct {
 type MasterClient struct {
 	Active       bool
 	Address      net.Addr // ip and port (192.0.2.1:27910)
+	Country      string   // 2 letter code, e.g. "US", "AU", "IE"
 	CurrentMap   string
 	FirstContact time.Time
 	GameDir      string
@@ -78,6 +75,7 @@ type MasterClient struct {
 
 type MasterClientPlayer struct {
 	ConnectTime time.Time // first seen
+	Country     string    // 2 char code
 	Name        string    // 15 chars max
 	Ping        int       // in milliseconds
 	Score       int       // specs will be 0
@@ -86,21 +84,18 @@ type MasterClientPlayer struct {
 // Setup a new server struct with default function calls and values
 func NewMaster() *MasterServer {
 	master := MasterServer{
-		Address:    DefaultListenAddr,
-		Port:       DefaultListenPort,
-		ApiEnabled: DefaultApiEnabled,
-		ApiIP:      DefaultApiAddr,
-		ApiPort:    DefaultApiPort,
+		Address: DefaultListenAddr,
+		Port:    DefaultListenPort,
 		Stats: MasterServerStats{
 			StartTime: time.Now(),
 		},
 		ThinkInterval:  DefaultThinkInterval,
-		ThinkFunc:      think,
-		ClientListFunc: clientList,
-		PingFunc:       ping,
-		AckFunc:        ack,
-		HeartbeatFunc:  heartbeat,
-		ShutdownFunc:   shutdown,
+		ThinkFunc:      Think,
+		ClientListFunc: ClientList,
+		PingFunc:       Ping,
+		AckFunc:        Ack,
+		HeartbeatFunc:  Heartbeat,
+		ShutdownFunc:   Shutdown,
 		PingInterval:   DefaultPingInterval,
 	}
 	return &master
@@ -120,10 +115,6 @@ func (m *MasterServer) Run() {
 
 	if m.ThinkFunc != nil {
 		go m.ThinkFunc(m)
-	}
-
-	if m.ApiEnabled {
-		go startAPIServer(m)
 	}
 
 	buf := make([]byte, 1024)
@@ -172,8 +163,8 @@ func (m *MasterServer) MarshalClients() *message.Buffer {
 	return &msg
 }
 
-// Write this MasterClient's IP and port in a format that can be sent
-// as a response
+// Write this MasterClient's IP and port in a format that can be sent as a
+// response
 func (cl *MasterClient) Marshal() *message.Buffer {
 	msg := message.Buffer{}
 	msg.WriteData([]byte(cl.IP))
@@ -185,12 +176,6 @@ func (cl *MasterClient) Marshal() *message.Buffer {
 	}
 	msg.WriteData(port)
 	return &msg
-}
-
-// dont do this
-func (m MasterServer) SendClientList() {
-	msg := m.MarshalClients()
-	fmt.Printf("%s\n", hex.Dump(msg.Data))
 }
 
 func (m *MasterServer) FindClient(cl net.Addr) *MasterClient {
@@ -212,17 +197,17 @@ func (m *MasterServer) HeartbeatCount() int {
 
 // Periodically checks in on each client, pruning dead ones.
 // Should be run concurrently
-func think(m *MasterServer) {
+func Think(m *MasterServer) {
 	for {
 		time.Sleep(time.Duration(m.ThinkInterval) * time.Second)
 		for i := range m.Clients {
 			if m.Clients[i].PendingAcks > 3 {
-				removeClient(m, &m.Clients[i].Address)
+				RemoveClient(m, &m.Clients[i].Address)
 				continue
 			}
 			needsPing := m.Clients[i].LastContact.Add(time.Duration(m.PingInterval) * time.Second)
 			if time.Now().After(needsPing) {
-				send("ping", m, &m.Clients[i].Address)
+				Send("ping", m, &m.Clients[i].Address)
 				m.Clients[i].PendingAcks++
 				m.Clients[i].LastContact = time.Now()
 			}
@@ -232,7 +217,7 @@ func think(m *MasterServer) {
 
 // Removes a client from the client slice.
 // Returns the slice of clients removed
-func removeClient(m *MasterServer, from *net.Addr) {
+func RemoveClient(m *MasterServer, from *net.Addr) {
 	oldClients := &m.Clients
 	newClients := []MasterClient{}
 
@@ -246,7 +231,7 @@ func removeClient(m *MasterServer, from *net.Addr) {
 }
 
 // for sending simple "ack"s and "ping"s
-func send(cmd string, m *MasterServer, recip *net.Addr) {
+func Send(cmd string, m *MasterServer, recip *net.Addr) {
 	ack := message.Buffer{}
 	ack.WriteLong(-1)
 	ack.WriteData([]byte(cmd))
@@ -294,7 +279,7 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 }
 
 // Someone requested a list of all Q2 servers we know about.
-func clientList(m *MasterServer, recip *net.Addr) {
+func ClientList(m *MasterServer, recip *net.Addr) {
 	m.Stats.GetServerHits++
 	msg := message.Buffer{}
 	msg.WriteLong(-1)
@@ -303,14 +288,13 @@ func clientList(m *MasterServer, recip *net.Addr) {
 	clients := m.MarshalClients()
 	msg.Append(*clients)
 	(*m.Conn).WriteTo(msg.Data, *recip)
-	log.Println("sending client list to", *recip)
 }
 
 // Sent from client to us every 5-10ish or so minutes.
-func heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
+func Heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 	cl := m.FindClient(*from)
 	if cl == nil {
-		cl = ping(m, from)
+		cl = Ping(m, from)
 	}
 	cl.Heartbeats++
 	cl.LastContact = time.Now()
@@ -325,12 +309,12 @@ func heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 		mp = 8
 	}
 	cl.MaxPlayers = mp
-	send("ack", m, from)
+	Send("ack", m, from)
 	log.Println("heartbeat from", (*from).String(), "-", info["hostname"])
 }
 
 // An unfamiliar server started talking to us. Start tracking it.
-func ping(m *MasterServer, from *net.Addr) *MasterClient {
+func Ping(m *MasterServer, from *net.Addr) *MasterClient {
 	c := m.FindClient(*from)
 	if c != nil {
 		return c // we already have this one
@@ -352,8 +336,8 @@ func ping(m *MasterServer, from *net.Addr) *MasterClient {
 	return &m.Clients[len(m.Clients)-1]
 }
 
-// A client sends us an ack when he "ping" them (from management)
-func ack(m *MasterServer, from *net.Addr) {
+// A client sends us an Ack when he "ping" them (from management)
+func Ack(m *MasterServer, from *net.Addr) {
 	cl := m.FindClient(*from)
 	if cl == nil {
 		return
@@ -378,12 +362,12 @@ func ack(m *MasterServer, from *net.Addr) {
 	log.Println("ack from", (*from).String())
 }
 
-// Clients issue shutdown msgs when they quit or go non-public
-func shutdown(m *MasterServer, from *net.Addr) {
+// Clients issue Shutdown msgs when they quit or go non-public
+func Shutdown(m *MasterServer, from *net.Addr) {
 	cl := m.FindClient(*from)
 	if cl == nil {
 		return
 	}
-	removeClient(m, from)
+	RemoveClient(m, from)
 	log.Println("shutdown issued from", (*from).String())
 }
