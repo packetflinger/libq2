@@ -326,7 +326,7 @@ func Heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 	cl.Heartbeats++
 	cl.LastContact = time.Now()
 	cl.Hostname = info["hostname"]
-	cl.GameDir = info["gamedir"]
+	cl.GameDir = info["gamename"]
 	cl.CurrentMap = info["mapname"]
 	cl.Passworded = info["needpass"] == "1"
 	cl.Software = info["version"]
@@ -430,8 +430,9 @@ func (m *MasterServer) DetailRefresher(ctx context.Context) {
 				info, err := srv.FetchInfo()
 				if err != nil {
 					log.Printf("error fetching info for %q: %v", s.Hostname, err)
+					continue
 				}
-				m.Clients[i].CurrentMap = info.Server["currentmap"]
+				m.Clients[i].CurrentMap = info.Server["mapname"]
 				m.Clients[i].Hostname = info.Server["hostname"]
 				m.Clients[i].GameDir = info.Server["gamename"]
 				mp, err := strconv.Atoi(info.Server["maxclients"])
