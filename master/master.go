@@ -17,6 +17,7 @@
 package master
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -48,9 +49,10 @@ type MasterServer struct {
 	PingInterval   int
 	Port           int // default 27900
 	ProcessFunc    func(m *MasterServer)
+	Refresh        bool // fetch players every minute or so
 	ShutdownFunc   func(m *MasterServer, from *net.Addr)
 	Stats          MasterServerStats
-	ThinkFunc      func(m *MasterServer)
+	ThinkFunc      func(ctx context.Context, m *MasterServer)
 	ThinkInterval  int // seconds between thinks
 }
 
@@ -107,12 +109,13 @@ func NewMaster() *MasterServer {
 		HeartbeatFunc:  Heartbeat,
 		ShutdownFunc:   Shutdown,
 		PingInterval:   DefaultPingInterval,
+		Refresh:        false,
 	}
 	return &master
 }
 
 // start the actual server
-func (m *MasterServer) Run() {
+func (m *MasterServer) Run(ctx context.Context) {
 	log.Println("Starting up...")
 	listenAddr := fmt.Sprintf("%s:%d", m.Address, m.Port)
 	listener, err := net.ListenPacket("udp", listenAddr)
@@ -123,7 +126,10 @@ func (m *MasterServer) Run() {
 	m.Conn = &listener
 	log.Println("Listening for Q2 Servers on", listenAddr)
 	if m.ThinkFunc != nil {
-		go m.ThinkFunc(m)
+		go m.ThinkFunc(ctx, m)
+	}
+	if m.Refresh {
+		go m.DetailRefresher(ctx)
 	}
 	buf := make([]byte, 1024)
 	for {
@@ -137,7 +143,7 @@ func (m *MasterServer) Run() {
 
 // Grab all servers
 func (m MasterServer) FetchServers() ([]MasterClient, error) {
-	clients := []MasterClient{}
+	var clients []MasterClient
 	req := message.ConnectionlessPacket{
 		Data: "getservers",
 	}
@@ -206,19 +212,27 @@ func (m *MasterServer) HeartbeatCount() int {
 
 // Periodically checks in on each client, pruning dead ones. This should be run
 // concurrently.
-func Think(m *MasterServer) {
+func Think(ctx context.Context, m *MasterServer) {
+	ticker := time.NewTicker(time.Duration(m.ThinkInterval) * time.Second)
+	defer ticker.Stop()
+
 	for {
-		time.Sleep(time.Duration(m.ThinkInterval) * time.Second)
-		for i := range m.Clients {
-			if m.Clients[i].PendingAcks > 3 {
-				RemoveClient(m, &m.Clients[i].Address)
-				continue
-			}
-			needsPing := m.Clients[i].LastContact.Add(time.Duration(m.PingInterval) * time.Second)
-			if time.Now().After(needsPing) {
-				Send("ping", m, &m.Clients[i].Address)
-				m.Clients[i].PendingAcks++
-				m.Clients[i].LastContact = time.Now()
+		select {
+		case <-ctx.Done():
+			log.Println("ending Think thread")
+			return
+		case <-ticker.C:
+			for i := range m.Clients {
+				if m.Clients[i].PendingAcks > 3 {
+					RemoveClient(m, &m.Clients[i].Address)
+					continue
+				}
+				needsPing := m.Clients[i].LastContact.Add(time.Duration(m.PingInterval) * time.Second)
+				if time.Now().After(needsPing) {
+					Send("ping", m, &m.Clients[i].Address)
+					m.Clients[i].PendingAcks++
+					m.Clients[i].LastContact = time.Now()
+				}
 			}
 		}
 	}
@@ -394,4 +408,61 @@ func Shutdown(m *MasterServer, from *net.Addr) {
 		return
 	}
 	RemoveClient(m, from)
+}
+
+// Once a minute, issue an out-of-band "info" request to each server to fetch
+// the map and status for of the players. This should be run as a concurrent
+// goroutine.
+func (m *MasterServer) DetailRefresher(ctx context.Context) {
+	ticker := time.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("context finished, stopping DetailRefresher thread")
+			return
+		case <-ticker.C:
+			playercount := 0
+			servercount := 0
+			for i, s := range m.Clients {
+				srv := state.Server{Address: s.IP.String(), Port: s.Port}
+				info, err := srv.FetchInfo()
+				if err != nil {
+					log.Printf("error fetching info for %q: %v", s.Hostname, err)
+				}
+				m.Clients[i].CurrentMap = info.Server["currentmap"]
+				m.Clients[i].Hostname = info.Server["hostname"]
+				m.Clients[i].GameDir = info.Server["gamename"]
+				mp, err := strconv.Atoi(info.Server["maxclients"])
+				if err != nil {
+					mp = 8
+				}
+				m.Clients[i].MaxPlayers = mp
+
+				var pls []MasterClientPlayer
+				if len(info.Players) > 0 {
+					for _, p := range info.Players {
+						when := time.Now()
+						for _, x := range m.Clients[i].Players {
+							if x.Name == p.Name {
+								when = x.ConnectTime
+							}
+						}
+						pls = append(pls, MasterClientPlayer{
+							Name:        p.Name,
+							Score:       p.Score,
+							Ping:        p.Ping,
+							ConnectTime: when,
+						})
+						playercount++
+					}
+				}
+				m.Clients[i].Players = pls
+				m.Stats.PlayerCount = playercount
+				servercount++
+			}
+			m.Stats.ServerCount = servercount
+		}
+	}
 }
