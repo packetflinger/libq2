@@ -1,6 +1,19 @@
-// A master server keeps track of all public q2 servers. Q2 servers need to
-// specifically be told to report to a master server. All versions of R1Q2
-// and Q2Pro have `master.q2servers.com` hard coded as the default master.
+// A master is an index of public Q2 servers. Servers need to be instructed to
+// report to a specific master. All versions of R1Q2 and Q2Pro have
+// `master.q2servers.com` hard coded as the default master. Servers will not
+// report to a master unless they are set as public: `set public 1`
+//
+// A server will send a heartbeat every few minutes to announce it's still
+// alive.
+//
+// Server commands:
+//
+//	`listmasters` - Show the currently configured masters.
+//	`setmaster`   - Sets a comma-separated list of masters to use. To remove
+//	                a master, issue this command again minus the server to
+//	                remove.
+//
+// Servers can typically support up to 8 different masters.
 package master
 
 import (
@@ -17,12 +30,9 @@ import (
 
 const (
 	DefaultListenPort    = 27900
-	DefaultListenAddr    = "[::]" // IPv4/IPv6 all
+	DefaultListenAddr    = "[::]" // Any IPv4/IPv6
 	DefaultThinkInterval = 360    // secs
 	DefaultPingInterval  = 360    // secs
-	DefaultApiPort       = 3333
-	DefaultApiAddr       = "[::]"
-	DefaultApiEnabled    = false
 )
 
 // the all-knowning master server
@@ -45,7 +55,6 @@ type MasterServer struct {
 }
 
 type MasterServerStats struct {
-	ApiHits       int       // how many times the API has been queried
 	GetServerHits int       // how many times GetServers/query was issued
 	PlayerCount   int       // how many players are known?
 	ServerCount   int       // how many q2 servers are registered
@@ -113,11 +122,9 @@ func (m *MasterServer) Run() {
 	defer listener.Close()
 	m.Conn = &listener
 	log.Println("Listening for Q2 Servers on", listenAddr)
-
 	if m.ThinkFunc != nil {
 		go m.ThinkFunc(m)
 	}
-
 	buf := make([]byte, 1024)
 	for {
 		count, addr, err := listener.ReadFrom(buf)
@@ -138,7 +145,6 @@ func (m MasterServer) FetchServers() ([]MasterClient, error) {
 	if err != nil {
 		return clients, err
 	}
-
 	msg.ReadLong() // eat the sequence
 	if string(msg.ReadData(7)) == "servers" {
 		for {
@@ -151,13 +157,12 @@ func (m MasterServer) FetchServers() ([]MasterClient, error) {
 			})
 		}
 	}
-
 	return clients, nil
 }
 
 // Write all MasterClient's info to a buffer for responding
 func (m *MasterServer) MarshalClients() *message.Buffer {
-	msg := message.Buffer{}
+	msg := message.NewEmptyBuffer()
 	for _, cl := range m.Clients {
 		msg.Append(*cl.Marshal())
 	}
@@ -167,7 +172,7 @@ func (m *MasterServer) MarshalClients() *message.Buffer {
 // Write this MasterClient's IP and port in a format that can be sent as a
 // response
 func (cl *MasterClient) Marshal() *message.Buffer {
-	msg := message.Buffer{}
+	msg := message.NewEmptyBuffer()
 	msg.WriteData([]byte(cl.IP))
 
 	// reversed byte-order from msg.WriteShort()
@@ -179,6 +184,7 @@ func (cl *MasterClient) Marshal() *message.Buffer {
 	return &msg
 }
 
+// Get a pointer to the client struct related to this IP address
 func (m *MasterServer) FindClient(cl net.Addr) *MasterClient {
 	for i, c := range m.Clients {
 		if c.Address.String() == cl.String() {
@@ -188,6 +194,8 @@ func (m *MasterServer) FindClient(cl net.Addr) *MasterClient {
 	return nil
 }
 
+// Calculate the total number of heartbeats this server has seen from all
+// clients.
 func (m *MasterServer) HeartbeatCount() int {
 	total := 0
 	for _, cl := range m.Clients {
@@ -196,8 +204,8 @@ func (m *MasterServer) HeartbeatCount() int {
 	return total
 }
 
-// Periodically checks in on each client, pruning dead ones.
-// Should be run concurrently
+// Periodically checks in on each client, pruning dead ones. This should be run
+// concurrently.
 func Think(m *MasterServer) {
 	for {
 		time.Sleep(time.Duration(m.ThinkInterval) * time.Second)
@@ -217,11 +225,9 @@ func Think(m *MasterServer) {
 }
 
 // Removes a client from the client slice.
-// Returns the slice of clients removed
 func RemoveClient(m *MasterServer, from *net.Addr) {
 	oldClients := &m.Clients
 	newClients := []MasterClient{}
-
 	for i, cl := range *oldClients {
 		if cl.Address.String() == (*from).String() {
 			continue
@@ -231,19 +237,22 @@ func RemoveClient(m *MasterServer, from *net.Addr) {
 	m.Clients = newClients
 }
 
-// for sending simple "ack"s and "ping"s
+// For sending simple "ack"s and "ping"s
 func Send(cmd string, m *MasterServer, recip *net.Addr) {
-	ack := message.Buffer{}
+	ack := message.NewEmptyBuffer()
 	ack.WriteLong(-1)
 	ack.WriteData([]byte(cmd))
 	(*m.Conn).WriteTo(ack.Data, *recip)
 }
 
-// Runs concurrently for every datagram recieved by the server
+// Runs concurrently for every datagram recieved by the master
 func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 	msg := message.NewBuffer(buf)
 	if msg.ReadLong() == -1 {
 		tok := strings.Split(string(msg.ReadData(msg.UnreadSize())), "\n")
+		if len(tok) == 0 {
+			return
+		}
 		cmd := strings.Trim(tok[0], "\x00\x0a\x20\x09") // null, new line, space, tab
 		switch cmd {
 		case "getservers":
@@ -256,6 +265,10 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 			}
 		case "heartbeat":
 			if m.HeartbeatFunc != nil {
+				if len(tok) < 2 || tok[1] == "" {
+					log.Printf("invalid heartbeat format from %q, ignoring: %v", (*from).String(), tok)
+					return
+				}
 				m.HeartbeatFunc(m, from, state.ParseInfoString(tok[1][1:]))
 			}
 		case "ack":
@@ -267,7 +280,7 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 				m.ShutdownFunc(m, from)
 			}
 		default:
-			log.Println("Ignoring unknown command from", *from, cmd)
+			log.Printf("Ignoring unknown command %q from %s\n", cmd, (*from).String())
 		}
 	} else {
 		msg.Rewind()
@@ -282,10 +295,9 @@ func processMessage(m *MasterServer, from *net.Addr, buf []byte) {
 // Someone requested a list of all Q2 servers we know about.
 func ClientList(m *MasterServer, recip *net.Addr) {
 	m.Stats.GetServerHits++
-	msg := message.Buffer{}
+	msg := message.NewEmptyBuffer()
 	msg.WriteLong(-1)
 	msg.WriteData([]byte("servers ")) // note the space
-
 	clients := m.MarshalClients()
 	msg.Append(*clients)
 	(*m.Conn).WriteTo(msg.Data, *recip)
@@ -319,7 +331,7 @@ func Heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 		}
 	}
 	Send("ack", m, from)
-	log.Println("heartbeat from", (*from).String(), "-", info["hostname"])
+	log.Printf("heartbeat from %s - %s\n", (*from).String(), info["hostname"])
 }
 
 // An unfamiliar server started talking to us. Start tracking it.
@@ -328,8 +340,11 @@ func Ping(m *MasterServer, from *net.Addr) *MasterClient {
 	if c != nil {
 		return c // we already have this one
 	}
-
 	tokens := strings.Split((*from).String(), ":")
+	if len(tokens) != 2 {
+		log.Printf("malformed addr %q, ignoring ping\n", (*from).String())
+		return nil
+	}
 	port, err := strconv.Atoi(tokens[1])
 	if err != nil {
 		log.Printf("ping - unable to parse port %q, defaulting to 27900\n", tokens[1])
@@ -345,7 +360,7 @@ func Ping(m *MasterServer, from *net.Addr) *MasterClient {
 	return &m.Clients[len(m.Clients)-1]
 }
 
-// A client sends us an Ack when he "ping" them (from management)
+// A client sends us an Ack when we "ping" them (from management)
 func Ack(m *MasterServer, from *net.Addr) {
 	cl := m.FindClient(*from)
 	if cl == nil {
@@ -373,10 +388,10 @@ func Ack(m *MasterServer, from *net.Addr) {
 
 // Clients issue Shutdown msgs when they quit or go non-public
 func Shutdown(m *MasterServer, from *net.Addr) {
+	log.Println("shutdown issued from", (*from).String())
 	cl := m.FindClient(*from)
 	if cl == nil {
 		return
 	}
 	RemoveClient(m, from)
-	log.Println("shutdown issued from", (*from).String())
 }
