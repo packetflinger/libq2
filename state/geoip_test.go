@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestCountry(t *testing.T) {
+func TestLookup(t *testing.T) {
 	tests := []struct {
 		name string
 		addr string
@@ -37,13 +37,13 @@ func TestCountry(t *testing.T) {
 		},
 	}
 
-	IPCountryList, err := LoadIPCountries("/tmp/ipcountry.csv.gz")
+	geoips, err := LoadGeoIPFile("/tmp/ipcountry.csv.gz")
 	if err != nil {
 		t.Fatalf("unable to load country db: %v", err)
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := (&IPCountryList).Lookup(tc.addr)
+			got := (&geoips).Lookup(tc.addr)
 			if got != tc.want {
 				t.Errorf("Country(%q) = %q, want %q", tc.addr, got, tc.want)
 			}
