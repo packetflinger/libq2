@@ -43,8 +43,8 @@ type MasterServer struct {
 	ClientListFunc func(m *MasterServer, recip *net.Addr)
 	Clients        []MasterClient  // our known q2 server
 	Conn           *net.PacketConn // the socket
+	GeoIPs         *state.GeoIPList
 	HeartbeatFunc  func(m *MasterServer, from *net.Addr, info map[string]string)
-	Location       *state.NetCountryList
 	PingFunc       func(m *MasterServer, from *net.Addr) *MasterClient
 	PingInterval   int
 	Port           int // default 27900
@@ -336,12 +336,12 @@ func Heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 		mp = 8
 	}
 	cl.MaxPlayers = mp
-	if m.Location != nil {
+	if m.GeoIPs != nil {
 		ip, _, err := net.SplitHostPort((*from).String())
 		if err != nil {
 			log.Printf("unable to split %q into host/port for location: %v\n", (*from).String(), err)
 		} else {
-			cl.Country = m.Location.Lookup(ip)
+			cl.Country = m.GeoIPs.Lookup(ip)
 		}
 	}
 	Send("ack", m, from)
