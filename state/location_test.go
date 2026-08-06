@@ -37,7 +37,7 @@ func TestCountry(t *testing.T) {
 		},
 	}
 
-	IPCountryList, err := LoadIPCountries("/tmp/ipcountry.csv", false)
+	IPCountryList, err := LoadIPCountries("/tmp/ipcountry.csv.gz")
 	if err != nil {
 		t.Fatalf("unable to load country db: %v", err)
 	}

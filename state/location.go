@@ -4,7 +4,9 @@ package state
 
 import (
 	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -35,12 +37,19 @@ type NetCountryList []NetCountry
 //
 // The `cont` parameter configures whether or not to continue if a parse error
 // occurs or to give up and return an error message.
-func LoadIPCountries(inputFile string, cont bool) (NetCountryList, error) {
+func LoadIPCountries(inputFile string) (NetCountryList, error) {
 	var out []NetCountry
+	var data []byte
+	var err error
+
 	if inputFile == "" {
 		return out, fmt.Errorf("country database not specified")
 	}
-	data, err := os.ReadFile(inputFile)
+	if strings.HasSuffix(inputFile, ".gz") {
+		data, err = gzippedFileData(inputFile)
+	} else {
+		data, err = os.ReadFile(inputFile)
+	}
 	if err != nil {
 		return out, fmt.Errorf("reading country db: %s", err)
 	}
@@ -61,6 +70,28 @@ func LoadIPCountries(inputFile string, cont bool) (NetCountryList, error) {
 		})
 	}
 	return out, nil
+}
+
+// Decompress and return file data
+func gzippedFileData(inputFile string) ([]byte, error) {
+	var out []byte
+	file, err := os.Open(inputFile)
+	if err != nil {
+		return out, fmt.Errorf("opening %q: %v", inputFile, err)
+	}
+	defer file.Close()
+
+	gzReader, err := gzip.NewReader(file)
+	if err != nil {
+		return out, fmt.Errorf("reading gzip format: %v", err)
+	}
+	defer gzReader.Close()
+
+	data, err := io.ReadAll(gzReader)
+	if err != nil {
+		return out, fmt.Errorf("reading compressed data: %v", err)
+	}
+	return data, nil
 }
 
 // Get the country code for a particular IP address string. Output of "zz" is
