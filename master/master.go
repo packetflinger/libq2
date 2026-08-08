@@ -9,7 +9,7 @@
 // Server commands:
 //
 //	`listmasters` - Show the currently configured masters.
-//	`setmaster`   - Sets a comma-separated list of masters to use. To remove
+//	`setmaster`   - Sets a space-delimited list of masters to use. To remove
 //	                a master, issue this command again minus the server to
 //	                remove.
 //
@@ -38,22 +38,24 @@ const (
 
 // the all-knowning master server
 type MasterServer struct {
+	Address       string            // IP or DNS name
+	Clients       []MasterClient    // our known q2 server
+	Conn          *net.PacketConn   // the socket
+	GeoIPs        *state.GeoIPList  // the ip-country list
+	PingInterval  int               // seconds
+	Port          int               // default 27900
+	Refresh       bool              // fetch player info
+	Stats         MasterServerStats // stats for this master
+	ThinkInterval int               // seconds
+	Verbose       bool              // be extra mouthy
+
 	AckFunc        func(m *MasterServer, from *net.Addr)
-	Address        string // IP or DNS name
 	ClientListFunc func(m *MasterServer, recip *net.Addr)
-	Clients        []MasterClient  // our known q2 server
-	Conn           *net.PacketConn // the socket
-	GeoIPs         *state.GeoIPList
 	HeartbeatFunc  func(m *MasterServer, from *net.Addr, info map[string]string)
 	PingFunc       func(m *MasterServer, from *net.Addr) *MasterClient
-	PingInterval   int
-	Port           int // default 27900
 	ProcessFunc    func(m *MasterServer)
-	Refresh        bool // fetch players every minute or so
 	ShutdownFunc   func(m *MasterServer, from *net.Addr)
-	Stats          MasterServerStats
 	ThinkFunc      func(ctx context.Context, m *MasterServer)
-	ThinkInterval  int // seconds between thinks
 }
 
 type MasterServerStats struct {
@@ -110,13 +112,13 @@ func NewMaster() *MasterServer {
 		ShutdownFunc:   Shutdown,
 		PingInterval:   DefaultPingInterval,
 		Refresh:        false,
+		Verbose:        false,
 	}
 	return &master
 }
 
 // start the actual server
 func (m *MasterServer) Run(ctx context.Context) {
-	log.Println("Starting up...")
 	listenAddr := fmt.Sprintf("%s:%d", m.Address, m.Port)
 	listener, err := net.ListenPacket("udp", listenAddr)
 	if err != nil {
@@ -219,7 +221,9 @@ func Think(ctx context.Context, m *MasterServer) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("ending Think thread")
+			if m.Verbose {
+				log.Println("ending Think thread")
+			}
 			return
 		case <-ticker.C:
 			for i := range m.Clients {
@@ -345,7 +349,9 @@ func Heartbeat(m *MasterServer, from *net.Addr, info map[string]string) {
 		}
 	}
 	Send("ack", m, from)
-	log.Printf("heartbeat from %s - %s\n", (*from).String(), info["hostname"])
+	if m.Verbose {
+		log.Printf("heartbeat from %s - %s\n", (*from).String(), info["hostname"])
+	}
 }
 
 // An unfamiliar server started talking to us. Start tracking it.
@@ -397,7 +403,9 @@ func Ack(m *MasterServer, from *net.Addr) {
 		cl.Players = players
 		cl.Info = info.Server
 	}
-	log.Println("ack from", (*from).String())
+	if m.Verbose {
+		log.Println("ack from", (*from).String())
+	}
 }
 
 // Clients issue Shutdown msgs when they quit or go non-public
@@ -420,7 +428,9 @@ func (m *MasterServer) DetailRefresher(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("context finished, stopping DetailRefresher thread")
+			if m.Verbose {
+				log.Println("context finished, stopping DetailRefresher thread")
+			}
 			return
 		case <-ticker.C:
 			playercount := 0
