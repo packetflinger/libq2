@@ -9,10 +9,8 @@
 // much preferred archive format as it's natively supported in nearly all OSes.
 //
 // This implementation does not allow for duplicate files in the same archive.
-// If you try to add a file of the same name as an existing file in the pak an
-// error will surface. If a file is added with the same contents but under a
-// different name, the index will point to the same data location for both in
-// an effort to minimize waste.
+// If you try to add a file of the same name or data as an existing file in the
+// pak an error will surface.
 //
 // Structure -
 // PAK files consist of a header, a blob of all the file contents concatinated
@@ -41,6 +39,8 @@
 package pak
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 
 	"github.com/packetflinger/libq2/message"
@@ -55,21 +55,28 @@ const (
 	FileOffset      = 56
 	FileLength      = 60
 	Separator       = "/" // always use linux-style, even on windows
+	MinLength       = 77  // header + index with 1 file, single byte of data
 )
 
 var (
-	ErrorDuplicateName = errors.New("Duplicate file name in pak")
-	ErrorFileNotFound  = errors.New("File not found in pak")
-	ErrorNilPak        = errors.New("Nil pak archive")
+	ErrorDuplicateData = errors.New("duplicate file data found in pak")
+	ErrorDuplicateName = errors.New("duplicate file name in pak")
+	ErrorFileNotFound  = errors.New("file not found in pak")
+	ErrorInvalidPak    = errors.New("invalid pak archive")
+	ErrorNilPak        = errors.New("nil pak archive")
+	ErrorShortPak      = errors.New("invalid pak file, not enough data")
 )
 
 // Load the binary .pak file data into a structured text proto. This structure
 // can be easily modified (changing/adding/removing files) and then changed
 // back into a binary .pak file.
 func Unmarshal(data []byte) (*pb.PAKArchive, error) {
+	if len(data) < MinLength {
+		return nil, ErrorShortPak
+	}
 	header := message.NewBuffer(data[:HeaderLength])
 	if header.ReadLong() != Magic {
-		return nil, errors.New("not a valid PAK file")
+		return nil, ErrorInvalidPak
 	}
 	location := header.ReadLong()
 	length := header.ReadLong()
@@ -81,11 +88,13 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 		index.Index += FileNameLength - len(name) - 1
 		dataloc := index.ReadLong()
 		datalen := index.ReadLong()
+		content := data[dataloc : dataloc+datalen]
 		files = append(files, &pb.PAKFile{
 			Name:     name,
-			Data:     data[dataloc : dataloc+datalen],
+			Data:     content,
 			Location: int32(dataloc),
 			Length:   int32(datalen),
+			Hash:     dataHash(content),
 		})
 	}
 	pak := &pb.PAKArchive{
@@ -101,6 +110,7 @@ func Marshal(archive *pb.PAKArchive) ([]byte, error) {
 		return []byte{}, ErrorNilPak
 	}
 	var buf, dataLump, metaLump message.Buffer
+	names := make(map[string]bool)
 	for _, f := range archive.GetFiles() {
 		metaLump.WriteString(f.Name)
 		for i := len(f.Name); i < FileNameLength-1; i++ {
@@ -109,6 +119,10 @@ func Marshal(archive *pb.PAKArchive) ([]byte, error) {
 		metaLump.WriteLong(dataLump.Index + HeaderLength)
 		metaLump.WriteLong(len(f.Data))
 		dataLump.WriteData(f.Data)
+		if _, dup := names[f.Name]; dup {
+			return []byte{}, ErrorDuplicateName
+		}
+		names[f.Name] = true
 	}
 	buf.WriteLong(Magic)
 	buf.WriteLong(len(dataLump.Data) + HeaderLength)
@@ -123,9 +137,13 @@ func AddFile(archive *pb.PAKArchive, name string, data []byte) error {
 	if archive == nil {
 		return ErrorNilPak
 	}
+	hash := dataHash(data)
 	for _, f := range archive.GetFiles() {
 		if f.GetName() == name {
 			return ErrorDuplicateName
+		}
+		if f.GetHash() == hash {
+			return ErrorDuplicateData
 		}
 	}
 	newfile := &pb.PAKFile{
@@ -166,4 +184,10 @@ func ExtractFile(archive *pb.PAKArchive, name string) (*pb.PAKFile, error) {
 		}
 	}
 	return nil, ErrorFileNotFound
+}
+
+// Get an SHA256 hash of the input parameter data
+func dataHash(data []byte) string {
+	hashbytes := sha256.Sum256(data)
+	return hex.EncodeToString(hashbytes[:])
 }
