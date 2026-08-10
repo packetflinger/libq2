@@ -9,7 +9,7 @@ func (bsp *BSPFile) FetchVertices() []Vertex {
 	msg := &bsp.LumpData[VerticesLump].Data
 	msg.Index = 0
 	quantity := len(bsp.LumpData[VerticesLump].Data.Data) / 12
-	for i := 0; i < quantity; i++ {
+	for range quantity {
 		verts = append(verts, Vertex{
 			X: msg.ReadLong(),
 			Y: msg.ReadLong(),

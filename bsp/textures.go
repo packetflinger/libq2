@@ -11,7 +11,7 @@ func (bsp *BSPFile) FetchTextures() []BSPTexture {
 	qty := len(lump.Data) / TextureLen
 	var textures []BSPTexture
 	lump.Index = 0
-	for i := 0; i < qty; i++ {
+	for range qty {
 		_ = lump.ReadData(40) // skip texture position and orientation for now
 		tdata := lump.ReadData(32)
 		_ = lump.ReadLong() // eat up the ending 0xffffffff

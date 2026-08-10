@@ -12,7 +12,7 @@ func (bsp *BSPFile) FetchVisibility() []Visibility {
 
 	visdata.Data.Index = 0
 
-	for i := 0; i < visCount; i++ {
+	for range visCount {
 		vis = append(vis, Visibility{
 			PVS: visdata.Data.ReadLong(),
 			PHS: visdata.Data.ReadLong(),
