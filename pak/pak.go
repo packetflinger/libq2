@@ -27,7 +27,7 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 	index := message.NewBuffer(data[location : location+length])
 	fileCount := len(index.Data) / FileBlockLength
 	files := []*pb.PAKFile{}
-	for i := 0; i < fileCount; i++ {
+	for range fileCount {
 		name := index.ReadString()
 		index.Index += FileNameLength - len(name) - 1
 		dataloc := index.ReadLong()

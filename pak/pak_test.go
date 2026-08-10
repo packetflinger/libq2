@@ -18,7 +18,9 @@ func TestUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Error(archive)
+	if len(archive.Files) != 2 {
+		t.Errorf("Unmarshal(): got %d files, want 2\n", len(archive.Files))
+	}
 }
 
 func TestMarshal(t *testing.T) {
