@@ -24,4 +24,6 @@ message PAKFile {
     int32 location = 3;
     // how many bytes the file is
     int32 length = 4;
+    // a SHA256 hash of the data for deduplication
+    string hash = 5;
 }
