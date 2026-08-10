@@ -47,9 +47,7 @@ func Unmarshal(data []byte) (*pb.PAKArchive, error) {
 
 // generate a binary pak, it should be written to disk after.
 func Marshal(archive *pb.PAKArchive) ([]byte, error) {
-	buf := message.Buffer{}
-	dataLump := message.Buffer{}
-	metaLump := message.Buffer{}
+	var buf, dataLump, metaLump message.Buffer
 	for _, f := range archive.GetFiles() {
 		metaLump.WriteString(f.Name)
 		for i := len(f.Name); i < FileNameLength-1; i++ {
