@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/packetflinger/libq2/demo"
 	"github.com/packetflinger/libq2/message"
@@ -18,17 +19,16 @@ var (
 func main() {
 	flag.Parse()
 
-	dm2, err := demo.NewDM2Demo(*demofile)
+	content, err := os.ReadFile(*demofile)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	dm2 := demo.NewDM2Parser()
 	dm2.RegisterCallback(message.SVCPrint, func(a any) {
 		pr := a.(*pb.Print)
-		fmt.Printf("%s\n", pr.GetData())
+		fmt.Printf("%s", pr.GetData()) // the \n is already on each line
 	})
-
-	err = dm2.Unmarshal()
+	err = dm2.Unmarshal(content)
 	if err != nil {
 		log.Fatalln(err)
 	}
