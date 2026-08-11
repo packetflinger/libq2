@@ -9,8 +9,6 @@ import (
 
 func main() {
 	srv := master.MasterServer{
-		//Address: "master.quetoo.org",
-		//Port:    1996,
 		Address: "master.q2servers.com",
 		Port:    27900,
 	}
