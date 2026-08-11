@@ -5,19 +5,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/packetflinger/libq2/demo"
+	"github.com/packetflinger/libq2/util"
 )
 
 func main() {
-	// open the demo file
-	dm2, err := demo.NewDM2Demo("../../testdata/testduel.dm2")
+	content, err := os.ReadFile("../../testdata/testduel.dm2")
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatalln(err)
 	}
 
-	err = dm2.Unmarshal()
+	dm2 := demo.NewDM2Parser()
+	err = dm2.Unmarshal(content)
 	if err != nil {
 		log.Println(err)
 		return
@@ -25,7 +26,8 @@ func main() {
 
 	for _, frame := range dm2.GetTextProto().GetFrames() {
 		for _, print := range frame.GetPrints() {
-			fmt.Println(print.GetData())
+			// newlines are included in the messages
+			fmt.Print(util.ConvertHighChars(print.GetData()))
 		}
 	}
 }
