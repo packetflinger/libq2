@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/packetflinger/libq2/demo"
 	"google.golang.org/protobuf/encoding/prototext"
@@ -17,16 +18,14 @@ var (
 
 func main() {
 	flag.Parse()
-
-	dm2, err := demo.NewDM2Demo(*demofile)
+	content, err := os.ReadFile(*demofile)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	err = dm2.Unmarshal()
+	dm2 := demo.NewDM2Parser()
+	err = dm2.Unmarshal(content)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	fmt.Println(prototext.Format(dm2.GetTextProto()))
 }
