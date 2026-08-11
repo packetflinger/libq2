@@ -2,6 +2,22 @@
 // server to a client; a one-sided conversation of network messages. Client to
 // server messages are irrelevant as the server will process those messages and
 // transmit the results to all clients anyway.
+//
+// All .dm2 demo files are recorded using protocol 34 regardless of what
+// protocol the client recording is connected at.
+//
+// Demos are grouped into "lumps" of data that could be thought of as packets.
+// Each packet is prefixed with a 4-byte integer size indicating the length
+// of that particular packet. Then each packet is just a collection of server
+// messages. The header will be a few packets containing a `serverdata` message
+// followed by all the initial configstrings and then all the baselines. At
+// that point there'll be stufftext message containing the string "precache\n"
+// and then the client is considered spawned into the game and serverframes
+// will start flowing. Serverframes are always followed by a playerstate msg
+// and then all the packetentities that changed for that particular frame;
+// always in that order. The other messages (sounds, temp entities, etc) can
+// come before and after, but those three will always be together and in that
+// order once per frame.
 package demo
 
 import (
