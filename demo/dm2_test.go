@@ -3,64 +3,51 @@ package demo
 import (
 	"os"
 	"testing"
-
-	"google.golang.org/protobuf/encoding/prototext"
 )
-
-func TestNewDM2Demo(t *testing.T) {
-	tests := []struct {
-		name string
-		file string
-		want int
-	}{
-		{
-			name: "Test 1",
-			file: "../testdata/test.dm2",
-			want: 7931,
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.file)
-			if err != nil {
-				t.Error(err)
-			}
-			got := len(demo.binaryData)
-			if got != tc.want {
-				t.Errorf("\nSize mismatch\ngot: %d, want: %d\n", got, tc.want)
-			}
-		})
-	}
-}
 
 func TestUnmarshal(t *testing.T) {
 	tests := []struct {
-		name           string
-		fileIn         string
-		wantFrameCount int
+		name              string
+		fileIn            string
+		wantBaselines     int
+		wantConfigstrings int
+		wantFrames        int
 	}{
 		{
-			name:           "Test 1",
-			fileIn:         "../testdata/test.dm2",
-			wantFrameCount: 23,
+			name:              "Test 1",
+			fileIn:            "../testdata/test.dm2",
+			wantBaselines:     107,
+			wantConfigstrings: 231,
+			wantFrames:        23,
 		},
-		/*{
-			name:           "Test 2",
-			fileIn:         "../testdata/testduel.dm2",
-			wantFrameCount: 3199,
-		},*/
+		{
+			name:              "Test 2",
+			fileIn:            "../testdata/testduel.dm2",
+			wantBaselines:     70,
+			wantConfigstrings: 241,
+			wantFrames:        3199,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.fileIn)
+			content, err := os.ReadFile(tc.fileIn)
+			if err != nil {
+				t.Fatal("opening demo file:", content)
+			}
+			demo := NewDM2Parser()
+			err = demo.Unmarshal(content)
 			if err != nil {
 				t.Error(err)
 			}
-			err = demo.Unmarshal()
-			if err != nil {
-				t.Error(err)
+			if len(demo.textProto.GetBaselines()) != tc.wantBaselines {
+				t.Errorf("Unmarshal() baseline mismatch: got %d, want %d\n", len(demo.textProto.Baselines), tc.wantBaselines)
 			}
-			t.Error(prototext.Format(demo.textProto))
+			if len(demo.textProto.GetConfigstrings()) != tc.wantConfigstrings {
+				t.Errorf("Unmarshal() configstring mismatch: got %d, want %d\n", len(demo.textProto.GetConfigstrings()), tc.wantConfigstrings)
+			}
+			if len(demo.textProto.GetFrames()) != tc.wantFrames {
+				t.Errorf("Unmarshal() frame mismatch: got %d, want %d\n", len(demo.textProto.GetFrames()), tc.wantFrames)
+			}
 		})
 	}
 }
@@ -92,9 +79,8 @@ func TestNextPacket(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			demo := &DM2Parser{
-				binaryData: tc.data,
-			}
+			demo := NewDM2Parser()
+			demo.binaryData = tc.data
 			_, got, err := demo.NextPacket()
 			if err != nil {
 				t.Error(err)
@@ -106,40 +92,13 @@ func TestNextPacket(t *testing.T) {
 	}
 }
 
-func TestWrite(t *testing.T) {
-	tests := []struct {
-		name    string
-		inFile  string
-		outFile string
-	}{
-		{
-			name:    "Test 1",
-			inFile:  "../testdata/test.dm2",
-			outFile: "../testdata/output-test.dm2.pb",
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.inFile)
-			if err != nil {
-				t.Error(err)
-			}
-			err = demo.Unmarshal()
-			if err != nil {
-				t.Error(err)
-			}
-			//demo.WriteTextProto(tc.outFile)
-		})
-	}
-}
-
 func TestMarshal(t *testing.T) {
 	tests := []struct {
 		name    string
 		inFile  string
 		outFile string
 	}{
-		/*{
+		{
 			name:    "multiple entities spinning",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1ents.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1ents-out.dm2",
@@ -153,33 +112,34 @@ func TestMarshal(t *testing.T) {
 			name:    "picking up ssh and shells one shell doesn't disappear",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1pickup.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1pickup-out.dm2",
-		},*/
+		},
 		{
 			name:    "fall and land with sound health highlight",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1fall2.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2-out.dm2",
 		},
-		/*{
+		{
 			name:    "rocket shot with explosion",
 			inFile:  "/Users/joe/.quake2/baseq2/demos/test-dm1rocket.dm2",
 			outFile: "/Users/joe/.quake2/baseq2/demos/test-dm1rocket-out.dm2",
-		},*/
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.inFile)
+			parser := NewDM2Parser()
+			content, err := os.ReadFile(tc.inFile)
 			if err != nil {
 				t.Error(err)
 			}
-			err = demo.Unmarshal()
+			err = parser.Unmarshal(content)
 			if err != nil {
 				t.Error(err)
 			}
-			data, err := demo.Marshal()
+			got, err := parser.Marshal()
 			if err != nil {
 				t.Error(err)
 			}
-			err = os.WriteFile(tc.outFile, data, 0777)
+			err = os.WriteFile(tc.outFile, got, 0644)
 			if err != nil {
 				t.Error(err)
 			}
@@ -188,32 +148,34 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestDemoDebug(t *testing.T) {
-	tests := []struct {
-		name   string
-		inFile string
-	}{
+	/*
+		tests := []struct {
+			name   string
+			inFile string
+		}{
 
-		/*{
-			name:   "fall and land with sound health highlight",
-			inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2.dm2",
-		},*/
+			{
+				name:   "fall and land with sound health highlight",
+				inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2.dm2",
+			},
 
-		{
-			name:   "rocket shot with explosion",
-			inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2-out.dm2",
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			demo, err := NewDM2Demo(tc.inFile)
-			if err != nil {
-				t.Error(err)
+			{
+				name:   "rocket shot with explosion",
+				inFile: "/Users/joe/.quake2/baseq2/demos/test-dm1fall2-out.dm2",
+			},
+		}
+			for _, tc := range tests {
+				t.Run(tc.name, func(t *testing.T) {
+					demo, err := NewDM2Demo(tc.inFile)
+					if err != nil {
+						t.Error(err)
+					}
+					err = demo.Unmarshal()
+					if err != nil {
+						t.Error(err)
+					}
+					t.Error(prototext.Format(demo.textProto))
+				})
 			}
-			err = demo.Unmarshal()
-			if err != nil {
-				t.Error(err)
-			}
-			t.Error(prototext.Format(demo.textProto))
-		})
-	}
+	*/
 }

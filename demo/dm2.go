@@ -1,14 +1,16 @@
+// Quake 2 demos are essentially just a copy of the network stream from the
+// server to a client; a one-sided conversation of network messages. Client to
+// server messages are irrelevant as the server will process those messages and
+// transmit the results to all clients anyway.
 package demo
 
 import (
 	"cmp"
 	"errors"
 	"fmt"
-	"os"
 	"slices"
 
 	"github.com/packetflinger/libq2/message"
-	"google.golang.org/protobuf/encoding/prototext"
 
 	pb "github.com/packetflinger/libq2/proto"
 )
@@ -23,17 +25,9 @@ type DM2Parser struct {
 	fps            int               // only supports 10
 }
 
-// Read the entire binary demo file into memory
-func NewDM2Demo(filename string) (*DM2Parser, error) {
-	if filename == "" {
-		return nil, fmt.Errorf("no file specified")
-	}
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	demo := &DM2Parser{
-		binaryData: data,
+// Create a new DM2 parser to hold a parsed demo.
+func NewDM2Parser() *DM2Parser {
+	return &DM2Parser{
 		callbacks:  make(map[int]func(any)),
 		frameCount: 0,
 		fps:        10,
@@ -43,11 +37,14 @@ func NewDM2Demo(filename string) (*DM2Parser, error) {
 			Frames:        make(map[int32]*pb.Frame),
 		},
 	}
-	return demo, nil
 }
 
 // Load the binary demo into protobuf
-func (p *DM2Parser) Unmarshal() error {
+func (p *DM2Parser) Unmarshal(content []byte) error {
+	if len(content) == 0 {
+		return fmt.Errorf("empty demo data")
+	}
+	p.binaryData = content
 	for {
 		data, length, err := p.NextPacket()
 		if err != nil {
@@ -217,22 +214,6 @@ func (demo *DM2Parser) NextPacket() (message.Buffer, int, error) {
 	return packet, packetLen, nil
 }
 
-// Turn a parsed demo structure back into a binary file
-func (demo *DM2Parser) WriteTextProto(filename string) error {
-	b, err := prototext.MarshalOptions{
-		Multiline: true,
-		Indent:    "  ",
-	}.Marshal(demo.textProto)
-	if err != nil {
-		return fmt.Errorf("error writing proto to file: %s", err.Error())
-	}
-	err = os.WriteFile(filename, b, 0777)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (demo *DM2Parser) GetTextProto() *pb.DM2Demo {
 	return demo.textProto
 }
@@ -246,7 +227,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 	textpb := demo.GetTextProto()
 
 	packet.Append(message.MarshalServerData(textpb.Serverinfo))
-	for i := 0; i < MaxConfigStrings; i++ {
+	for i := range MaxConfigStrings {
 		cs, ok := textpb.Configstrings[int32(i)]
 		if !ok {
 			continue
@@ -254,7 +235,7 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 		tmp := message.MarshalConfigstring(cs)
 		buildDemoPacket(&out, &packet, tmp, false)
 	}
-	for i := 0; i < MaxEdicts; i++ {
+	for i := range MaxEdicts {
 		bl, ok := textpb.Baselines[int32(i)]
 		if !ok {
 			continue
