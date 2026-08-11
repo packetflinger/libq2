@@ -1,3 +1,5 @@
+// A very basic library for making a bot capable of connecting to a Quake 2
+// server.
 package bot
 
 import (
@@ -11,8 +13,8 @@ import (
 	"time"
 
 	"github.com/packetflinger/libq2/message"
-	pl "github.com/packetflinger/libq2/player"
 
+	pl "github.com/packetflinger/libq2/player"
 	pb "github.com/packetflinger/libq2/proto"
 )
 
@@ -169,7 +171,7 @@ func (bot *Bot) Run() error {
 	}
 
 	bot.Net.Challenge = ch
-	log.Printf("received challenge (%d)\n", bot.Net.Challenge.Number)
+	log.Printf("received challenge [%d]\n", bot.Net.Challenge.Number)
 
 	constr := fmt.Sprintf("connect 34 %d %d \"%s\"", bot.Netchan.QPort, bot.Net.Challenge.Number, bot.User.Marshal())
 	con := message.ConnectionlessPacket{Data: constr}.Marshal()
@@ -298,7 +300,6 @@ func (bot *Bot) Run() error {
 			return nil
 		case <-time.After(time.Duration(frametime) * time.Millisecond):
 			if bot.Spawned {
-				fmt.Println("send new usercmd_t")
 				usercmd = pl.UserCommand{
 					Msec: 100,
 				}
@@ -311,7 +312,6 @@ func (bot *Bot) Run() error {
 				}
 			}
 		}
-		fmt.Println("loop iteration")
 	}
 }
 
