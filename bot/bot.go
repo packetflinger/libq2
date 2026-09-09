@@ -269,6 +269,49 @@ func (bot *Bot) Run() error {
 					continue
 				}
 
+				// A LEVEL CHANGE IS NOT A DISCONNECT, and the two commands
+				// that carry one have to be answered or the client goes
+				// quiet without ever being dropped.
+				//
+				// `changing` is the server saying it is leaving this level.
+				// id's CL_Changing_f takes the client out of the spawned
+				// state and holds the connection open; there is nothing to
+				// send back.  Without this the bot keeps sending usercmds
+				// for a level that no longer exists, and the fallback at the
+				// bottom of this loop echoes the word back as a client
+				// command -- which is what a server logs as `<name>:
+				// changing`.
+				if t := strings.Fields(st.GetData()); len(t) >= 1 && t[0] == "changing" {
+					bot.Spawned = false
+					bot.AckPending = true
+					continue
+				}
+
+				// `reconnect` asks for the SPAWN handshake again, not for a
+				// new connection.  id's CL_Reconnect_f answers a connected
+				// client with the string command `new`, and that is what
+				// makes the server re-send serverdata, configstrings and
+				// baselines for the new level.  A client that does not
+				// answer stays connected and receives nothing further: its
+				// frame counter stops, its configstrings go stale and every
+				// command it sends is for a level the server has left.  From
+				// the outside that is indistinguishable from a mod that has
+				// stopped talking to it, which is how it was first read.
+				//
+				// The frame history goes with it.  Frames are delta-encoded
+				// against earlier ones and the new level restarts the
+				// sequence, so keeping the old map's frames as a delta base
+				// decodes the new level against the wrong entities.
+				if t := strings.Fields(st.GetData()); len(t) >= 1 && t[0] == "reconnect" {
+					bot.Spawned = false
+					bot.FrameNum = 0
+					clear(bot.oldframes)
+					bot.AddClientString("new\n")
+					bot.Netchan.ReliableS1 = true
+					bot.AckPending = true
+					continue
+				}
+
 				// handle version probe
 				if t := strings.Fields(st.GetData()); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
 					bot.AddClientString("\177c version %s\n", bot.Version)
@@ -351,7 +394,12 @@ func (bot *Bot) Run() error {
 				}
 			}
 
-			bot.Netchan.out.Append(bot.BuildUserCommand())
+			// Only once spawned: between `changing` and the `begin` that
+			// follows `precache` there is no level to move in, and what has to
+			// get through is the reliable `new`.
+			if bot.Spawned {
+				bot.Netchan.out.Append(bot.BuildUserCommand())
+			}
 			bot.Send()
 		}
 	}()
