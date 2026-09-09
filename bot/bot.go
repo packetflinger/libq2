@@ -255,8 +255,24 @@ func (bot *Bot) Run() error {
 			}
 
 			for _, st := range packet.GetStuffs() {
+				// EVERY stufftext reaches the callback, including the ones this
+				// loop answers itself.  A stufftext is the server typing a console
+				// command into this client, and a caller registered on SVCStuffText
+				// is asking to see what the server said -- not only the words the
+				// bot had no use for.  Dispatching below the handling instead, with
+				// every branch returning early, made the channel go silent for
+				// exactly the interesting ones: `changing`, `reconnect`, and on a
+				// vanilla-protocol server the whole `cmd ...` handshake -- which is
+				// every stufftext such a server sends, so the callback received
+				// nothing at all for a full session.
+				if cb, ok := bot.callbacks[message.SVCStuffText]; ok {
+					cb(st, &bot.Netchan.out)
+				}
+
+				t := strings.Fields(st.GetData())
+
 				// entering the game
-				if t := strings.Fields(st.GetData()); len(t) > 1 && t[0] == "precache" {
+				if len(t) > 1 && t[0] == "precache" {
 					bot.Spawned = true
 					log.Println("spawning into game")
 					bot.AddClientString("begin %s\n", t[1])
@@ -281,7 +297,7 @@ func (bot *Bot) Run() error {
 				// bottom of this loop echoes the word back as a client
 				// command -- which is what a server logs as `<name>:
 				// changing`.
-				if t := strings.Fields(st.GetData()); len(t) >= 1 && t[0] == "changing" {
+				if len(t) >= 1 && t[0] == "changing" {
 					bot.Spawned = false
 					bot.AckPending = true
 					continue
@@ -302,7 +318,7 @@ func (bot *Bot) Run() error {
 				// against earlier ones and the new level restarts the
 				// sequence, so keeping the old map's frames as a delta base
 				// decodes the new level against the wrong entities.
-				if t := strings.Fields(st.GetData()); len(t) >= 1 && t[0] == "reconnect" {
+				if len(t) >= 1 && t[0] == "reconnect" {
 					bot.Spawned = false
 					bot.FrameNum = 0
 					clear(bot.oldframes)
@@ -313,7 +329,7 @@ func (bot *Bot) Run() error {
 				}
 
 				// handle version probe
-				if t := strings.Fields(st.GetData()); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
+				if len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
 					bot.AddClientString("\177c version %s\n", bot.Version)
 					bot.Netchan.ReliableS1 = true
 					continue
@@ -331,16 +347,19 @@ func (bot *Bot) Run() error {
 				// here for ever, and the fallback below sent the text back
 				// WITH its `cmd` prefix, which the server logs as an unknown
 				// client command.
-				if t := strings.Fields(st.GetData()); len(t) >= 2 && t[0] == "cmd" {
-					bot.AddClientString("%s\n", strings.Join(t[1:], " "))
+				//
+				// The text is macro-expanded on the way out.  A server that asks
+				// for a cvar value -- `cmd \177c <var> $<var>`, which is how q2pro
+				// serves a cvarban and how it collects an anticheat token -- gets
+				// an answer, and a literal `$<var>` is not an answer: it is a value
+				// the client claims to hold, and a ban rule matches or misses on it.
+				if len(t) >= 2 && t[0] == "cmd" {
+					bot.AddClientString("%s\n", strings.Join(bot.expandCVars(t[1:]), " "))
 					bot.Netchan.ReliableS1 = true
 					bot.AckPending = true
 					continue
 				}
 
-				if cb, ok := bot.callbacks[message.SVCStuffText]; ok {
-					cb(st, &bot.Netchan.out)
-				}
 				resolved := bot.ResolveString(st.GetData())
 				cmds := ParseCmd(resolved)
 				for _, c := range cmds {
@@ -552,6 +571,40 @@ func (b *Bot) BuildUserCommand() message.Buffer {
 	return msg
 }
 
+// cvar returns the bot's value for a cvar and whether it had one, matched
+// case-insensitively the way Quake II's own cvar lookup is.
+func (b *Bot) cvar(name string) (string, bool) {
+	for k, v := range b.CVars {
+		if strings.EqualFold(name, k) {
+			return v, true
+		}
+	}
+	return "", false
+}
+
+// expandCVars replaces every $name in tokens with the bot's value for that
+// cvar, and with the empty string when it has none -- which is what a real
+// client's macro expansion does, since an unset cvar expands to nothing.
+//
+// It exists apart from ResolveString because the two answer different
+// questions.  ResolveString prepares text for this bot's own command table,
+// resolves an alias in the first token, and DROPS a $name it cannot resolve --
+// which shifts every argument after it one place left.  Text being forwarded
+// to the server must keep its shape: the server counts arguments, so an
+// unknown value has to stay an empty argument rather than vanish.
+func (b *Bot) expandCVars(tokens []string) []string {
+	out := make([]string, 0, len(tokens))
+	for _, t := range tokens {
+		if len(t) < 2 || !strings.HasPrefix(t, "$") {
+			out = append(out, t)
+			continue
+		}
+		val, _ := b.cvar(t[1:])
+		out = append(out, val)
+	}
+	return out
+}
+
 // Replace any variables and aliases with their substitutions. Aliases are not
 // recursive.
 func (b *Bot) ResolveString(s string) string {
@@ -577,10 +630,8 @@ func (b *Bot) ResolveString(s string) string {
 			out = append(out, t)
 			continue
 		}
-		for k, v := range b.CVars {
-			if strings.EqualFold(t[1:], k) {
-				out = append(out, v)
-			}
+		if v, ok := b.cvar(t[1:]); ok {
+			out = append(out, v)
 		}
 	}
 	return strings.Join(out, " ")
