@@ -276,6 +276,25 @@ func (bot *Bot) Run() error {
 					continue
 				}
 
+				// `cmd <rest>` MEANS "forward <rest> to the server", and a
+				// vanilla-protocol server's whole spawn handshake is built out
+				// of it: SV_New_f stuffs `cmd configstrings <spawncount> 0`,
+				// SV_Configstrings_f answers with more of the same and then
+				// `cmd baselines <spawncount> 0`, and only after the baselines
+				// are drained does `precache <spawncount>` arrive.  Q2PRO
+				// short-circuits all of that and stuffs `precache` straight
+				// away, which is why this was never needed before -- against
+				// Yamagi Quake II, id's own q2ded or r1q2 the client stalled
+				// here for ever, and the fallback below sent the text back
+				// WITH its `cmd` prefix, which the server logs as an unknown
+				// client command.
+				if t := strings.Fields(st.GetData()); len(t) >= 2 && t[0] == "cmd" {
+					bot.AddClientString("%s\n", strings.Join(t[1:], " "))
+					bot.Netchan.ReliableS1 = true
+					bot.AckPending = true
+					continue
+				}
+
 				if cb, ok := bot.callbacks[message.SVCStuffText]; ok {
 					cb(st, &bot.Netchan.out)
 				}
@@ -452,10 +471,6 @@ func ClientStringCommand(s string) message.Buffer {
 }
 
 func (b *Bot) BuildUserCommand() message.Buffer {
-	msg := message.NewEmptyBuffer()
-	msg.WriteByte(message.CLCMove)
-	msg.WriteByte(0xa1) // checksum, make up something
-	msg.WriteLong(b.FrameNum)
 	b.MoveMu.Lock()
 	move := b.Move
 	b.MoveMu.Unlock()
@@ -463,11 +478,29 @@ func (b *Bot) BuildUserCommand() message.Buffer {
 	if move.Msec == 0 {
 		move.Msec = 100
 	}
+
+	// The checksummed region is everything AFTER the checksum byte: the
+	// acknowledged frame number and the three commands.  Built first so the
+	// byte can be computed over it rather than invented.
+	//
 	// Three commands per packet is what the protocol expects: the oldest two
 	// are re-sends so a dropped packet does not lose input.
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body := message.NewEmptyBuffer()
+	body.WriteLong(b.FrameNum)
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+
+	// A REAL CHECKSUM, not a placeholder.  Vanilla-protocol servers verify it
+	// and silently ignore the rest of the packet when it is wrong, so with a
+	// made-up byte a client connects, spawns and then never moves on Yamagi
+	// Quake II, q2ded or r1q2.  Q2PRO does not check, which is why the
+	// placeholder went unnoticed.  The sequence it is salted with is the
+	// OUTGOING one this packet will carry.
+	msg := message.NewEmptyBuffer()
+	msg.WriteByte(message.CLCMove)
+	msg.WriteByte(int(blockSequenceCRCByte(body.Data, b.Netchan.Sequence1)))
+	msg.Append(body)
 	return msg
 }
 
