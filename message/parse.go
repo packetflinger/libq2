@@ -2,6 +2,7 @@ package message
 
 import (
 	"errors"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -843,6 +844,110 @@ func MarshalFrame(fr *pb.Frame) Buffer {
 		msg.Append(MarshalConfigstring(cs))
 	}
 	for _, cp := range fr.GetCenterprints() {
+		msg.WriteByte(SVCCenterPrint)
+		msg.Append(MarshalCenterPrint(cp))
+	}
+	return msg
+}
+
+// MarshalFrameDelta writes a frame as an incremental delta against `from`,
+// only encoding playerstate fields and entities that actually changed since
+// that reference frame, and explicitly removing entities that dropped out of
+// the active roster since then. Passing a nil `from` produces a full/keyframe
+// encoding (delta field -1), equivalent in content to MarshalFrame.
+func MarshalFrameDelta(from, to *pb.Frame) Buffer {
+	msg := Buffer{}
+	msg.WriteByte(SVCFrame)
+	msg.WriteLong(int(to.GetNumber()))
+	if from == nil {
+		msg.WriteLong(-1)
+	} else {
+		msg.WriteLong(int(from.GetNumber()))
+	}
+	msg.WriteByte(int(to.GetSuppressed()))
+	msg.WriteByte(int(to.GetAreaBytes()))
+	for _, ab := range to.GetAreaBits() {
+		msg.WriteByte(int(ab))
+	}
+
+	msg.Append(WriteDeltaPlayerstate(from.GetPlayerState(), to.GetPlayerState()))
+
+	msg.WriteByte(SVCPacketEntities)
+	fromEnts := from.GetEntities()
+	toEnts := to.GetEntities()
+	seen := make(map[int32]bool, len(fromEnts)+len(toEnts))
+	nums := make([]int32, 0, len(fromEnts)+len(toEnts))
+	for num := range fromEnts {
+		seen[num] = true
+		nums = append(nums, num)
+	}
+	for num := range toEnts {
+		if !seen[num] {
+			seen[num] = true
+			nums = append(nums, num)
+		}
+	}
+	slices.Sort(nums)
+
+	for _, num := range nums {
+		toEnt, stillPresent := toEnts[num]
+		fromEnt, existed := fromEnts[num]
+		if !stillPresent {
+			// left the active roster since the reference frame -- tell the
+			// client explicitly, otherwise it keeps it around forever
+			msg.Append(WriteDeltaEntity(fromEnt, &pb.PackedEntity{Number: uint32(num), Remove: true}))
+			continue
+		}
+		if existed && DeltaEntityBitmask(toEnt, fromEnt) == 0 {
+			continue // unchanged since the reference frame, omit entirely
+		}
+		// A brand new entity is always written, even with an empty bitmask
+		// (all its fields happen to match a zeroed entity) -- omitting it
+		// would mean the client (and our own parser, reading it back) never
+		// learns this number exists at all, instead of caching it as-is.
+		msg.Append(WriteDeltaEntity(fromEnt, toEnt))
+	}
+	msg.WriteShort(0) // EoE
+
+	// player-based muzzle flashes
+	for _, flash := range to.GetFlashes1() {
+		msg.WriteByte(SVCMuzzleFlash)
+		msg.Append(MarshalFlash(flash))
+	}
+	// monster-based muzzle flashes
+	for _, flash := range to.GetFlashes2() {
+		msg.WriteByte(SVCMuzzleFlash2)
+		msg.Append(MarshalFlash(flash))
+	}
+	for _, ent := range to.GetTemporaryEntities() {
+		msg.WriteByte(SVCTempEntity)
+		msg.Append(MarshalTempEntity(ent))
+	}
+	for _, layout := range to.GetLayouts() {
+		msg.WriteByte(SVCLayout)
+		msg.Append(MarshalLayout(layout))
+	}
+	for _, sound := range to.GetSounds() {
+		msg.WriteByte(SVCSound)
+		msg.Append(MarshalSound(sound))
+	}
+	for _, print := range to.GetPrints() {
+		msg.WriteByte(SVCPrint)
+		msg.Append(MarshalPrint(print))
+	}
+	for _, stuff := range to.GetStufftexts() {
+		msg.WriteByte(SVCStuffText)
+		msg.Append(MarshalStuffText(stuff))
+	}
+	// Configstrings attached to this frame are deliberately NOT written
+	// here -- see the caller (dm2.go Marshal). ApplyPacket always processes
+	// a lump's configstrings before its frames, regardless of their true
+	// byte order, so a configstring embedded in this same message would be
+	// attributed to the *previous* frame when the demo is re-parsed. The
+	// caller writes it as its own lump right after this one instead, so it
+	// lands in a later ApplyPacket call, once currentFrame has actually
+	// advanced to this frame's number.
+	for _, cp := range to.GetCenterprints() {
 		msg.WriteByte(SVCCenterPrint)
 		msg.Append(MarshalCenterPrint(cp))
 	}

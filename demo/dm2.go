@@ -269,15 +269,34 @@ func (demo *DM2Parser) Marshal() ([]byte, error) {
 
 	frameNum := int32(0)
 	total := 0
+	var prevFrame *pb.Frame
 	for total < len(textpb.GetFrames()) {
 		frameNum++
 		fr, ok := textpb.Frames[frameNum]
 		if !ok {
 			continue
 		}
-		tmp := message.MarshalFrame(fr)
+		tmp := message.MarshalFrameDelta(prevFrame, fr)
 		buildDemoPacket(&out, &packet, tmp, true)
+		if cstrings := fr.GetConfigstrings(); len(cstrings) > 0 {
+			// written as its own lump, forced, so it lands in the
+			// ApplyPacket call *after* this frame's -- see the comment on
+			// MarshalFrameDelta for why that matters on re-parse.
+			csmsg := message.Buffer{}
+			for _, cs := range cstrings {
+				csmsg.Append(message.MarshalConfigstring(cs))
+			}
+			buildDemoPacket(&out, &packet, csmsg, true)
+		}
+		prevFrame = fr
 		total++
+	}
+	// buildDemoPacket only flushes what was already buffered *before* the
+	// message it's given, so the last frame appended is still sitting in
+	// packet -- flush it too, or it's silently lost.
+	if len(packet.Data) > 0 {
+		out.WriteLong(len(packet.Data))
+		out.Append(packet)
 	}
 	out.WriteLong(-1) // end of demo
 	return out.Data, nil

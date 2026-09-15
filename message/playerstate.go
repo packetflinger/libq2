@@ -98,7 +98,6 @@ func DeltaPlayerBitmask(from *pb.PackedPlayer, to *pb.PackedPlayer) int {
 func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	to := &pb.PackedPlayer{}
 	pm := &pb.PlayerMove{}
-	stats := make(map[uint32]int32)
 	if m.Index == m.Length { // end of buffer (or empty buffer)
 		return nil
 	}
@@ -110,9 +109,9 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 			// from might not have playermove defined
 			pm = &pb.PlayerMove{}
 		}
-		for k, v := range from.GetStats() {
-			to.Stats[k] = v
-		}
+	}
+	if to.Stats == nil {
+		to.Stats = make(map[uint32]int32)
 	}
 	mask := m.ReadWord()
 
@@ -201,10 +200,9 @@ func (m *Buffer) ParseDeltaPlayerstate(from *pb.PackedPlayer) *pb.PackedPlayer {
 	var i uint32
 	for i = 0; i < MaxStats; i++ {
 		if (statsMask & (1 << i)) != 0 {
-			stats[i] = int32(m.ReadShort())
+			to.Stats[i] = int32(m.ReadShort())
 		}
 	}
-	to.Stats = stats
 	to.Movestate = pm
 	return to
 }
