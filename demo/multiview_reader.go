@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -154,10 +153,10 @@ func (p *MVD2Parser) NextPacket() (message.Buffer, error) {
 	}
 	sizebytes := message.NewBuffer(p.binaryData[p.binaryPosition : p.binaryPosition+2])
 	packetLen := int(sizebytes.ReadShort())
+	p.binaryPosition += 2
 	if packetLen == 0 { // EoD
 		return message.Buffer{}, nil
 	}
-	p.binaryPosition += 2
 	packet := message.NewBuffer(p.binaryData[p.binaryPosition : p.binaryPosition+packetLen])
 	p.binaryPosition += packetLen
 	return packet, nil
@@ -187,13 +186,13 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 				return nil, err
 			}
 			packet.Serverdata = data
-			p.demo.Configstrings = p.ParseConfigStrings(msg, p.remap)
+			packet.Configstrings = p.ParseConfigStrings(msg, p.remap)
+			p.demo.Configstrings = packet.Configstrings
 			frame, err := p.ParseFrame(msg)
 			if err != nil {
 				return nil, err
 			}
 			packet.Frames = append(packet.Frames, frame)
-			p.demo.Entities = frame.GetEntities()
 
 		case MVDSvcConfigString:
 			cs, err := p.ParseConfigString(msg, p.remap)
@@ -225,7 +224,6 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 				cbFunc(frame)
 			}
 			packet.Frames = append(packet.Frames, frame)
-			p.demo.Entities = frame.GetEntities() // maybe??
 
 		case MVDSvcSound:
 			sound := p.ParseSound(msg, extra)
@@ -271,11 +269,18 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 		case MVDSvcMulticastPVS:
 			fallthrough
 		case MVDSvcMulticastPVSR:
-			multicast := p.ParseMulticast(msg, int(cmd)-MVDSvcMulticastAll, extra)
+			multicast := p.ParseMulticast(msg, int(cmd), extra)
 			packet.Multicasts = append(packet.Multicasts, multicast)
 		}
 	}
 	return packet, nil
+}
+
+// HasMoreData confirms if there is more binary data in the parser past the
+// current index. This indicates there is another demo (a different map) yet to
+// be read.
+func (p *MVD2Parser) HasMoreData() bool {
+	return p.binaryPosition < len(p.binaryData)
 }
 
 // ServerData is the first message in a demo, it contains info about what
@@ -283,8 +288,9 @@ func (p *MVD2Parser) ParsePacket(msg *message.Buffer) (*pb.MvdPacket, error) {
 // the client number of the dummy spec, and more.
 func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) (*pb.MvdServerData, error) {
 	data := &pb.MvdServerData{}
-	if msg.ReadLongP() != 37 {
-		return nil, fmt.Errorf("parse error: demo protocol not 37")
+
+	if pr := msg.ReadLongP(); pr != 37 {
+		return nil, fmt.Errorf("parse error: demo protocol not 37: %d [%d]", pr, p.binaryPosition)
 	}
 	data.Protocol = msg.ReadShortP()
 
@@ -313,7 +319,7 @@ func (p *MVD2Parser) ParseServerData(msg *message.Buffer, extra int) (*pb.MvdSer
 		data.EntitystateFlags |= EntityStateExtensions2
 		data.PlayerstateFlags |= PlayerStateExtensions2
 		if data.GetProtocol() >= ProtocolPlayerFog {
-			data.PlayerstateFlags |= MvdPlayerMoreBits
+			data.PlayerstateFlags |= MvdPlayerFlagMoreBits
 		}
 	}
 
@@ -408,7 +414,14 @@ func (p *MVD2Parser) ParseFrame(msg *message.Buffer) (*pb.MvdFrame, error) {
 func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.PackedPlayer, error) {
 	var bits uint32
 	out := make(map[int32]*pb.PackedPlayer)
+	if p.demo.Players == nil {
+		p.demo.Players = make(map[int32]*pb.MvdPlayer)
+	}
+	moreBits := (p.demo.PlayerStateFlags & MvdPlayerFlagMoreBits) != 0
 	for {
+		if msg.Index >= msg.Length {
+			return nil, fmt.Errorf("ParsePacketPlayers error - read past end of buffer without CLIENTNUM_NONE")
+		}
 		number := int32(msg.ReadByte())
 		if number == ClientNumNone {
 			break
@@ -418,16 +431,30 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.Pack
 			pl = &pb.MvdPlayer{
 				Name: "unknown",
 			}
+			p.demo.Players[number] = pl
 		}
+
 		// check num bounds later
 		bits = uint32(msg.ReadWord())
-		ps, err := p.ParseDeltaPlayer(msg, bits, p.demo.PlayerStateFlags)
+		if (bits & MvdPlayerMoreBits) != 0 {
+			if moreBits {
+				bits |= uint32(msg.ReadByteP()) << 16
+			}
+			// else: bit 15 doubles as "player removed" on old demos, handled
+			// by the removed check below.
+		}
+
+		ps, err := p.ParseDeltaPlayer(msg, bits, p.demo.PlayerStateFlags, pl.GetPlayerState())
 		if err != nil {
 			return nil, fmt.Errorf("error parsing player: %v", err)
 		}
 		pl.PlayerState = ps
 
-		if (bits & MvdPlayerRemove) != 0 {
+		removed := bits&MvdPlayerMoreBits != 0
+		if moreBits {
+			removed = bits&MvdPlayerRemove != 0
+		}
+		if removed {
 			pl.InUse = false
 			continue
 		}
@@ -446,14 +473,30 @@ func (p *MVD2Parser) ParsePacketPlayers(msg *message.Buffer) (map[int32]*pb.Pack
 
 // Parse a compressed player. Parsing delta players from regular DM2 demos is
 // similar but not identical, so a separate func is needed.
-func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags int32) (*pb.PackedPlayer, error) {
+//
+// `from` is the player's playerstate as of the previous frame (nil if this is
+// the first time we've seen them); fields not present in `bits` carry over
+// from it unchanged, exactly like ParseDeltaEntity does for entities.
+func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags int32, from *pb.PackedPlayer) (*pb.PackedPlayer, error) {
 	to := &pb.PackedPlayer{}
-	pm := &pb.PlayerMove{}
+	if from != nil {
+		to = proto.Clone(from).(*pb.PackedPlayer)
+	}
+	pm := to.GetMovestate()
+	if pm == nil {
+		pm = &pb.PlayerMove{}
+	}
 	if (bits & MvdPlayerType) != 0 {
 		pm.Type = msg.ReadByteP()
 	}
 	if flags&MvdPlayerFlagExtensions2 != 0 {
-		log.Println("MVD Playerstate Extensions found")
+		if (bits & MvdPlayerOrigin) != 0 {
+			pm.OriginX = readDeltaCoord(msg, pm.OriginX)
+			pm.OriginY = readDeltaCoord(msg, pm.OriginY)
+		}
+		if (bits & MvdPlayerOrigin2) != 0 {
+			pm.OriginZ = readDeltaCoord(msg, pm.OriginZ)
+		}
 	} else {
 		if (bits & MvdPlayerOrigin) != 0 {
 			pm.OriginX = msg.ReadShortP()
@@ -515,16 +558,16 @@ func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags in
 			if (bf & (1 << 3)) != 0 {
 				to.BlendZ = int32(msg.ReadByte())
 			}
-			if (bf & (1 << 0)) != 0 {
+			if (bf & (1 << 4)) != 0 {
 				to.DamageBlendW = int32(msg.ReadByte())
 			}
-			if (bf & (1 << 1)) != 0 {
+			if (bf & (1 << 5)) != 0 {
 				to.DamageBlendX = int32(msg.ReadByte())
 			}
-			if (bf & (1 << 2)) != 0 {
+			if (bf & (1 << 6)) != 0 {
 				to.DamageBlendY = int32(msg.ReadByte())
 			}
-			if (bf & (1 << 3)) != 0 {
+			if (bf & (1 << 7)) != 0 {
 				to.DamageBlendZ = int32(msg.ReadByte())
 			}
 		} else {
@@ -534,6 +577,11 @@ func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags in
 			to.BlendZ = int32(msg.ReadByte())
 		}
 	}
+	if (bits & MvdPlayerFog) != 0 {
+		// Fog data isn't represented in PackedPlayer yet, but the bytes still
+		// have to be consumed in order to keep the rest of the stream aligned.
+		skipPlayerFog(msg)
+	}
 	if (bits & MvdPlayerFov) != 0 {
 		to.Fov = msg.ReadByteP()
 	}
@@ -541,11 +589,58 @@ func (p *MVD2Parser) ParseDeltaPlayer(msg *message.Buffer, bits uint32, flags in
 		to.RdFlags = msg.ReadByteP()
 	}
 	if (bits & MvdPlayerStats) != 0 {
-		stats := p.ParsePlayerStats(msg, flags)
-		to.Stats = stats
+		changed := p.ParsePlayerStats(msg, flags)
+		if to.Stats == nil {
+			to.Stats = make(map[uint32]int32)
+		}
+		for k, v := range changed {
+			to.Stats[k] = v
+		}
 	}
 	to.Movestate = pm
 	return to, nil
+}
+
+// skipPlayerFog consumes the bytes of a playerstate fog update without
+// storing them (PackedPlayer has no fields for fog yet). Mirrors the sub-bit
+// layout of q2pro's MSG_ReadFog so the read position stays correct.
+func skipPlayerFog(msg *message.Buffer) {
+	const (
+		fogBitColor            = 1 << 0
+		fogBitDensity          = 1 << 1
+		fogBitHeightDensity    = 1 << 2
+		fogBitHeightFalloff    = 1 << 3
+		fogBitHeightStartColor = 1 << 4
+		fogBitHeightEndColor   = 1 << 5
+		fogBitHeightStartDist  = 1 << 6
+		fogBitHeightEndDist    = 1 << 7
+	)
+	bits := msg.ReadByte()
+	if bits&fogBitColor != 0 {
+		msg.ReadData(3)
+	}
+	if bits&fogBitDensity != 0 {
+		msg.ReadWord()
+		msg.ReadWord()
+	}
+	if bits&fogBitHeightDensity != 0 {
+		msg.ReadWord()
+	}
+	if bits&fogBitHeightFalloff != 0 {
+		msg.ReadWord()
+	}
+	if bits&fogBitHeightStartColor != 0 {
+		msg.ReadData(3)
+	}
+	if bits&fogBitHeightEndColor != 0 {
+		msg.ReadData(3)
+	}
+	if bits&fogBitHeightStartDist != 0 {
+		readExtCoord(msg)
+	}
+	if bits&fogBitHeightEndDist != 0 {
+		readExtCoord(msg)
+	}
 }
 
 // Stats are a set of integer values at the end of each playerstate. They are
@@ -577,7 +672,10 @@ func (p *MVD2Parser) ParsePlayerStats(msg *message.Buffer, flags int32) map[uint
 	return stats
 }
 
-// Parse all the entities from a frame. These come directly after all the playerstates.
+// Parse all the entities from a frame. These come directly after all the
+// playerstates. Returns the entities touched this frame (new baseline or
+// removed); p.demo.Entities keeps accumulating as the running baseline used
+// for delta decoding, exactly like p.demo.Players does for playerstates.
 func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[int32]*pb.PackedEntity, error) {
 	var bits int64
 	var num int32
@@ -586,6 +684,7 @@ func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[int32]*pb.Pack
 	if p.demo.Entities == nil {
 		p.demo.Entities = make(map[int32]*pb.PackedEntity)
 	}
+	out := make(map[int32]*pb.PackedEntity)
 
 	for {
 		num, bits = p.ParseEntityBits(msg)
@@ -600,21 +699,60 @@ func (p *MVD2Parser) ParseDeltaEntities(msg *message.Buffer) (map[int32]*pb.Pack
 		if err != nil {
 			return nil, err
 		}
+		ent.Number = uint32(num)
 		if (bits & message.EntityRemove) != 0 {
 			if (ent.RenderFx & message.RFBeam) == 0 {
 				ent.OldOriginX = ent.GetOriginX()
 				ent.OldOriginY = ent.GetOriginY()
 				ent.OldOriginZ = ent.GetOriginZ()
 			}
-			// set inuse false
+			ent.Remove = true
 		}
-		ent.Number = uint32(num)
+		// Keep the entry as the delta baseline even when removed: q2pro
+		// doesn't clear the underlying entity_state_t on removal either, so a
+		// later re-add of the same slot without a fresh baseline still needs
+		// the last known field values to delta-decode from.
 		p.demo.Entities[num] = ent
+		out[num] = ent
 	}
 	if p.debug {
 		fmt.Printf("entities\n")
 	}
-	return nil, nil
+	return out, nil
+}
+
+// signExtend sign-extends the low `bits` bits of v into a full int32, mirroring
+// q2pro's SignExtend() helper used throughout its delta coord decoding.
+func signExtend(v uint32, bits uint) int32 {
+	shift := 32 - bits
+	return int32(v<<shift) >> shift
+}
+
+// readDeltaCoord decodes one axis of an extensions2 (protocol++) delta
+// coordinate: a 15-bit signed delta added to `base`, or (when the far bit of
+// the initial word is set) a full 23-bit absolute replacement value. Mirrors
+// q2pro's MSG_ReadDeltaCoord/MSG_ReadDeltaInt23, kept in raw coord units
+// rather than converted to world-unit floats to match this package's
+// convention of storing wire values as-is.
+func readDeltaCoord(msg *message.Buffer, base int32) int32 {
+	v := uint32(msg.ReadWordP())
+	if v&1 != 0 {
+		v |= uint32(msg.ReadByteP()) << 16
+		return signExtend(v>>1, 23)
+	}
+	return base + signExtend(v>>1, 15)
+}
+
+// readExtCoord decodes a single absolute extensions2 coordinate (used for
+// old_origin and fog height distances), which unlike readDeltaCoord is never
+// relative to a previous value. Mirrors q2pro's MSG_ReadExtCoord.
+func readExtCoord(msg *message.Buffer) int32 {
+	v := uint32(msg.ReadWordP())
+	if v&1 != 0 {
+		v |= uint32(msg.ReadByteP()) << 16
+		return signExtend(v>>1, 23)
+	}
+	return signExtend(v>>1, 15)
 }
 
 // Each entity is prefixed with up to 5 bytes of bitmask followed by the entity
@@ -662,6 +800,10 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits int64, from *pb.
 	if from != nil {
 		to = proto.Clone(from).(*pb.PackedEntity)
 	}
+	// event and remove are one-shot signals, not sticky state; reset them
+	// every parse so a value from a previous frame doesn't leak forward.
+	to.Event = 0
+	to.Remove = false
 
 	if ((flags & EntityStateExtensions) != 0) && ((bits & message.EntityModel16) != 0) {
 		if (bits & message.EntityModel) != 0 {
@@ -724,7 +866,15 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits int64, from *pb.
 	}
 
 	if (flags & EntityStateExtensions2) != 0 {
-		// read delta coords for origins here
+		if (bits & message.EntityOrigin1) != 0 {
+			to.OriginX = readDeltaCoord(msg, to.OriginX)
+		}
+		if (bits & message.EntityOrigin2) != 0 {
+			to.OriginY = readDeltaCoord(msg, to.OriginY)
+		}
+		if (bits & message.EntityOrigin3) != 0 {
+			to.OriginZ = readDeltaCoord(msg, to.OriginZ)
+		}
 	} else {
 		if (bits & message.EntityOrigin1) != 0 {
 			to.OriginX = int32(msg.ReadShort())
@@ -737,7 +887,7 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits int64, from *pb.
 		}
 	}
 
-	if ((flags & EntityStateShortAngles) != 1) && ((bits & message.EntityAngle16) != 0) {
+	if ((flags & EntityStateShortAngles) != 0) && ((bits & message.EntityAngle16) != 0) {
 		if (bits & message.EntityAngle1) != 0 {
 			to.AngleX = int32(msg.ReadShort())
 		}
@@ -759,14 +909,34 @@ func (p *MVD2Parser) ParseDeltaEntity(msg *message.Buffer, bits int64, from *pb.
 		}
 	}
 
-	if (bits & message.EntityOldOrigin) != 0 { // if extended2 read delta coords
-		to.OldOriginX = int32(msg.ReadShort())
-		to.OldOriginY = int32(msg.ReadShort())
-		to.OldOriginZ = int32(msg.ReadShort())
+	if (bits & message.EntityOldOrigin) != 0 {
+		if (flags & EntityStateExtensions2) != 0 {
+			to.OldOriginX = readExtCoord(msg)
+			to.OldOriginY = readExtCoord(msg)
+			to.OldOriginZ = readExtCoord(msg)
+		} else {
+			to.OldOriginX = int32(msg.ReadShort())
+			to.OldOriginY = int32(msg.ReadShort())
+			to.OldOriginZ = int32(msg.ReadShort())
+		}
 	}
 
-	if (bits & message.EntitySound) != 0 { // if extensions do more
-		to.Sound = uint32(msg.ReadByte())
+	if (bits & message.EntitySound) != 0 {
+		if (flags & EntityStateExtensions) != 0 {
+			w := msg.ReadWord()
+			to.Sound = uint32(w & 0x3fff)
+			if p.demo.Extension == nil {
+				p.demo.Extension = &pb.MvdEntityStateExtension{}
+			}
+			if (w & 0x4000) != 0 {
+				p.demo.Extension.LoopVolume = int32(msg.ReadByte())
+			}
+			if (w & 0x8000) != 0 {
+				p.demo.Extension.LoopAttenuation = int32(msg.ReadByte())
+			}
+		} else {
+			to.Sound = uint32(msg.ReadByte())
+		}
 	}
 
 	if (bits & message.EntityEvent) != 0 {
@@ -822,10 +992,8 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 	out.Player = player
 
 	readStart := msg.Index
-	for {
-		if (msg.Index - readStart) >= int(len) {
-			break
-		}
+	end := readStart + int(len)
+	for msg.Index < end {
 		cmd := msg.ReadByte()
 		switch cmd {
 		case SvcLayout:
@@ -840,7 +1008,15 @@ func (p *MVD2Parser) ParseUnicast(msg *message.Buffer, reliable bool, extra int)
 		case SvcStuffText:
 			st := &pb.StuffText{Data: msg.ReadString()}
 			out.Stuffs = append(out.Stuffs, st)
+		default:
+			// Unrecognized sub-command: give up on structured decoding and
+			// treat the remainder of this unicast as opaque, same as q2pro.
+			msg.Seek(end)
+			return out, nil
 		}
+	}
+	if msg.Index > end {
+		return nil, fmt.Errorf("ParseUnicast error - read past end of unicast")
 	}
 	if p.debug {
 		fmt.Printf("unicast - [%d] %q\n", clientNum, player.Name)
@@ -883,9 +1059,8 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 	}
 
 	sendchan := msg.ReadWordP()
-	entnum := int32(sendchan >> 3)
-	ent := p.demo.Entities[entnum]
-	s.Entity = ent.GetNumber()
+	s.Channel = sendchan & 0x7
+	s.Entity = sendchan >> 3
 	if p.debug {
 		fmt.Printf(
 			"sound - [%d] %q\n",
@@ -896,17 +1071,21 @@ func (p *MVD2Parser) ParseSound(msg *message.Buffer, extra int) *pb.PackedSound 
 	return s
 }
 
-// ParseMulticast is used to parse all 6 multicast cmd types
-func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, to int, extra int) *pb.MvdMulticast {
-	out := &pb.MvdMulticast{}
+// ParseMulticast is used to parse all 6 multicast cmd types. `cmd` is the raw
+// MVDSvcMulticast* command byte (with the extra bits already masked off).
+// Only the PHS/PVS variants (reliable or not) carry a leaf number; the "all"
+// variants broadcast to everyone and never read one.
+func (p *MVD2Parser) ParseMulticast(msg *message.Buffer, cmd int, extra int) *pb.MvdMulticast {
+	out := &pb.MvdMulticast{Type: int32(cmd)}
 	len := msg.ReadByteP()
 	len |= uint32(extra) << 8
-	if to != 0 {
+	switch cmd {
+	case MVDSvcMulticastPHS, MVDSvcMulticastPVS, MVDSvcMulticastPHSR, MVDSvcMulticastPVSR:
 		out.Leaf = int32(msg.ReadWordP())
 	}
 	out.Data = msg.ReadData(int(len))
 
-	if cbFunc, found := p.callbacks[to]; found {
+	if cbFunc, found := p.callbacks[cmd]; found {
 		cbFunc(out)
 	}
 	if p.debug {

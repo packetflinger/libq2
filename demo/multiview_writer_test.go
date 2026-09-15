@@ -10,38 +10,38 @@ import (
 func TestMvdMarshalServerData(t *testing.T) {
 	tests := []struct {
 		name string
-		demo *pb.MvdDemo
+		data *pb.MvdServerData
 		want string
 	}{
 		{
 			name: "no demo flags",
-			demo: &pb.MvdDemo{
-				Version:  2010,
-				Identity: 123456789,
-				GameDir:  "uranus",
-				Dummy:    20,
+			data: &pb.MvdServerData{
+				Protocol:      2010,
+				Identity:      123456789,
+				GameDirectory: "uranus",
+				DummyClient:   20,
 			},
-			want: "25000000da0715cd5b077572616e7573001400",
+			want: "0425000000da0715cd5b077572616e7573001400",
 		},
 		{
 			name: "with demo flags",
-			demo: &pb.MvdDemo{
-				Version:  2012,
-				Identity: 123456789,
-				GameDir:  "uranus",
-				Dummy:    20,
-				Flags:    715,
+			data: &pb.MvdServerData{
+				Protocol:      2012,
+				Identity:      123456789,
+				GameDirectory: "uranus",
+				DummyClient:   20,
+				Flags:         715,
 			},
-			want: "25000000dc07cb0215cd5b077572616e7573001400",
+			want: "0425000000dc07cb0215cd5b077572616e7573001400",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			writer := NewMVD2Writer(tc.demo)
-			msg := writer.MarshalServerData()
+			writer := NewMVD2Writer(&pb.MvdDemo{})
+			msg := writer.MarshalServerData(tc.data)
 			got := hex.EncodeToString(msg.Data)
 			if got != tc.want {
-				t.Errorf("MarshalServerData(%v) = %s, want %s\n", tc.demo, got, tc.want)
+				t.Errorf("MarshalServerData(%v) = %s, want %s\n", tc.data, got, tc.want)
 			}
 		})
 	}
@@ -166,7 +166,7 @@ func TestMvdMarshalPlayer(t *testing.T) {
 					1: 100,
 				},
 			},
-			want: "0202001102000a0019000000020000006400",
+			want: "0202400a001900020000006400",
 		},
 		{
 			name:   "player3",
@@ -191,7 +191,7 @@ func TestMvdMarshalPlayer(t *testing.T) {
 					1: 100,
 				},
 			},
-			want: "0302081102080a0019000000690a00000064000000",
+			want: "0302410a001900690a00000064000000",
 		},
 	}
 	for _, tc := range tests {
@@ -272,7 +272,7 @@ func TestMvdMarshalPlayers(t *testing.T) {
 					},
 				},
 			},
-			want: "????",
+			want: "030000040000ff",
 		},
 	}
 	for _, tc := range tests {

@@ -355,6 +355,7 @@ func WriteDeltaEntity(from *pb.PackedEntity, to *pb.PackedEntity) Buffer {
 func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
 	bits := int(0)
 	mask := int(0xffff8000)
+	isNew := from == nil
 	if to == nil {
 		to = &pb.PackedEntity{}
 	}
@@ -432,7 +433,9 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
 		bits |= EntitySolid
 	}
 
-	if to.GetEvent() != from.GetEvent() {
+	// event is not delta compressed, just zero compressed: it's a one-shot
+	// signal that fires whenever non-zero, regardless of the previous frame.
+	if to.GetEvent() != 0 {
 		bits |= EntityEvent
 	}
 
@@ -459,6 +462,11 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
 	if (to.GetRenderFx() & RFFrameLerp) > 0 {
 		bits |= EntityOldOrigin
 	} else if (to.GetRenderFx() & RFBeam) > 0 {
+		bits |= EntityOldOrigin
+	} else if isNew && (to.GetOldOriginX() != 0 || to.GetOldOriginY() != 0 || to.GetOldOriginZ() != 0) {
+		// A brand new entity (no baseline to delta against) needs old_origin
+		// sent explicitly too, or its value is lost forever -- there's no
+		// "from" state a later frame could ever recover it from.
 		bits |= EntityOldOrigin
 	}
 

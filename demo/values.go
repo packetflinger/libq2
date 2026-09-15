@@ -116,7 +116,11 @@ const (
 	SvcMax
 )
 
-// Multi-view playerstate bit values
+// Multi-view playerstate bit values (PPS_* in q2pro). Bit 15 is overloaded:
+// on demos where MvdPlayerFlagMoreBits isn't set (old demos), it directly
+// means "player removed"; otherwise it means "one more bits byte follows"
+// (covering bits 16-23), and MvdPlayerRemove/MvdPlayerFog live in that
+// extended range instead.
 const (
 	MvdPlayerType        = 1 << 0
 	MvdPlayerOrigin      = 1 << 1
@@ -133,15 +137,16 @@ const (
 	MvdPlayerGunAngles   = 1 << 12
 	MvdPlayerRdFlags     = 1 << 13
 	MvdPlayerStats       = 1 << 14
-	MvdPlayerRemove      = 1 << 15
-
-	MvdPlayerMoreBits = 1 << 8
+	MvdPlayerMoreBits    = 1 << 15
+	MvdPlayerRemove      = 1 << 16
+	MvdPlayerFog         = 1 << 17
 
 	MvdPlayerBits = 16
 	MvdPlayerMask = (1 << MvdPlayerBits) - 1
 )
 
-// Multi-view playerstate flags
+// Multi-view playerstate flags (MSG_PS_* in q2pro), computed once per demo
+// (or per map change) and stored on MvdServerData.PlayerstateFlags.
 const (
 	MvdPlayerFlagIgnoreGunIndex    = 1 << 0
 	MvdPlayerFlagIgnoreGunFrames   = 1 << 1
@@ -151,8 +156,9 @@ const (
 	MvdPlayerFlagIgnorePrediction  = 1 << 5
 	MvdPlayerFlagExtensions        = 1 << 6
 	MvdPlayerFlagExtensions2       = 1 << 7
-	MvdPlayerFlagForce             = 1 << 8
-	MvdPlayerFlagRemove            = 1 << 9
+	MvdPlayerFlagMoreBits          = 1 << 8
+	MvdPlayerFlagForce             = 1 << 9
+	MvdPlayerFlagRemove            = 1 << 10
 )
 
 // Multi-view stream flags (3 bits)

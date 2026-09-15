@@ -233,6 +233,7 @@ func (msg *Buffer) ReadData(length int) []byte {
 func (msg *Buffer) WriteData(data []byte) {
 	msg.Data = append(msg.Data, data...)
 	msg.Index += len(data)
+	msg.Length = len(msg.Data)
 }
 
 // Keep building a string until we hit a null
@@ -294,6 +295,7 @@ func (msg *Buffer) WriteByte(b int) {
 	bb := []byte{uint8(int8(b))}
 	msg.Data = append(msg.Data, bb...)
 	msg.Index++
+	msg.Length = len(msg.Data)
 }
 
 // 1 byte signed
@@ -311,6 +313,7 @@ func (msg *Buffer) WriteChar(c int) {
 	bb := []byte{uint8(int8(c))}
 	msg.Data = append(msg.Data, bb...)
 	msg.Index++
+	msg.Length = len(msg.Data)
 }
 
 // 2 bytes unsigned
