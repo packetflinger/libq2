@@ -459,7 +459,14 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
 		bits |= EntitySound
 	}
 
-	if (to.GetRenderFx() & RFFrameLerp) > 0 {
+	if to.GetOldOriginX() != from.GetOldOriginX() || to.GetOldOriginY() != from.GetOldOriginY() || to.GetOldOriginZ() != from.GetOldOriginZ() {
+		// Old_origin is delta-compressed just like origin/angles -- most
+		// entities never touch it so this is usually a no-op, but MOVETYPE_STEP
+		// entities (players included) get it updated by the game every frame
+		// while off-ground, and that has to be re-sent or interpolation on the
+		// receiving end freezes at whatever value the last full encode had.
+		bits |= EntityOldOrigin
+	} else if (to.GetRenderFx() & RFFrameLerp) > 0 {
 		bits |= EntityOldOrigin
 	} else if (to.GetRenderFx() & RFBeam) > 0 {
 		bits |= EntityOldOrigin
