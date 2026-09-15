@@ -255,8 +255,24 @@ func (bot *Bot) Run() error {
 			}
 
 			for _, st := range packet.GetStuffs() {
+				// EVERY stufftext reaches the callback, including the ones this
+				// loop answers itself.  A stufftext is the server typing a console
+				// command into this client, and a caller registered on SVCStuffText
+				// is asking to see what the server said -- not only the words the
+				// bot had no use for.  Dispatching below the handling instead, with
+				// every branch returning early, made the channel go silent for
+				// exactly the interesting ones: `changing`, `reconnect`, and on a
+				// vanilla-protocol server the whole `cmd ...` handshake -- which is
+				// every stufftext such a server sends, so the callback received
+				// nothing at all for a full session.
+				if cb, ok := bot.callbacks[message.SVCStuffText]; ok {
+					cb(st, &bot.Netchan.out)
+				}
+
+				t := strings.Fields(st.GetData())
+
 				// entering the game
-				if t := strings.Fields(st.GetData()); len(t) > 1 && t[0] == "precache" {
+				if len(t) > 1 && t[0] == "precache" {
 					bot.Spawned = true
 					log.Println("spawning into game")
 					bot.AddClientString("begin %s\n", t[1])
@@ -269,16 +285,81 @@ func (bot *Bot) Run() error {
 					continue
 				}
 
+				// A LEVEL CHANGE IS NOT A DISCONNECT, and the two commands
+				// that carry one have to be answered or the client goes
+				// quiet without ever being dropped.
+				//
+				// `changing` is the server saying it is leaving this level.
+				// id's CL_Changing_f takes the client out of the spawned
+				// state and holds the connection open; there is nothing to
+				// send back.  Without this the bot keeps sending usercmds
+				// for a level that no longer exists, and the fallback at the
+				// bottom of this loop echoes the word back as a client
+				// command -- which is what a server logs as `<name>:
+				// changing`.
+				if len(t) >= 1 && t[0] == "changing" {
+					bot.Spawned = false
+					bot.AckPending = true
+					continue
+				}
+
+				// `reconnect` asks for the SPAWN handshake again, not for a
+				// new connection.  id's CL_Reconnect_f answers a connected
+				// client with the string command `new`, and that is what
+				// makes the server re-send serverdata, configstrings and
+				// baselines for the new level.  A client that does not
+				// answer stays connected and receives nothing further: its
+				// frame counter stops, its configstrings go stale and every
+				// command it sends is for a level the server has left.  From
+				// the outside that is indistinguishable from a mod that has
+				// stopped talking to it, which is how it was first read.
+				//
+				// The frame history goes with it.  Frames are delta-encoded
+				// against earlier ones and the new level restarts the
+				// sequence, so keeping the old map's frames as a delta base
+				// decodes the new level against the wrong entities.
+				if len(t) >= 1 && t[0] == "reconnect" {
+					bot.Spawned = false
+					bot.FrameNum = 0
+					clear(bot.oldframes)
+					bot.AddClientString("new\n")
+					bot.Netchan.ReliableS1 = true
+					bot.AckPending = true
+					continue
+				}
+
 				// handle version probe
-				if t := strings.Fields(st.GetData()); len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
+				if len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
 					bot.AddClientString("\177c version %s\n", bot.Version)
 					bot.Netchan.ReliableS1 = true
 					continue
 				}
 
-				if cb, ok := bot.callbacks[message.SVCStuffText]; ok {
-					cb(st, &bot.Netchan.out)
+				// `cmd <rest>` MEANS "forward <rest> to the server", and a
+				// vanilla-protocol server's whole spawn handshake is built out
+				// of it: SV_New_f stuffs `cmd configstrings <spawncount> 0`,
+				// SV_Configstrings_f answers with more of the same and then
+				// `cmd baselines <spawncount> 0`, and only after the baselines
+				// are drained does `precache <spawncount>` arrive.  Q2PRO
+				// short-circuits all of that and stuffs `precache` straight
+				// away, which is why this was never needed before -- against
+				// Yamagi Quake II, id's own q2ded or r1q2 the client stalled
+				// here for ever, and the fallback below sent the text back
+				// WITH its `cmd` prefix, which the server logs as an unknown
+				// client command.
+				//
+				// The text is macro-expanded on the way out.  A server that asks
+				// for a cvar value -- `cmd \177c <var> $<var>`, which is how q2pro
+				// serves a cvarban and how it collects an anticheat token -- gets
+				// an answer, and a literal `$<var>` is not an answer: it is a value
+				// the client claims to hold, and a ban rule matches or misses on it.
+				if len(t) >= 2 && t[0] == "cmd" {
+					bot.AddClientString("%s\n", strings.Join(bot.expandCVars(t[1:]), " "))
+					bot.Netchan.ReliableS1 = true
+					bot.AckPending = true
+					continue
 				}
+
 				resolved := bot.ResolveString(st.GetData())
 				cmds := ParseCmd(resolved)
 				for _, c := range cmds {
@@ -332,7 +413,12 @@ func (bot *Bot) Run() error {
 				}
 			}
 
-			bot.Netchan.out.Append(bot.BuildUserCommand())
+			// Only once spawned: between `changing` and the `begin` that
+			// follows `precache` there is no level to move in, and what has to
+			// get through is the reliable `new`.
+			if bot.Spawned {
+				bot.Netchan.out.Append(bot.BuildUserCommand())
+			}
 			bot.Send()
 		}
 	}()
@@ -452,10 +538,6 @@ func ClientStringCommand(s string) message.Buffer {
 }
 
 func (b *Bot) BuildUserCommand() message.Buffer {
-	msg := message.NewEmptyBuffer()
-	msg.WriteByte(message.CLCMove)
-	msg.WriteByte(0xa1) // checksum, make up something
-	msg.WriteLong(b.FrameNum)
 	b.MoveMu.Lock()
 	move := b.Move
 	b.MoveMu.Unlock()
@@ -463,12 +545,64 @@ func (b *Bot) BuildUserCommand() message.Buffer {
 	if move.Msec == 0 {
 		move.Msec = 100
 	}
+
+	// The checksummed region is everything AFTER the checksum byte: the
+	// acknowledged frame number and the three commands.  Built first so the
+	// byte can be computed over it rather than invented.
+	//
 	// Three commands per packet is what the protocol expects: the oldest two
 	// are re-sends so a dropped packet does not lose input.
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
-	msg.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body := message.NewEmptyBuffer()
+	body.WriteLong(b.FrameNum)
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+	body.Append(move.WriteDeltaUsercmd(pl.UserCommand{}))
+
+	// A REAL CHECKSUM, not a placeholder.  Vanilla-protocol servers verify it
+	// and silently ignore the rest of the packet when it is wrong, so with a
+	// made-up byte a client connects, spawns and then never moves on Yamagi
+	// Quake II, q2ded or r1q2.  Q2PRO does not check, which is why the
+	// placeholder went unnoticed.  The sequence it is salted with is the
+	// OUTGOING one this packet will carry.
+	msg := message.NewEmptyBuffer()
+	msg.WriteByte(message.CLCMove)
+	msg.WriteByte(int(blockSequenceCRCByte(body.Data, b.Netchan.Sequence1)))
+	msg.Append(body)
 	return msg
+}
+
+// cvar returns the bot's value for a cvar and whether it had one, matched
+// case-insensitively the way Quake II's own cvar lookup is.
+func (b *Bot) cvar(name string) (string, bool) {
+	for k, v := range b.CVars {
+		if strings.EqualFold(name, k) {
+			return v, true
+		}
+	}
+	return "", false
+}
+
+// expandCVars replaces every $name in tokens with the bot's value for that
+// cvar, and with the empty string when it has none -- which is what a real
+// client's macro expansion does, since an unset cvar expands to nothing.
+//
+// It exists apart from ResolveString because the two answer different
+// questions.  ResolveString prepares text for this bot's own command table,
+// resolves an alias in the first token, and DROPS a $name it cannot resolve --
+// which shifts every argument after it one place left.  Text being forwarded
+// to the server must keep its shape: the server counts arguments, so an
+// unknown value has to stay an empty argument rather than vanish.
+func (b *Bot) expandCVars(tokens []string) []string {
+	out := make([]string, 0, len(tokens))
+	for _, t := range tokens {
+		if len(t) < 2 || !strings.HasPrefix(t, "$") {
+			out = append(out, t)
+			continue
+		}
+		val, _ := b.cvar(t[1:])
+		out = append(out, val)
+	}
+	return out
 }
 
 // Replace any variables and aliases with their substitutions. Aliases are not
@@ -496,10 +630,8 @@ func (b *Bot) ResolveString(s string) string {
 			out = append(out, t)
 			continue
 		}
-		for k, v := range b.CVars {
-			if strings.EqualFold(t[1:], k) {
-				out = append(out, v)
-			}
+		if v, ok := b.cvar(t[1:]); ok {
+			out = append(out, v)
 		}
 	}
 	return strings.Join(out, " ")
