@@ -97,6 +97,10 @@ func (m *Buffer) ParseEntity(from *pb.PackedEntity, num uint16, bits uint32) *pb
 	}
 	to.Number = uint32(num)
 
+	// event is reset every frame, never carried over from the previous
+	// baseline -- it's a one-shot signal, not a delta-compressed value.
+	to.Event = 0
+
 	if bits == 0 {
 		return to
 	}
