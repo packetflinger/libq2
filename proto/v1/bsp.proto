@@ -1,0 +1,224 @@
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative bsp.proto
+syntax="proto3";
+option go_package = "github.com/packetflinger/libq2/proto";
+package proto.v1;
+
+// A 3-dimensional float vector, used for normals, points, and origins.
+message Vector3 {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+// An axis-aligned bounding box.
+message BoundingBox {
+    Vector3 mins = 1;
+    Vector3 maxs = 2;
+}
+
+// Describes where a single lump lives within the file.
+message BSPLump {
+    // byte offset from the start of the file
+    int32 offset = 1;
+    // length of the lump in bytes
+    int32 length = 2;
+}
+
+// The fixed-size header at the start of every .bsp file.
+message BSPHeader {
+    // always "IBSP" (0x50534249)
+    int32 magic = 1;
+    // always 38 for Quake 2
+    int32 version = 2;
+    // always 19 of these, one per lump
+    repeated BSPLump lumps = 3;
+}
+
+// A single map entity (player starts, items, triggers, lights, etc).
+message BSPEntity {
+    // convenience copy of the "classname" property
+    string class_name = 1;
+    // all key/value pairs defined for this entity
+    map<string, string> properties = 2;
+}
+
+// A plane used to split the world for BSP nodes, faces, and brush sides.
+message BSPPlane {
+    Vector3 normal = 1;
+    float distance = 2;
+    // PLANE_X, PLANE_Y, PLANE_Z, PLANE_ANYX, PLANE_ANYY, or PLANE_ANYZ
+    int32 type = 3;
+}
+
+// A single point in 3D space.
+message BSPVertex {
+    Vector3 point = 1;
+}
+
+// Byte offsets into the visibility bit vectors for one cluster.
+message BSPVisOffset {
+    // offset to this cluster's potentially visible set
+    int32 pvs = 1;
+    // offset to this cluster's potentially hearable set
+    int32 phs = 2;
+}
+
+// The visibility lump: run-length-encoded bit vectors describing which
+// clusters are visible/audible from which other clusters.
+message BSPVisibility {
+    int32 cluster_count = 1;
+    repeated BSPVisOffset offsets = 2;
+    // raw RLE-encoded vis bit vectors referenced by the offsets above
+    bytes bit_vectors = 3;
+}
+
+// A node in the BSP tree.
+message BSPNode {
+    int32 plane_num = 1;
+    // negative values are -(leaf_index + 1) rather than a node index
+    int32 front_child = 2;
+    int32 back_child = 3;
+    BoundingBox bounds = 4;
+    uint32 first_face = 5;
+    uint32 num_faces = 6;
+}
+
+// Texture placement/orientation info, shared by one or more faces.
+message BSPTexInfo {
+    Vector3 s_axis = 1;
+    float s_offset = 2;
+    Vector3 t_axis = 3;
+    float t_offset = 4;
+    // SURF_* bitflags (light, slick, sky, warp, trans33, trans66, flowing, nodraw...)
+    int32 flags = 5;
+    // light emission value, for surfaces that emit light
+    int32 value = 6;
+    // texture name (max 32 chars), no path prefix or extension
+    string texture = 7;
+    // for animated textures, index of the next frame; -1 if none
+    int32 next_texinfo = 8;
+}
+
+// A single planar surface made up of edges.
+message BSPFace {
+    uint32 plane_num = 1;
+    // 0 = front of plane, 1 = back of plane
+    int32 side = 2;
+    // index into the surfedges table
+    int32 first_edge = 3;
+    int32 num_edges = 4;
+    int32 texinfo = 5;
+    // up to 4 lightmap style indices
+    repeated uint32 light_styles = 6;
+    // offset into the lighting lump; -1 if this face isn't lit
+    int32 light_offset = 7;
+}
+
+// A leaf node of the BSP tree; leaves are where the actual geometry and
+// visibility/collision data live.
+message BSPLeaf {
+    // CONTENTS_* bitflags (solid, water, lava, slime, etc)
+    int32 contents = 1;
+    // -1 if this leaf has no visibility info
+    int32 cluster = 2;
+    int32 area = 3;
+    BoundingBox bounds = 4;
+    uint32 first_leaf_face = 5;
+    uint32 num_leaf_faces = 6;
+    uint32 first_leaf_brush = 7;
+    uint32 num_leaf_brushes = 8;
+}
+
+// An edge connecting two vertices, referenced by faces via surfedges.
+message BSPEdge {
+    uint32 vertex1 = 1;
+    uint32 vertex2 = 2;
+}
+
+// A rigid group of brushes/faces, either the world itself (model 0) or an
+// inline brush model referenced by an entity.
+message BSPModel {
+    BoundingBox bounds = 1;
+    // used for rotating brush models
+    Vector3 origin = 2;
+    int32 head_node = 3;
+    int32 first_face = 4;
+    int32 num_faces = 5;
+}
+
+// A convex volume made of planes (brush sides), used for collision.
+message BSPBrush {
+    int32 first_side = 1;
+    int32 num_sides = 2;
+    // CONTENTS_* bitflags
+    int32 contents = 3;
+}
+
+// One plane bounding a brush.
+message BSPBrushSide {
+    uint32 plane_num = 1;
+    // -1 if this side has no texture
+    int32 texinfo = 2;
+}
+
+// Areas are large-scale visibility/sound regions connected by area portals
+// (e.g. separate rooms connected by a door).
+message BSPArea {
+    int32 num_area_portals = 1;
+    int32 first_area_portal = 2;
+}
+
+// A portal connecting two areas, opened/closed via func_areaportal entities.
+message BSPAreaPortal {
+    int32 portal_num = 1;
+    int32 other_area = 2;
+}
+
+// The complete contents of a Quake 2 .bsp map file.
+message BSPFile {
+    // just the filename minus extension, ex: "q2dm1"
+    string name = 1;
+    // including any path prefix and .bsp extension
+    string filename = 2;
+    BSPHeader header = 3;
+    // lump 0: entity definitions, stored as a single text blob in the file
+    repeated BSPEntity entities = 4;
+    // lump 1
+    repeated BSPPlane planes = 5;
+    // lump 2
+    repeated BSPVertex vertices = 6;
+    // lump 3
+    BSPVisibility visibility = 7;
+    // lump 4
+    repeated BSPNode nodes = 8;
+    // lump 5 (LUMP_TEXINFO)
+    repeated BSPTexInfo texture_info = 9;
+    // lump 6
+    repeated BSPFace faces = 10;
+    // lump 7: raw lightmap data referenced by BSPFace.light_offset
+    bytes lighting = 11;
+    // lump 8
+    repeated BSPLeaf leaves = 12;
+    // lump 9: indices into faces, referenced by leaves
+    repeated uint32 leaf_faces = 13;
+    // lump 10: indices into brushes, referenced by leaves
+    repeated uint32 leaf_brushes = 14;
+    // lump 11
+    repeated BSPEdge edges = 15;
+    // lump 12: signed indices into edges; negative means traverse the edge
+    // vertex2 -> vertex1 instead of vertex1 -> vertex2
+    repeated int32 surf_edges = 16;
+    // lump 13: model 0 is always the world itself
+    repeated BSPModel models = 17;
+    // lump 14
+    repeated BSPBrush brushes = 18;
+    // lump 15
+    repeated BSPBrushSide brush_sides = 19;
+    // lump 16: potentially visible set decompression table (unused by id software's tools)
+    bytes pop = 20;
+    // lump 17
+    repeated BSPArea areas = 21;
+    // lump 18
+    repeated BSPAreaPortal area_portals = 22;
+}
