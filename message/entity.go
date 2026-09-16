@@ -227,7 +227,9 @@ func (m *Buffer) ParsePacketEntities(from map[int32]*pb.PackedEntity) map[int32]
 			previous = &pb.PackedEntity{}
 		}
 		e := m.ParseEntity(previous, num, bits)
-		if !e.GetRemove() {
+		if e.GetRemove() {
+			delete(out, int32(num))
+		} else {
 			out[int32(num)] = e
 		}
 	}
