@@ -74,17 +74,18 @@ func Save(bsp *bpb.BSPFile, filename string) error {
 	return os.WriteFile(filename, data, 0644)
 }
 
-// Unmarshal parses the raw binary contents of a .bsp file into a BSPFile
-// proto message.
-func Unmarshal(data []byte) (*bpb.BSPFile, error) {
+// parseHeader reads the magic number, version, and lump directory from the
+// start of a .bsp file, returning the header proto and a function that
+// slices out an individual lump's raw bytes by index.
+func parseHeader(data []byte) (*bpb.BSPHeader, func(index int) ([]byte, error), error) {
 	if len(data) < HeaderSize {
-		return nil, fmt.Errorf("file too short to contain a header: got %d bytes, want at least %d", len(data), HeaderSize)
+		return nil, nil, fmt.Errorf("file too short to contain a header: got %d bytes, want at least %d", len(data), HeaderSize)
 	}
 
 	hr := newReader(data[:HeaderSize])
 	magic := hr.int32Val()
 	if magic != Magic {
-		return nil, fmt.Errorf("bad magic number %#08x, want %#08x", uint32(magic), uint32(Magic))
+		return nil, nil, fmt.Errorf("bad magic number %#08x, want %#08x", uint32(magic), uint32(Magic))
 	}
 	version := hr.int32Val()
 
@@ -103,6 +104,30 @@ func Unmarshal(data []byte) (*bpb.BSPFile, error) {
 			return nil, fmt.Errorf("lump %d out of bounds: offset=%d length=%d file=%d bytes", index, start, length, len(data))
 		}
 		return data[start : start+length], nil
+	}
+
+	return header, lump, nil
+}
+
+// EntityLumpBytes extracts the raw, unparsed bytes of a .bsp file's entity
+// lump. This is what q2pro's CRC-16 checksum for hashed ".ent" override
+// filenames is computed over (see EntChecksum): re-marshaling a parsed
+// entity list back to text won't reproduce the same bytes, since entity
+// property order isn't preserved once parsed into a map.
+func EntityLumpBytes(data []byte) ([]byte, error) {
+	_, lump, err := parseHeader(data)
+	if err != nil {
+		return nil, err
+	}
+	return lump(LumpEntities)
+}
+
+// Unmarshal parses the raw binary contents of a .bsp file into a BSPFile
+// proto message.
+func Unmarshal(data []byte) (*bpb.BSPFile, error) {
+	header, lump, err := parseHeader(data)
+	if err != nil {
+		return nil, err
 	}
 
 	bsp := &bpb.BSPFile{Header: header}
