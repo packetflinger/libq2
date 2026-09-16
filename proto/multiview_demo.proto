@@ -10,16 +10,16 @@ import "server_message.proto";
 // contain more than one MvdDemo. Each map is technically considered a separate
 // demo even though they're all contained in the same file.
 message MvdDemo {
-    int32 version = 1;                      // minor version, 2010 is current
-    int32 identity = 2;                     // unique number
-    string game_dir = 3;                    // "opentdm", "baseq2", etc
-    int32 dummy = 4;                        // player number of observer dummy
-    int32 max_players = 5;                  // server cvar
-    string map = 6;                         // the current map
+    int32 version = 1; // minor version, 2010 is current
+    int32 identity = 2; // unique number
+    string game_dir = 3; // "opentdm", "baseq2", etc
+    int32 dummy = 4; // player number of observer dummy
+    int32 max_players = 5; // server cvar
+    string map = 6; // the current map
     int32 flags = 7;
     int32 entity_state_flags = 8;
     int32 player_state_flags = 9;
-    MvdConfigStringRemap remap = 10;         // cs numbers, flags depenedant
+    MvdConfigStringRemap remap = 10; // cs numbers, flags depenedant
     MvdEntityStateExtension extension = 11;
     map<int32,ConfigString> configstrings = 12;
     map<int32,MvdPlayer> players = 13;
@@ -71,14 +71,14 @@ message MvdEntityStateExtension {
 message MvdFrame {
     //int32 portal_bits = 1;  // remove later this is len(portal_data)
     bytes portal_data = 2;
-    map<int32, PackedPlayer> players = 3;  // players introduced this frame
+    map<int32, PackedPlayer> players = 3; // players introduced this frame
     map<int32, PackedEntity> entities = 4; // ents seen this frame
     repeated PackedSound sounds = 5;
 }
 
 message MvdMulticast {
-    int32 type = 1;    // byte
-    int32 leaf = 2;    // word
+    int32 type = 1; // byte
+    int32 leaf = 2; // word
     bytes data = 3;
 }
 
@@ -92,7 +92,7 @@ message MvdUnicast {
 }
 
 message MvdPacket {
-    MvdServerData serverdata = 8;   // one per demo
+    MvdServerData serverdata = 8; // one per demo
     repeated PackedSound sounds = 1;
     repeated Print prints = 2;
     repeated MvdUnicast unicasts= 3;

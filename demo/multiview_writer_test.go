@@ -2,6 +2,7 @@ package demo
 
 import (
 	"encoding/hex"
+	"os"
 	"testing"
 
 	pb "github.com/packetflinger/libq2/proto"
@@ -284,6 +285,41 @@ func TestMvdMarshalPlayers(t *testing.T) {
 			got := hex.EncodeToString(msg.Data)
 			if got != tc.want {
 				t.Errorf("MarshalPlayers(%v) = %s, want %s\n", tc.players, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestMVDMarshal(t *testing.T) {
+	tests := []struct {
+		name    string
+		inFile  string
+		outFile string
+	}{
+		{
+			name:    "A few team games",
+			inFile:  "/Users/joe/.quake2/baseq2/demos/big.mvd2",
+			outFile: "/Users/joe/.quake2/baseq2/demos/big-out.mvd2",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			parser, err := NewMVD2Parser(tc.inFile)
+			if err != nil {
+				t.Error(err)
+			}
+			demos, err := parser.Unmarshal()
+			if err != nil {
+				t.Error(err)
+			}
+			writer := NewMVD2Writer(demos[0])
+			got, err := writer.Marshal()
+			if err != nil {
+				t.Error(err)
+			}
+			err = os.WriteFile(tc.outFile, got.Data, 0644)
+			if err != nil {
+				t.Error(err)
 			}
 		})
 	}
