@@ -19,3 +19,12 @@
 
 # Go workspace file
 go.work
+
+# q2 demos
+*.mvd2
+*.dm2
+*.textmvd2
+
+# paks
+*.pak
+*.pkz
