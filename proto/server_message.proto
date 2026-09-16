@@ -33,27 +33,42 @@ message StuffText {
 // an edict_t packed up and ready for xfer
 message PackedEntity {
     uint32 number = 1;          // 32 bits
+
+    // Where is it?
     int32 origin_x = 2;         // 16 bits
     int32 origin_y = 3;         // 16 bits
     int32 origin_z = 4;         // 16 bits
+
+    // What direction is it facing?
     int32 angle_x = 5;
     int32 angle_y = 6;
     int32 angle_z = 7;
+
+    // Where was it?
     int32 old_origin_x = 8;
     int32 old_origin_y = 9;
     int32 old_origin_z = 10;
-    uint32 model_index = 11;    // 8 bits
-    uint32 model_index2 = 12;
-    uint32 model_index3 = 13;
-    uint32 model_index4 = 14;
-    uint32 skin = 15;
-    uint32 effects = 16;
-    uint32 render_fx = 17;
-    uint32 solid = 18;
+
+    // configstring index of the model to use. CS_MODELS + number + this value
+    uint32 model_index = 11;    // Ent's main model
+    uint32 model_index2 = 12;   // Usually the gun model for vwep
+    uint32 model_index3 = 13;   // The flag in ctf mod
+    uint32 model_index4 = 14;   // Mostly unused
+    
+    uint32 skin = 15;           // Player + gun skins multiplexed. First byte
+                                // is player, second byte is gun. Special case
+                                // is RF_BEAM, this value holds the 4 colors for
+                                // rail trail 
+    uint32 effects = 16;        // Some effect should happen (eg: quad shell)
+    uint32 render_fx = 17;      // How that effect should be dislayed (eg: blue)
+    uint32 solid = 18;          // Packed mins/maxs for client side collision
+                                // detection
     uint32 frame = 19;          // 16 bits
-    uint32 sound = 20;          // 8 bits
-    uint32 event = 21;          // 8 bits
-    bool remove = 22;           // this ent should be removed after frame
+    uint32 sound = 20;          // Persistent looping sounds, doors, plats,
+                                // ambient world stuff
+    uint32 event = 21;          // Origin-oriented stuff: foot step sounds,
+                                // teleport sounds, fall dmg
+    bool remove = 22;           // This ent should be removed after frame
 }
 
 message PlayerMove {

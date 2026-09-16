@@ -10,10 +10,6 @@ import (
 )
 
 const (
-	MaxItems         = 256
-	MaxStats         = 32
-	MaxEntities      = 1024
-	MaxConfigStrings = 2080
 	MaxMessageLength = 1390
 	PrintLevelLow    = 1
 	PrintLevelObit   = 2

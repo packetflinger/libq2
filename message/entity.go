@@ -70,7 +70,11 @@ func (m *Buffer) ParseEntityBitmask() uint32 {
 }
 
 // ParseEntityNumber will read the edict number of an entity. This number will
-// be between 1 and MaxEntities. Entity 0 is the world.
+// be between 1 and MaxEntities.
+//
+// Entity 0 is the world.
+// Entity 1 to maxclients is a player
+// Entity maxclients to maxentities is just an object (gun, health, etc)
 func (m *Buffer) ParseEntityNumber(flags uint32) uint16 {
 	if m.Index == m.Length {
 		return 0

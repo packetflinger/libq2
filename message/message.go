@@ -7,6 +7,25 @@ import (
 	"github.com/packetflinger/libq2/util"
 )
 
+// random named constants used through the code
+const (
+	Pitch = 0 // up, down
+	Yaw   = 1 // left, right
+	Roll  = 2 // fall over
+
+	MaxClients     = 256 // hard limit
+	MaxEntities    = 1024
+	MaxModels      = 256
+	MaxSounds      = 256
+	MaxImages      = 256
+	MaxLightStyles = 256
+	MaxItems       = 256
+	MaxGeneral     = MaxClients * 2
+
+	MaxStats         = 32
+	MaxConfigStrings = 2080
+)
+
 // server to client message types
 const (
 	SVCBad = iota
@@ -123,6 +142,26 @@ const (
 
 // configstrings
 const (
+	StringName      = 0 // the map title, "The Edge"
+	StringCDTrack   = 1
+	StringSky       = 2
+	StringSkyAxis   = 3 // %f %f %f format
+	StringSkyRotate = 4
+	StringStatusBar = 5 // layout string
+	// 6 - 28 are also used for statusbar, one per line of layout code
+	StringAirAccel    = 29
+	StringMaxClients  = 30
+	StringMapChecksum = 31 // ensure client and server bsp are identical
+	StringModels      = 32
+	StringMapName     = 33                            // file, "maps/q2dm1.bsp"
+	StringSounds      = StringModels + MaxModels      // 288
+	StringImages      = StringSounds + MaxSounds      // 544
+	StringLights      = StringImages + MaxImages      // 800
+	StringItems       = StringLights + MaxLightStyles // 1056
+	StringSkins       = StringItems + MaxItems        // 1312
+	StringGeneral     = StringSkins + MaxClients      // 1568, mod-specific
+	StringMax         = StringGeneral + MaxGeneral    // 2080
+
 	CSMapname = 33
 )
 
