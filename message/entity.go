@@ -366,7 +366,17 @@ func DeltaEntityBitmask(to *pb.PackedEntity, from *pb.PackedEntity) int {
 	}
 
 	if to.GetRemove() {
-		bits |= EntityRemove
+		// A removal carries no field data on the wire -- just the number and
+		// the bit itself. Diffing the rest of `to` (a bare stub) against the
+		// real, populated `from` would flag nearly every field as "changed"
+		// (real value -> zero) and write all of that bogus zeroed payload
+		// after it, which desyncs any reader that (correctly) treats REMOVE
+		// as a self-contained sentinel with nothing else to parse.
+		bits = EntityRemove
+		if (to.GetNumber() & 0xff00) > 0 {
+			bits |= EntityNumber16
+		}
+		return bits
 	}
 
 	if to.GetOriginX() != from.GetOriginX() {
