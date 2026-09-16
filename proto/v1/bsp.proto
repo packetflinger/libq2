@@ -222,3 +222,22 @@ message BSPFile {
     // lump 18
     repeated BSPAreaPortal area_portals = 22;
 }
+
+// An r1q2 ".override" sidecar file (conventionally named
+// "<mapname>.bsp.override"), which lets a server transparently redirect
+// clients to a different .bsp, report a specific checksum instead of
+// computing one from the loaded file, and/or replace the entity string
+// without modifying the .bsp itself. See CM_LoadMap in
+// https://github.com/tastyspleen/r1q2-archive/blob/master/qcommon/cmodel.c
+message BSPOverride {
+    // replacement .bsp filename the server should actually load instead of
+    // the one requested, ex: "maps/q2dm1.bsp" (max 63 chars). Unset means
+    // no redirect.
+    optional string map_name = 1;
+    // checksum to report to clients instead of computing one from the
+    // loaded file. Unset means compute it normally.
+    optional uint32 checksum = 2;
+    // entity definitions to use instead of whatever's baked into the
+    // loaded .bsp's own entity lump. Empty means use the .bsp's own.
+    repeated BSPEntity entities = 3;
+}
