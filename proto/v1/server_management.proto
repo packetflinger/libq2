@@ -1,0 +1,65 @@
+// Intended for use as a local file containing definitions for multiple Quake 2
+// servers for common management tasks. Primary use is for resolving an
+// arbitrary server name something more meaningful.
+//
+//   E.G. "pf-tdm-dc" -> "198.7.63.227:27910"
+//
+// Also provides functionality for abstracting and mapping remote console
+// passwords to named servers. You can update the actual rcon password in one
+// place while it remains linked to all the servers that use that common
+// password.
+//
+// compile with:
+// protoc --go_out=. --go_opt=paths=source_relative server_management.proto
+syntax="proto3";
+
+option go_package = "github.com/packetflinger/libq2/proto";
+
+package proto.v1;
+
+message ServerManagementFile {
+    // Each message being a unique rcon password
+  message Password {
+    // Arbitrary name for this particular password
+    string name = 1;
+
+    // The actual password itself
+    string secret = 2;
+  }
+
+  message Server {
+    // An alias for a server, "pf-ra2", "dm", "aq2-ffa"
+    string name = 1;
+
+    // The IP or DNS address of the server with port.
+    // E.G.:
+    //   "frag.gr:27912"
+    //   "192.0.2.4:27999"
+    //   "[2003:db8:f47:b00b:135]:27910" (note brackets around v6 addrs)
+    string address = 2;
+
+    // The password name reference (Password.Name), not the secret itself
+    string rcon_password = 3;
+
+    // Arbitrary identifiers for making collections of servers. Think something
+    // like mods, locations, owners, etc.
+    // E.G.
+    //   "opentdm", "arena", "us-east", "eu-west", "packetflinger", "tasty" 
+    repeated string groups = 4;
+
+    // Reference to a ~/.ssh/config host entry. This allows for automation of
+    // file/asset managmement, log file ingestion, server-side demo fetching,
+    // etc.
+    string ssh_host = 5;
+
+    // The local path to the q2 log file on this server. Specificly for log
+    // ingestion/rotation
+    string log_file = 6;
+  }
+
+  // Allow multiple password definitions per file
+  repeated Password password = 1;
+
+  // Allow mutiple server definitions per file
+  repeated Server server = 2;
+}
