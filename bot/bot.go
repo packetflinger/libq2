@@ -64,6 +64,28 @@ type Bot struct {
 	Move pl.UserCommand
 	// MoveMu guards Move for callers driving from another goroutine.
 	MoveMu sync.Mutex
+	// NetMu guards Netchan.out and the sequence/ack state, which the receive
+	// loop, Run's frame timer and AddClientString callers all write. It is
+	// never held across a callback.
+	NetMu sync.Mutex
+	// readErr is why the receive loop stopped, if it stopped on an error.
+	readErr error
+}
+
+// ReadErr returns the error that stopped the receive loop, or nil while it
+// is running.
+func (bot *Bot) ReadErr() error {
+	bot.NetMu.Lock()
+	defer bot.NetMu.Unlock()
+	return bot.readErr
+}
+
+func (bot *Bot) setReadErr(err error) {
+	bot.NetMu.Lock()
+	defer bot.NetMu.Unlock()
+	if bot.readErr == nil {
+		bot.readErr = err
+	}
 }
 
 type Connection struct {
@@ -100,11 +122,15 @@ func (b *Bot) UnregisterCallback(index int) {
 
 // is there anything that needs to be sent?
 func (bot *Bot) OutPending() bool {
+	bot.NetMu.Lock()
+	defer bot.NetMu.Unlock()
 	return len(bot.Netchan.out.Data) > 0
 }
 
 // was a recently received msg reliable and needs an ack?
 func (bot *Bot) ReliablePending() bool {
+	bot.NetMu.Lock()
+	defer bot.NetMu.Unlock()
 	return bot.Netchan.ReliableS2
 }
 
@@ -207,6 +233,7 @@ func (bot *Bot) Run() error {
 		for {
 			bytes, err := bot.Receive()
 			if err != nil {
+				bot.setReadErr(err)
 				return
 			}
 			if bytes == 0 {
@@ -215,12 +242,15 @@ func (bot *Bot) Run() error {
 			}
 			// just sequence and ack sequence, ack back
 			if bytes == 8 {
+				bot.NetMu.Lock()
 				bot.AckPending = true
+				bot.NetMu.Unlock()
 			}
 			recv <- true
 
 			packet, err := bot.Netchan.in.ParsePacket(bot.oldframes)
 			if err != nil {
+				bot.setReadErr(fmt.Errorf("parsing a packet: %w", err))
 				return
 			}
 
@@ -276,7 +306,9 @@ func (bot *Bot) Run() error {
 					bot.Spawned = true
 					log.Println("spawning into game")
 					bot.AddClientString("begin %s\n", t[1])
+					bot.NetMu.Lock()
 					bot.Netchan.ReliableS1 = true
+					bot.NetMu.Unlock()
 					bot.FrameNum = 1
 					cb, ok := bot.callbacks[message.CallbackOnBegin]
 					if ok {
@@ -299,7 +331,9 @@ func (bot *Bot) Run() error {
 				// changing`.
 				if len(t) >= 1 && t[0] == "changing" {
 					bot.Spawned = false
+					bot.NetMu.Lock()
 					bot.AckPending = true
+					bot.NetMu.Unlock()
 					continue
 				}
 
@@ -323,15 +357,19 @@ func (bot *Bot) Run() error {
 					bot.FrameNum = 0
 					clear(bot.oldframes)
 					bot.AddClientString("new\n")
+					bot.NetMu.Lock()
 					bot.Netchan.ReliableS1 = true
 					bot.AckPending = true
+					bot.NetMu.Unlock()
 					continue
 				}
 
 				// handle version probe
 				if len(t) >= 4 && t[0] == "cmd" && t[2] == "version" {
 					bot.AddClientString("\177c version %s\n", bot.Version)
+					bot.NetMu.Lock()
 					bot.Netchan.ReliableS1 = true
+					bot.NetMu.Unlock()
 					continue
 				}
 
@@ -355,8 +393,10 @@ func (bot *Bot) Run() error {
 				// the client claims to hold, and a ban rule matches or misses on it.
 				if len(t) >= 2 && t[0] == "cmd" {
 					bot.AddClientString("%s\n", strings.Join(bot.expandCVars(t[1:]), " "))
+					bot.NetMu.Lock()
 					bot.Netchan.ReliableS1 = true
 					bot.AckPending = true
+					bot.NetMu.Unlock()
 					continue
 				}
 
@@ -369,7 +409,9 @@ func (bot *Bot) Run() error {
 						sayFunc(bot, c)
 					}
 				}
+				bot.NetMu.Lock()
 				bot.AckPending = true
+				bot.NetMu.Unlock()
 			}
 
 			for _, cs := range packet.GetConfigStrings() {
@@ -417,7 +459,10 @@ func (bot *Bot) Run() error {
 			// follows `precache` there is no level to move in, and what has to
 			// get through is the reliable `new`.
 			if bot.Spawned {
-				bot.Netchan.out.Append(bot.BuildUserCommand())
+				cmd := bot.BuildUserCommand()
+				bot.NetMu.Lock()
+				bot.Netchan.out.Append(cmd)
+				bot.NetMu.Unlock()
 			}
 			bot.Send()
 		}
@@ -436,11 +481,17 @@ func (bot *Bot) Run() error {
 				usercmd = pl.UserCommand{
 					Msec: 100,
 				}
-				bot.Netchan.out.Append(bot.BuildUserCommand())
+				cmd := bot.BuildUserCommand()
+				bot.NetMu.Lock()
+				bot.Netchan.out.Append(cmd)
+				bot.NetMu.Unlock()
 				bot.lastMove = usercmd
 				bot.Send()
 			} else {
-				if !bot.Netchan.out.IsEmpty() || bot.AckPending {
+				bot.NetMu.Lock()
+				pending := !bot.Netchan.out.IsEmpty() || bot.AckPending
+				bot.NetMu.Unlock()
+				if pending {
 					bot.Send()
 				}
 			}
@@ -449,6 +500,8 @@ func (bot *Bot) Run() error {
 }
 
 func (bot *Bot) Send() error {
+	bot.NetMu.Lock()
+	defer bot.NetMu.Unlock()
 	msg2 := &bot.Netchan.out
 	msg := message.Buffer{}
 	msg.WriteLong(bot.Netchan.Sequence1)
@@ -500,12 +553,12 @@ func (bot *Bot) Receive() (int, error) {
 
 	sequence := uint32(msg.ReadLong())
 	reliable := (sequence >> 31) == 1
+	bot.NetMu.Lock()
 	bot.Netchan.Sequence2 = int(sequence) & ^(1 >> 31)
+	bot.Netchan.ReliableS2 = reliable
+	bot.NetMu.Unlock()
 	if reliable {
-		bot.Netchan.ReliableS2 = true
 		bot.Send() // immediately ack if last is reliable
-	} else {
-		bot.Netchan.ReliableS2 = false
 	}
 
 	// we don't care about the ack sequence
@@ -519,7 +572,10 @@ func (bot *Bot) Receive() (int, error) {
 // Without it the map could be edited but never sent, so a mod's
 // ClientUserinfoChanged path was unreachable from a bot.
 func (b *Bot) SendUserinfo() {
-	b.Netchan.out.Append(ClientUserMessage(b.User.Marshal()))
+	ui := ClientUserMessage(b.User.Marshal())
+	b.NetMu.Lock()
+	defer b.NetMu.Unlock()
+	b.Netchan.out.Append(ui)
 }
 
 // Marshal a c2s userinfo update message
@@ -641,6 +697,8 @@ func (b *Bot) ResolveString(s string) string {
 // strings are sent from the bot to the server.
 func (b *Bot) AddClientString(format string, args ...any) {
 	final := fmt.Sprintf(format, args...)
+	b.NetMu.Lock()
+	defer b.NetMu.Unlock()
 	b.Netchan.out.WriteByte(message.CLCStringCommand)
 	b.Netchan.out.WriteString(final)
 }
